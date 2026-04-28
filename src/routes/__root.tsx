@@ -29,19 +29,23 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "Korolov IT-Service | Websites & IT-Support in Leverkusen" },
+      {
+        name: "description",
+        content:
+          "Korolov IT-Service unterstützt kleine Unternehmen in Leverkusen, Köln und NRW bei Websites, E-Mail, Hosting, IT-Support und digitaler Organisation.",
+      },
+      { name: "theme-color", content: "#0F2742" },
+      { property: "og:site_name", content: "Korolov IT-Service" },
+      { property: "og:locale", content: "de_DE" },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-      { name: "twitter:site", content: "@Lovable" },
     ],
     links: [
+      { rel: "stylesheet", href: appCss },
+      { rel: "preconnect", href: "https://fonts.bunny.net" },
       {
         rel: "stylesheet",
-        href: appCss,
+        href: "https://fonts.bunny.net/css?family=inter:400,500,600,700,800&display=swap",
       },
     ],
   }),
