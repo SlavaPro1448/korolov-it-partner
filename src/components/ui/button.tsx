@@ -16,11 +16,18 @@ const buttonVariants = cva(
         secondary: "bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
+        brand:
+          "bg-[var(--brand)] text-[var(--brand-foreground)] shadow-sm hover:bg-[color-mix(in_oklab,var(--brand)_88%,white)]",
+        accent:
+          "bg-[var(--accent-blue)] text-white shadow-sm hover:bg-[color-mix(in_oklab,var(--accent-blue)_88%,black)]",
+        soft:
+          "bg-section text-brand hover:bg-[color-mix(in_oklab,var(--section)_85%,var(--accent-blue))]",
       },
       size: {
-        default: "h-9 px-4 py-2",
-        sm: "h-8 rounded-md px-3 text-xs",
-        lg: "h-10 rounded-md px-8",
+        default: "h-10 px-5 py-2",
+        sm: "h-9 rounded-md px-3.5 text-xs",
+        lg: "h-12 rounded-md px-7 text-base",
+        xl: "h-14 rounded-lg px-8 text-base",
         icon: "h-9 w-9",
       },
     },
