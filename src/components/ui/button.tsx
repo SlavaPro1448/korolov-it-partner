@@ -17,11 +17,11 @@ const buttonVariants = cva(
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
         brand:
-          "bg-[var(--brand)] text-[var(--brand-foreground)] shadow-sm hover:bg-[color-mix(in_oklab,var(--brand)_88%,white)]",
+          "btn-shine bg-[var(--brand)] text-[var(--brand-foreground)] shadow-sm hover:bg-[color-mix(in_oklab,var(--brand)_88%,white)]",
         accent:
-          "bg-[var(--accent-blue)] text-white shadow-sm hover:bg-[color-mix(in_oklab,var(--accent-blue)_88%,black)]",
+          "btn-shine bg-[var(--accent-blue)] text-white shadow-sm hover:bg-[color-mix(in_oklab,var(--accent-blue)_88%,black)]",
         soft:
-          "bg-section text-brand hover:bg-[color-mix(in_oklab,var(--section)_85%,var(--accent-blue))]",
+          "hover-lift bg-section text-brand hover:bg-[color-mix(in_oklab,var(--section)_85%,var(--accent-blue))]",
       },
       size: {
         default: "h-10 px-5 py-2",

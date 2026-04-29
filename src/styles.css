@@ -139,11 +139,12 @@
     border: 1px solid var(--border);
     border-radius: var(--radius-xl);
     box-shadow: var(--shadow-soft);
-    transition: box-shadow 0.25s ease, transform 0.25s ease, border-color 0.25s ease;
+    transition: box-shadow 0.3s ease, transform 0.3s ease, border-color 0.3s ease;
   }
   .card-soft:hover {
-    box-shadow: var(--shadow-card);
-    border-color: color-mix(in oklab, var(--accent-blue) 30%, var(--border));
+    box-shadow: var(--shadow-elevated);
+    border-color: color-mix(in oklab, var(--accent-blue) 35%, var(--border));
+    transform: translateY(-4px);
   }
 
   .fade-in-up {
@@ -153,5 +154,96 @@
   @keyframes fadeInUp {
     from { opacity: 0; transform: translateY(12px); }
     to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ====== Scroll Reveal ====== */
+  .reveal {
+    opacity: 0;
+    will-change: opacity, transform;
+    transition:
+      opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .reveal-up { transform: translate3d(0, 28px, 0); }
+  .reveal-fade { transform: none; }
+  .reveal-left { transform: translate3d(-28px, 0, 0); }
+  .reveal-right { transform: translate3d(28px, 0, 0); }
+  .reveal-scale { transform: scale(0.96); }
+  .reveal-visible {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .reveal {
+      opacity: 1 !important;
+      transform: none !important;
+      transition: none !important;
+    }
+  }
+
+  /* ====== Button polish ====== */
+  .btn-shine {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, filter 0.25s ease;
+  }
+  .btn-shine::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      120deg,
+      transparent 30%,
+      rgba(255, 255, 255, 0.28) 50%,
+      transparent 70%
+    );
+    transform: translateX(-120%);
+    transition: transform 0.7s ease;
+    pointer-events: none;
+  }
+  .btn-shine:hover::after { transform: translateX(120%); }
+  .btn-shine:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px -10px color-mix(in oklab, var(--accent-blue) 55%, transparent);
+  }
+  .btn-shine:active { transform: translateY(0); }
+
+  /* ====== Hover lift utility ====== */
+  .hover-lift {
+    transition: transform 0.25s ease, box-shadow 0.25s ease, color 0.25s ease;
+  }
+  .hover-lift:hover {
+    transform: translateY(-2px);
+  }
+
+  /* Animated underline for inline links */
+  .link-underline {
+    position: relative;
+    display: inline-block;
+  }
+  .link-underline::after {
+    content: "";
+    position: absolute;
+    left: 0; bottom: -2px;
+    width: 100%;
+    height: 2px;
+    background: var(--accent-blue);
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .link-underline:hover::after {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+
+  /* Icon bubble pop on hover */
+  .icon-pop {
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.3s ease, color 0.3s ease;
+  }
+  .group:hover .icon-pop {
+    transform: scale(1.08) rotate(-3deg);
   }
 }
