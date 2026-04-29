@@ -5,8 +5,6 @@ type RevealProps = {
   children: ReactNode;
   className?: string;
   delay?: number;
-  as?: keyof JSX.IntrinsicElements;
-  /** Initial transform direction */
   variant?: "up" | "fade" | "left" | "right" | "scale";
 };
 
@@ -14,10 +12,9 @@ export function Reveal({
   children,
   className,
   delay = 0,
-  as: Tag = "div",
   variant = "up",
 }: RevealProps) {
-  const ref = useRef<HTMLElement | null>(null);
+  const ref = useRef<HTMLDivElement | null>(null);
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -48,13 +45,10 @@ export function Reveal({
     return () => io.disconnect();
   }, []);
 
-  const style: CSSProperties = {
-    transitionDelay: `${delay}ms`,
-  };
+  const style: CSSProperties = { transitionDelay: `${delay}ms` };
 
   return (
-    <Tag
-      // @ts-expect-error - dynamic tag ref
+    <div
       ref={ref}
       style={style}
       className={cn(
@@ -65,6 +59,6 @@ export function Reveal({
       )}
     >
       {children}
-    </Tag>
+    </div>
   );
 }
