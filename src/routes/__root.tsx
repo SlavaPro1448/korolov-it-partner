@@ -1,4 +1,5 @@
 import { Outlet, Link, createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
+import { useEffect } from "react";
 
 import appCss from "../styles.css?url";
 
@@ -77,5 +78,49 @@ function RootShell({ children }: { children: React.ReactNode }) {
 }
 
 function RootComponent() {
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+
+    const targets = document.querySelectorAll<HTMLElement>(
+      "main section, section, [data-reveal]",
+    );
+
+    targets.forEach((el) => {
+      if (!el.classList.contains("reveal")) {
+        el.classList.add("reveal", "reveal-up");
+      }
+    });
+
+    if (reduce) {
+      targets.forEach((el) => el.classList.add("reveal-visible"));
+      return;
+    }
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("reveal-visible");
+            io.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.08, rootMargin: "0px 0px -80px 0px" },
+    );
+
+    targets.forEach((el) => {
+      const rect = el.getBoundingClientRect();
+      // Already in view on initial load → reveal immediately (e.g. hero)
+      if (rect.top < window.innerHeight * 0.9) {
+        el.classList.add("reveal-visible");
+      } else {
+        io.observe(el);
+      }
+    });
+
+    return () => io.disconnect();
+  }, []);
+
   return <Outlet />;
 }
