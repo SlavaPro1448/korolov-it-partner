@@ -1,7 +1,9 @@
 import { Link } from "@tanstack/react-router";
 import { Mail, MapPin, Phone } from "lucide-react";
 
-export function SiteFooter() {
+type Locale = "de" | "ru" | "ua";
+
+export function SiteFooter({ locale = "de" }: { locale?: Locale }) {
   const year = new Date().getFullYear();
   return (
     <footer className="bg-brand text-brand-foreground mt-24">
@@ -15,12 +17,18 @@ export function SiteFooter() {
             </div>
           </div>
           <p className="mt-4 text-sm text-white/70 max-w-md">
-            Websites, IT-Support und digitale Lösungen für kleine Unternehmen.
+            {locale === "de"
+              ? "Websites, IT-Support und digitale Lösungen für kleine Unternehmen."
+              : locale === "ru"
+                ? "Сайты, IT-поддержка и цифровые решения для малого бизнеса."
+                : "Сайти, IT-підтримка та цифрові рішення для малого бізнесу."}
           </p>
         </div>
 
         <div>
-          <div className="text-sm font-semibold mb-3">Kontakt</div>
+          <div className="text-sm font-semibold mb-3">
+            {locale === "de" ? "Kontakt" : locale === "ru" ? "Контакты" : "Контакти"}
+          </div>
           <ul className="space-y-2 text-sm text-white/70">
             <li className="flex items-center gap-2"><Mail className="h-4 w-4" /> info@korolov-it-service.de</li>
             <li className="flex items-center gap-2"><Phone className="h-4 w-4" /> +49 …</li>
@@ -29,17 +37,36 @@ export function SiteFooter() {
         </div>
 
         <div>
-          <div className="text-sm font-semibold mb-3">Rechtliches</div>
+          <div className="text-sm font-semibold mb-3">
+            {locale === "de" ? "Rechtliches" : locale === "ru" ? "Правовая информация" : "Правова інформація"}
+          </div>
           <ul className="space-y-2 text-sm text-white/70">
-            <li><Link to="/impressum" className="hover:text-white transition-colors">Impressum</Link></li>
-            <li><Link to="/datenschutz" className="hover:text-white transition-colors">Datenschutz</Link></li>
+            <li>
+              <Link to="/impressum" className="hover:text-white transition-colors">
+                {locale === "de" ? "Impressum" : locale === "ru" ? "Выходные данные" : "Вихідні дані"}
+              </Link>
+            </li>
+            <li>
+              <Link to="/datenschutz" className="hover:text-white transition-colors">
+                {locale === "de" ? "Datenschutz" : locale === "ru" ? "Конфиденциальность" : "Конфіденційність"}
+              </Link>
+            </li>
           </ul>
         </div>
       </div>
       <div className="border-t border-white/10">
         <div className="container-page py-5 text-xs text-white/50 flex flex-col md:flex-row gap-2 md:items-center md:justify-between">
-          <div>© {year} Korolov IT-Service. Alle Rechte vorbehalten.</div>
-          <div>Beratung auf Deutsch, Russisch und Ukrainisch möglich.</div>
+          <div>
+            © {year} Korolov IT-Service.{" "}
+            {locale === "de" ? "Alle Rechte vorbehalten." : locale === "ru" ? "Все права защищены." : "Усі права захищені."}
+          </div>
+          <div>
+            {locale === "de"
+              ? "Beratung auf Deutsch, Russisch und Ukrainisch möglich."
+              : locale === "ru"
+                ? "Консультации возможны на немецком, русском и украинском языках."
+                : "Консультації можливі німецькою, російською та українською мовами."}
+          </div>
         </div>
       </div>
     </footer>
