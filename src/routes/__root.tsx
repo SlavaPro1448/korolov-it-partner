@@ -78,6 +78,20 @@ function RootShell({ children }: { children: React.ReactNode }) {
 }
 
 function RootComponent() {
+  // Restore scroll position after language switch
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const savedY = sessionStorage.getItem("__lang_scrollY");
+    if (savedY) {
+      sessionStorage.removeItem("__lang_scrollY");
+      const y = parseInt(savedY, 10);
+      // Wait for layout to settle, then scroll
+      requestAnimationFrame(() => {
+        window.scrollTo({ top: y, behavior: "instant" as ScrollBehavior });
+      });
+    }
+  }, []);
+
   useEffect(() => {
     if (typeof window === "undefined") return;
     const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
