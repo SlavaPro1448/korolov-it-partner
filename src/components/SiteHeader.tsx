@@ -162,36 +162,36 @@ export function SiteHeader({ locale = "de", basePath = "/" }: { locale?: Locale;
                   : "Консультації німецькою, російською та українською"}
             </div>
             <div className="mt-2 flex items-center gap-2 px-2">
-              <a
-                href="/"
-                className={`rounded-md px-3 py-2 text-sm border transition-colors ${
+              <button
+                onClick={() => switchLang("/")}
+                className={`rounded-md px-3 py-2 text-sm border transition-colors cursor-pointer ${
                   locale === "de"
                     ? "border-accent-blue text-accent-blue bg-accent-blue/5 font-medium"
                     : "border-border text-foreground/80 hover:bg-section"
                 }`}
               >
                 Deutsch
-              </a>
-              <a
-                href="/ru"
-                className={`rounded-md px-3 py-2 text-sm border transition-colors ${
+              </button>
+              <button
+                onClick={() => switchLang("/ru")}
+                className={`rounded-md px-3 py-2 text-sm border transition-colors cursor-pointer ${
                   locale === "ru"
                     ? "border-accent-blue text-accent-blue bg-accent-blue/5 font-medium"
                     : "border-border text-foreground/80 hover:bg-section"
                 }`}
               >
                 Русский
-              </a>
-              <a
-                href="/ua"
-                className={`rounded-md px-3 py-2 text-sm border transition-colors ${
+              </button>
+              <button
+                onClick={() => switchLang("/ua")}
+                className={`rounded-md px-3 py-2 text-sm border transition-colors cursor-pointer ${
                   locale === "ua"
                     ? "border-accent-blue text-accent-blue bg-accent-blue/5 font-medium"
                     : "border-border text-foreground/80 hover:bg-section"
                 }`}
               >
                 Українська
-              </a>
+              </button>
             </div>
             <Button asChild variant="brand" className="mt-3">
               <a href={`${basePath}#kontakt`} onClick={() => setOpen(false)}>
