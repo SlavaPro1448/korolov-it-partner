@@ -722,11 +722,68 @@ function FAQ() {
 function Contact() {
   const [agreed, setAgreed] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [topic, setTopic] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const topicLabelMap: Record<string, string> = {
+    website: "Website erstellen",
+    wartung: "Website-Betreuung",
+    "email-domain": "E-Mail, Domain & Hosting",
+    "it-support": "IT-Support",
+    "digital-setup": "Digital Setup",
+    sonstiges: "Sonstiges",
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // No backend connected yet — show clear message instead of faking success.
-    setSubmitted(true);
+    setErrorMessage("");
+    setSubmitted(false);
+
+    const form = e.currentTarget as HTMLFormElement;
+    const data = new FormData(form);
+    const name = String(data.get("name") ?? "").trim();
+    const company = String(data.get("company") ?? "").trim();
+    const email = String(data.get("email") ?? "").trim();
+    const phone = String(data.get("phone") ?? "").trim();
+    const message = String(data.get("message") ?? "").trim();
+    const topicLabel = topic ? topicLabelMap[topic] ?? topic : "Nicht angegeben";
+
+    const payload = new FormData();
+    payload.append("_subject", `Neue Anfrage von ${name || "Website-Formular"}`);
+    payload.append("_captcha", "false");
+    payload.append("Name", name || "-");
+    payload.append("Unternehmen", company || "-");
+    payload.append("E-Mail", email || "-");
+    payload.append("Telefon", phone || "-");
+    payload.append("Anliegen", topicLabel);
+    payload.append("Nachricht", message || "-");
+
+    try {
+      setSubmitting(true);
+      const response = await fetch("https://formsubmit.co/ajax/korolovslava04@gmail.com", {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+        },
+        body: payload,
+      });
+
+      if (!response.ok) {
+        throw new Error("request_failed");
+      }
+
+      setSubmitted(true);
+      form.reset();
+      setTopic("");
+      setAgreed(false);
+    } catch {
+      setErrorMessage(
+        "Senden fehlgeschlagen. Bitte versuchen Sie es erneut oder schreiben Sie direkt an korolovslava04@gmail.com.",
+      );
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -768,7 +825,7 @@ function Contact() {
               </Field>
             </div>
             <Field label="Anliegen" required>
-              <Select name="topic">
+              <Select value={topic} onValueChange={setTopic} required>
                 <SelectTrigger>
                   <SelectValue placeholder="Bitte wählen" />
                 </SelectTrigger>
@@ -781,6 +838,7 @@ function Contact() {
                   <SelectItem value="sonstiges">Sonstiges</SelectItem>
                 </SelectContent>
               </Select>
+              <input type="hidden" name="topic" value={topic} />
             </Field>
             <Field label="Nachricht" required>
               <Textarea
@@ -805,19 +863,25 @@ function Contact() {
               </span>
             </label>
 
-            <Button type="submit" variant="brand" size="lg" disabled={!agreed} className="w-full sm:w-auto">
+            <Button
+              type="submit"
+              variant="brand"
+              size="lg"
+              disabled={!agreed || submitting}
+              className="w-full sm:w-auto"
+            >
               Anfrage senden <ArrowRight className="h-4 w-4" />
             </Button>
 
             {submitted && (
               <div className="rounded-lg border border-border bg-section p-4 text-sm text-foreground/85">
-                Das Kontaktformular ist aktuell nicht an einen Versanddienst angebunden.
-                <br />
-                Bitte kontaktieren Sie mich aktuell direkt per E-Mail an{" "}
-                <a className="text-accent-blue underline" href="mailto:info@korolov-it-service.de">
-                  info@korolov-it-service.de
-                </a>
-                .
+                Vielen Dank! Ihre Anfrage wurde erfolgreich gesendet.
+              </div>
+            )}
+
+            {errorMessage && (
+              <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-sm text-foreground/85">
+                {errorMessage}
               </div>
             )}
           </form>
