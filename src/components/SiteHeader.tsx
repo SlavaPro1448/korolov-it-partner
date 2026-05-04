@@ -101,30 +101,30 @@ export function SiteHeader({ locale = "de", basePath = "/" }: { locale?: Locale;
         <div className="hidden lg:flex items-center gap-3">
           <div className="hidden xl:inline-flex items-center gap-1.5 rounded-full border border-border bg-background px-2 py-1">
             <Languages className="h-3.5 w-3.5" />
-            <a
-              href="/"
-              className={`rounded-md px-2 py-1 text-sm transition-colors ${
+            <button
+              onClick={() => switchLang("/")}
+              className={`rounded-md px-2 py-1 text-sm transition-colors cursor-pointer ${
                 locale === "de" ? "bg-section text-brand font-medium" : "text-muted-foreground hover:text-foreground"
               }`}
             >
               DE
-            </a>
-            <a
-              href="/ru"
-              className={`rounded-md px-2 py-1 text-sm transition-colors ${
+            </button>
+            <button
+              onClick={() => switchLang("/ru")}
+              className={`rounded-md px-2 py-1 text-sm transition-colors cursor-pointer ${
                 locale === "ru" ? "bg-section text-brand font-medium" : "text-muted-foreground hover:text-foreground"
               }`}
             >
               RU
-            </a>
-            <a
-              href="/ua"
-              className={`rounded-md px-2 py-1 text-sm transition-colors ${
+            </button>
+            <button
+              onClick={() => switchLang("/ua")}
+              className={`rounded-md px-2 py-1 text-sm transition-colors cursor-pointer ${
                 locale === "ua" ? "bg-section text-brand font-medium" : "text-muted-foreground hover:text-foreground"
               }`}
             >
               UA
-            </a>
+            </button>
           </div>
           <Button asChild variant="brand" size="sm">
             <a href={`${basePath}#kontakt`}>{cta}</a>
