@@ -4,6 +4,13 @@ import { Button } from "@/components/ui/button";
 
 type Locale = "de" | "ru" | "ua";
 
+function switchLang(href: string) {
+  if (typeof window !== "undefined") {
+    sessionStorage.setItem("__lang_scrollY", String(window.scrollY));
+    window.location.href = href;
+  }
+}
+
 const navItemsByLocale: Record<Locale, Array<{ label: string; href: string }>> = {
   de: [
     { label: "Leistungen", href: "#leistungen" },
@@ -94,30 +101,30 @@ export function SiteHeader({ locale = "de", basePath = "/" }: { locale?: Locale;
         <div className="hidden lg:flex items-center gap-3">
           <div className="hidden xl:inline-flex items-center gap-1.5 rounded-full border border-border bg-background px-2 py-1">
             <Languages className="h-3.5 w-3.5" />
-            <a
-              href="/"
-              className={`rounded-md px-2 py-1 text-sm transition-colors ${
+            <button
+              onClick={() => switchLang("/")}
+              className={`rounded-md px-2 py-1 text-sm transition-colors cursor-pointer ${
                 locale === "de" ? "bg-section text-brand font-medium" : "text-muted-foreground hover:text-foreground"
               }`}
             >
               DE
-            </a>
-            <a
-              href="/ru"
-              className={`rounded-md px-2 py-1 text-sm transition-colors ${
+            </button>
+            <button
+              onClick={() => switchLang("/ru")}
+              className={`rounded-md px-2 py-1 text-sm transition-colors cursor-pointer ${
                 locale === "ru" ? "bg-section text-brand font-medium" : "text-muted-foreground hover:text-foreground"
               }`}
             >
               RU
-            </a>
-            <a
-              href="/ua"
-              className={`rounded-md px-2 py-1 text-sm transition-colors ${
+            </button>
+            <button
+              onClick={() => switchLang("/ua")}
+              className={`rounded-md px-2 py-1 text-sm transition-colors cursor-pointer ${
                 locale === "ua" ? "bg-section text-brand font-medium" : "text-muted-foreground hover:text-foreground"
               }`}
             >
               UA
-            </a>
+            </button>
           </div>
           <Button asChild variant="brand" size="sm">
             <a href={`${basePath}#kontakt`}>{cta}</a>
@@ -155,36 +162,36 @@ export function SiteHeader({ locale = "de", basePath = "/" }: { locale?: Locale;
                   : "Консультації німецькою, російською та українською"}
             </div>
             <div className="mt-2 flex items-center gap-2 px-2">
-              <a
-                href="/"
-                className={`rounded-md px-3 py-2 text-sm border transition-colors ${
+              <button
+                onClick={() => switchLang("/")}
+                className={`rounded-md px-3 py-2 text-sm border transition-colors cursor-pointer ${
                   locale === "de"
                     ? "border-accent-blue text-accent-blue bg-accent-blue/5 font-medium"
                     : "border-border text-foreground/80 hover:bg-section"
                 }`}
               >
                 Deutsch
-              </a>
-              <a
-                href="/ru"
-                className={`rounded-md px-3 py-2 text-sm border transition-colors ${
+              </button>
+              <button
+                onClick={() => switchLang("/ru")}
+                className={`rounded-md px-3 py-2 text-sm border transition-colors cursor-pointer ${
                   locale === "ru"
                     ? "border-accent-blue text-accent-blue bg-accent-blue/5 font-medium"
                     : "border-border text-foreground/80 hover:bg-section"
                 }`}
               >
                 Русский
-              </a>
-              <a
-                href="/ua"
-                className={`rounded-md px-3 py-2 text-sm border transition-colors ${
+              </button>
+              <button
+                onClick={() => switchLang("/ua")}
+                className={`rounded-md px-3 py-2 text-sm border transition-colors cursor-pointer ${
                   locale === "ua"
                     ? "border-accent-blue text-accent-blue bg-accent-blue/5 font-medium"
                     : "border-border text-foreground/80 hover:bg-section"
                 }`}
               >
                 Українська
-              </a>
+              </button>
             </div>
             <Button asChild variant="brand" className="mt-3">
               <a href={`${basePath}#kontakt`} onClick={() => setOpen(false)}>
