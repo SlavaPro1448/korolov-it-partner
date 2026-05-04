@@ -1,8 +1,15 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Menu, X, Languages } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 type Locale = "de" | "ru" | "ua";
+
+function switchLang(href: string) {
+  if (typeof window !== "undefined") {
+    sessionStorage.setItem("__lang_scrollY", String(window.scrollY));
+    window.location.href = href;
+  }
+}
 
 const navItemsByLocale: Record<Locale, Array<{ label: string; href: string }>> = {
   de: [
