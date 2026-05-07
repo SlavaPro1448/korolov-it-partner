@@ -94,20 +94,18 @@ function Hero() {
             IT-партнер для малого бизнеса в NRW
           </div>
           <h1 className="mt-6 text-4xl md:text-5xl lg:text-6xl font-bold text-brand leading-[1.05]">
-            Современные сайты.<br />
-            Надежная IT-поддержка.<br />
-            <span className="text-accent-blue">Понятное сопровождение.</span>
+            Больше заявок с сайта и IT-поддержки из Леверкузена
           </h1>
           <p className="mt-6 text-lg text-muted-foreground max-w-2xl leading-relaxed">
-            Я помогаю малому бизнесу в Leverkusen, Köln и NRW с сайтами, деловой почтой,
-            хостингом, IT-поддержкой и цифровой организацией процессов.
+            Помогаю малому бизнесу в Леверкузене с сайтом, деловой почтой, хостингом и
+            IT-поддержкой - просто и надежно.
           </p>
           <div className="mt-8 flex flex-col sm:flex-row gap-3">
             <Button
               asChild
               variant="brand"
               size="lg"
-              className="w-full sm:w-auto whitespace-normal h-auto py-3 text-center leading-snug"
+              className="w-full sm:w-auto h-14 px-8 text-base bg-accent-blue hover:bg-accent-blue/90 shadow-lg shadow-accent-blue/30"
             >
               <a href="#kontakt">
                 Запросить бесплатную консультацию <ArrowRight className="h-4 w-4" />
@@ -115,18 +113,18 @@ function Hero() {
             </Button>
             <Button
               asChild
-              variant="outline"
-              size="lg"
-              className="w-full sm:w-auto whitespace-normal h-auto py-3 text-center leading-snug"
+              variant="ghost"
+              size="default"
+              className="w-full sm:w-auto"
             >
               <a href="#leistungen">Посмотреть услуги</a>
             </Button>
           </div>
           <ul className="mt-10 grid sm:grid-cols-3 gap-4 max-w-2xl">
             {[
-              "Прямой контакт со специалистом",
-              "Сайт и IT из одних рук",
-              "Консультации на DE, RU и UA",
+              "Личный контакт",
+              "Сайт + IT",
+              "DE · RU · UA",
             ].map((t) => (
               <li key={t} className="flex items-start gap-2 text-sm text-foreground/80">
                 <CheckCircle2 className="h-5 w-5 text-accent-teal shrink-0 mt-0.5" />

@@ -95,21 +95,18 @@ function Hero() {
             IT-Partner für kleine Unternehmen in NRW
           </div>
           <h1 className="mt-6 text-4xl md:text-5xl lg:text-6xl font-bold text-brand leading-[1.05]">
-            Moderne Websites.<br />
-            Zuverlässige IT.<br />
-            <span className="text-accent-blue">Verständliche Betreuung.</span>
+            Mehr Kundenanfragen mit Website und IT-Support aus Leverkusen
           </h1>
           <p className="mt-6 text-lg text-muted-foreground max-w-2xl leading-relaxed">
-            Ich unterstütze kleine Unternehmen in Leverkusen, Köln und NRW bei Websites,
-            geschäftlicher E-Mail, Hosting, IT-Support und digitaler Organisation —
-            persönlich, verständlich und zuverlässig.
+            Ich unterstütze kleine Unternehmen in Leverkusen mit Website, E-Mail, Hosting und
+            IT-Support - persönlich und zuverlässig.
           </p>
           <div className="mt-8 flex flex-col sm:flex-row gap-3">
             <Button
               asChild
               variant="brand"
               size="lg"
-              className="w-full sm:w-auto whitespace-normal h-auto py-3 text-center leading-snug"
+              className="w-full sm:w-auto h-14 px-8 text-base bg-accent-blue hover:bg-accent-blue/90 shadow-lg shadow-accent-blue/30"
             >
               <a href="#kontakt">
                 Kostenloses Erstgespräch anfragen <ArrowRight className="h-4 w-4" />
@@ -117,18 +114,18 @@ function Hero() {
             </Button>
             <Button
               asChild
-              variant="outline"
-              size="lg"
-              className="w-full sm:w-auto whitespace-normal h-auto py-3 text-center leading-snug"
+              variant="ghost"
+              size="default"
+              className="w-full sm:w-auto"
             >
               <a href="#leistungen">Leistungen ansehen</a>
             </Button>
           </div>
           <ul className="mt-10 grid sm:grid-cols-3 gap-4 max-w-2xl">
             {[
-              "Direkter Ansprechpartner",
-              "Website & IT aus einer Hand",
-              "Beratung auf DE, RU & UA",
+              "Persönlicher Ansprechpartner",
+              "Website + IT",
+              "DE · RU · UA",
             ].map((t) => (
               <li key={t} className="flex items-start gap-2 text-sm text-foreground/80">
                 <CheckCircle2 className="h-5 w-5 text-accent-teal shrink-0 mt-0.5" />
