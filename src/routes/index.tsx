@@ -557,7 +557,7 @@ function References() {
       text:
         "Professioneller Webauftritt für eine Immobilienverwaltung mit klarer Struktur, Kontaktmöglichkeit und technischer Einrichtung.",
       cta: "Projekt ansehen",
-      href: "#",
+      href: "https://www.hausverwaltung-natalie-frank.de/",
     },
     {
       title: "IT-Unterstützung für Kanzlei / Büro",
