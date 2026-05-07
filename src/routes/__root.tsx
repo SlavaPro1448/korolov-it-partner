@@ -1,4 +1,4 @@
-import { Outlet, Link, createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
+import { Outlet, Link, createRootRoute } from "@tanstack/react-router";
 import { useEffect } from "react";
 
 import appCss from "../styles.css?url";
@@ -27,53 +27,11 @@ function NotFoundComponent() {
 
 export const Route = createRootRoute({
   head: () => ({
-    meta: [
-      { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Korolov IT-Service | Websites & IT-Support in Leverkusen" },
-      {
-        name: "description",
-        content:
-          "Korolov IT-Service unterstützt kleine Unternehmen in Leverkusen, Köln und NRW bei Websites, E-Mail, Hosting, IT-Support und digitaler Organisation.",
-      },
-      { name: "theme-color", content: "#0F2742" },
-      { property: "og:site_name", content: "Korolov IT-Service" },
-      { property: "og:locale", content: "de_DE" },
-      { property: "og:type", content: "website" },
-      { property: "og:title", content: "Korolov IT-Service | Websites & IT-Support in Leverkusen" },
-      { name: "twitter:title", content: "Korolov IT-Service | Websites & IT-Support in Leverkusen" },
-      { name: "description", content: "Korolov IT-Service offers comprehensive website creation, IT support, and digital solutions for small businesses." },
-      { property: "og:description", content: "Korolov IT-Service offers comprehensive website creation, IT support, and digital solutions for small businesses." },
-      { name: "twitter:description", content: "Korolov IT-Service offers comprehensive website creation, IT support, and digital solutions for small businesses." },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
-    links: [
-      { rel: "stylesheet", href: appCss },
-      { rel: "preconnect", href: "https://fonts.bunny.net" },
-      {
-        rel: "stylesheet",
-        href: "https://fonts.bunny.net/css?family=inter:400,500,600,700,800&display=swap",
-      },
-    ],
+    links: [{ rel: "stylesheet", href: appCss }],
   }),
-  shellComponent: RootShell,
   component: RootComponent,
   notFoundComponent: NotFoundComponent,
 });
-
-function RootShell({ children }: { children: React.ReactNode }) {
-  return (
-    <html lang="en">
-      <head>
-        <HeadContent />
-      </head>
-      <body>
-        {children}
-        <Scripts />
-      </body>
-    </html>
-  );
-}
 
 function RootComponent() {
   // Restore scroll position after language switch

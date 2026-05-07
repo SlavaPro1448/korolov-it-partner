@@ -20,7 +20,7 @@ function ImpressumPage() {
       <main className="container-page py-16 md:py-24 max-w-3xl">
         <h1 className="text-3xl md:text-4xl font-bold text-brand">Impressum</h1>
         <p className="mt-3 text-sm text-muted-foreground">
-          Hinweis: Dies ist ein Platzhalter. Bitte ergänzen Sie die rechtlich erforderlichen Angaben gemäß § 5 TMG.
+          Hinweis: Dies ist ein Platzhalter. Bitte ergänzen Sie die rechtlich erforderlichen Angaben gemäß § 52 TMG.
         </p>
 
         {/* TODO: Echte Anbieterkennzeichnung einsetzen (Name, Anschrift, Kontakt, USt-ID falls zutreffend, etc.) */}
