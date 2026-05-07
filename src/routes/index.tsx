@@ -648,17 +648,19 @@ function About() {
         </div>
         <div className="lg:col-span-5">
           <div className="card-soft p-7 bg-gradient-to-br from-white to-section">
-            <div className="w-full max-w-[220px] aspect-[4/5] rounded-2xl overflow-hidden shadow-sm">
-              <img
-                src="/images/viacheslav-portrait-v4.jpeg"
-                alt="Viacheslav Korolov – Inhaber Korolov IT-Service"
-                loading="lazy"
-                className="h-full w-full object-cover object-center"
-              />
-            </div>
-            <div className="mt-5">
-              <div className="font-semibold text-brand text-lg">Viacheslav Korolov</div>
-              <div className="text-sm text-muted-foreground">Inhaber · Korolov IT-Service</div>
+            <div className="flex items-start justify-between gap-4">
+              <div className="min-w-0 pt-1">
+                <div className="font-semibold text-brand text-lg">Viacheslav Korolov</div>
+                <div className="text-sm text-muted-foreground">Inhaber · Korolov IT-Service</div>
+              </div>
+              <div className="w-24 sm:w-28 aspect-[4/5] rounded-2xl overflow-hidden shadow-sm shrink-0">
+                <img
+                  src="/images/viacheslav-portrait-v4.jpeg"
+                  alt="Viacheslav Korolov – Inhaber Korolov IT-Service"
+                  loading="lazy"
+                  className="h-full w-full object-cover object-center"
+                />
+              </div>
             </div>
             <div className="mt-6 space-y-2.5 text-sm text-foreground/80">
               <div className="flex items-center gap-2"><MapPin className="h-4 w-4 text-accent-blue" /> Leverkusen, NRW</div>
