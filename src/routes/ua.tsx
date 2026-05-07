@@ -93,12 +93,22 @@ function Hero() {
             хостингом, IT-підтримкою та цифровою організацією процесів.
           </p>
           <div className="mt-8 flex flex-col sm:flex-row gap-3">
-            <Button asChild variant="brand" size="lg">
+            <Button
+              asChild
+              variant="brand"
+              size="lg"
+              className="w-full sm:w-auto whitespace-normal h-auto py-3 text-center leading-snug"
+            >
               <a href="#kontakt">
                 Замовити безкоштовну консультацію <ArrowRight className="h-4 w-4" />
               </a>
             </Button>
-            <Button asChild variant="outline" size="lg">
+            <Button
+              asChild
+              variant="outline"
+              size="lg"
+              className="w-full sm:w-auto whitespace-normal h-auto py-3 text-center leading-snug"
+            >
               <a href="#leistungen">Переглянути послуги</a>
             </Button>
           </div>
