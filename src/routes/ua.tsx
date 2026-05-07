@@ -522,8 +522,13 @@ function About() {
         </div>
         <div className="lg:col-span-5">
           <div className="card-soft p-7 bg-gradient-to-br from-white to-section">
-            <div className="h-20 w-20 rounded-2xl bg-brand text-brand-foreground flex items-center justify-center text-3xl font-bold">
-              VK
+            <div className="h-20 w-20 rounded-2xl overflow-hidden shadow-sm">
+              <img
+                src="/images/viacheslav-portrait.jpg"
+                alt="Viacheslav Korolov – Inhaber Korolov IT-Service"
+                loading="lazy"
+                className="h-full w-full object-cover"
+              />
             </div>
             <div className="mt-5">
               <div className="font-semibold text-brand text-lg">Viacheslav Korolov</div>
