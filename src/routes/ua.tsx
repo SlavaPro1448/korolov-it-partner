@@ -37,6 +37,8 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { breadcrumbSchema, faqPageSchema, localBusinessSchema } from "@/lib/structured-data";
 
 export const Route = createFileRoute("/ua")({
   head: () => ({
@@ -54,8 +56,17 @@ export const Route = createFileRoute("/ua")({
 });
 
 function UkrainianHomePage() {
+  const faqItems = faqs.map((item) => ({ question: item.q, answer: item.a }));
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      <JsonLd data={localBusinessSchema("uk")} />
+      <JsonLd data={faqPageSchema(faqItems)} />
+      <JsonLd
+        data={breadcrumbSchema([
+          { name: "Головна", item: "https://korolov-it-service.de/ua" },
+        ])}
+      />
       <SiteHeader locale="ua" basePath="/ua" />
       <main className="flex-1">
         <Hero />
@@ -531,34 +542,35 @@ function About() {
   );
 }
 
+const faqs = [
+  {
+    q: "Скільки часу займає створення сайту?",
+    a: "Простий сайт зазвичай займає від кількох днів до кількох тижнів - залежно від контенту та погоджень.",
+  },
+  {
+    q: "Чи можна вносити зміни після запуску?",
+    a: "Так. Можна узгодити регулярну технічну підтримку та невеликі доопрацювання.",
+  },
+  {
+    q: "Ви допомагаєте з доменом і поштою?",
+    a: "Так. Допомагаю з доменом, хостингом, діловою поштою, DNS, SPF, DKIM, DMARC і налаштуванням відправки форм.",
+  },
+  {
+    q: "Наскільки сайт відповідає DSGVO?",
+    a: "Я допомагаю з технічною DSGVO-орієнтованою реалізацією. Юридичні тексти бажано додатково перевірити через профільний сервіс або у юриста.",
+  },
+  {
+    q: "Ви працюєте також офлайн?",
+    a: "Залежно від проєкту можлива віддалена робота та підтримка у Leverkusen, Köln і навколишніх районах.",
+  },
+  {
+    q: "Чи можлива консультація російською або українською?",
+    a: "Так, консультації можливі німецькою, російською та українською мовами.",
+  },
+];
+
 function FAQ() {
   const [open, setOpen] = useState<number | null>(0);
-  const faqs = [
-    {
-      q: "Скільки часу займає створення сайту?",
-      a: "Простий сайт зазвичай займає від кількох днів до кількох тижнів - залежно від контенту та погоджень.",
-    },
-    {
-      q: "Чи можна вносити зміни після запуску?",
-      a: "Так. Можна узгодити регулярну технічну підтримку та невеликі доопрацювання.",
-    },
-    {
-      q: "Ви допомагаєте з доменом і поштою?",
-      a: "Так. Допомагаю з доменом, хостингом, діловою поштою, DNS, SPF, DKIM, DMARC і налаштуванням відправки форм.",
-    },
-    {
-      q: "Наскільки сайт відповідає DSGVO?",
-      a: "Я допомагаю з технічною DSGVO-орієнтованою реалізацією. Юридичні тексти бажано додатково перевірити через профільний сервіс або у юриста.",
-    },
-    {
-      q: "Ви працюєте також офлайн?",
-      a: "Залежно від проєкту можлива віддалена робота та підтримка у Leverkusen, Köln і навколишніх районах.",
-    },
-    {
-      q: "Чи можлива консультація російською або українською?",
-      a: "Так, консультації можливі німецькою, російською та українською мовами.",
-    },
-  ];
 
   return (
     <section className="py-20 md:py-28 bg-section">

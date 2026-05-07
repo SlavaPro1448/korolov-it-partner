@@ -2,6 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { COMPANY_DETAILS } from "@/config/legal";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { breadcrumbSchema, organizationSchema } from "@/lib/structured-data";
 
 export const Route = createFileRoute("/impressum")({
   head: () => ({
@@ -20,6 +22,13 @@ function ImpressumPage() {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <JsonLd data={organizationSchema("de")} />
+      <JsonLd
+        data={breadcrumbSchema([
+          { name: "Startseite", item: "https://korolov-it-service.de/" },
+          { name: "Impressum", item: "https://korolov-it-service.de/impressum" },
+        ])}
+      />
       <SiteHeader />
       <main className="container-page py-16 md:py-24 max-w-3xl">
         <h1 className="text-3xl md:text-4xl font-bold text-brand">Impressum</h1>

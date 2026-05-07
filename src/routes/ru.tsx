@@ -37,6 +37,8 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { breadcrumbSchema, faqPageSchema, localBusinessSchema } from "@/lib/structured-data";
 
 export const Route = createFileRoute("/ru")({
   head: () => ({
@@ -62,8 +64,17 @@ export const Route = createFileRoute("/ru")({
 });
 
 function RussianHomePage() {
+  const faqItems = faqs.map((item) => ({ question: item.q, answer: item.a }));
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      <JsonLd data={localBusinessSchema("ru")} />
+      <JsonLd data={faqPageSchema(faqItems)} />
+      <JsonLd
+        data={breadcrumbSchema([
+          { name: "Главная", item: "https://korolov-it-service.de/ru" },
+        ])}
+      />
       <SiteHeader locale="ru" basePath="/ru" />
       <main className="flex-1">
         <Hero />

@@ -37,6 +37,8 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { breadcrumbSchema, faqPageSchema, localBusinessSchema } from "@/lib/structured-data";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -62,8 +64,17 @@ export const Route = createFileRoute("/")({
 });
 
 function HomePage() {
+  const faqItems = faqs.map((item) => ({ question: item.q, answer: item.a }));
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      <JsonLd data={localBusinessSchema("de")} />
+      <JsonLd data={faqPageSchema(faqItems)} />
+      <JsonLd
+        data={breadcrumbSchema([
+          { name: "Startseite", item: "https://korolov-it-service.de/" },
+        ])}
+      />
       <SiteHeader />
       <main className="flex-1">
         <Hero />
