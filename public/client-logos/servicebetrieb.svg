@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="96" viewBox="0 0 320 96" fill="none">
+  <rect width="320" height="96" rx="12" fill="#F3F4F6"/>
+  <rect x="1" y="1" width="318" height="94" rx="11" stroke="#D1D5DB"/>
+  <text x="160" y="56" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" fill="#6B7280">TODO: Servicebetrieb</text>
+</svg>

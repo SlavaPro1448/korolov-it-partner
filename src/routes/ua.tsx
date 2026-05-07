@@ -37,6 +37,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
+import { ReferencesSection } from "@/components/sections/ReferencesSection";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumbSchema, faqPageSchema, localBusinessSchema } from "@/lib/structured-data";
 import { buildSeoMeta } from "@/lib/seo";
@@ -436,50 +437,7 @@ function Process() {
 }
 
 function References() {
-  const refs = [
-    {
-      title: "Hausverwaltung Natalie Frank",
-      type: "Сайт і технічний супровід",
-      text:
-        "Професійний вебсайт для компанії з управління нерухомістю: чітка структура, контакти та налаштована технічна база.",
-      cta: "Переглянути проєкт",
-      href: "#",
-    },
-    {
-      title: "IT-підтримка для офісу / практики",
-      type: "IT-підтримка та обслуговування",
-      text:
-        "Регулярна технічна підтримка в щоденній роботі з фокусом на надійність, конфіденційність і практичні рішення.",
-      cta: "Дізнатися більше",
-      href: "#",
-    },
-  ];
-
-  return (
-    <section id="referenzen" className="py-20 md:py-28 bg-section scroll-mt-20">
-      <div className="container-page">
-        <SectionHeading eyebrow="Референси" title="Вибрані проєкти" subtitle="Приклади з попередньої співпраці." />
-        <div className="mt-12 grid md:grid-cols-2 gap-6">
-          {refs.map((r) => (
-            <article key={r.title} className="card-soft p-7 flex flex-col">
-              <div className="aspect-[16/9] rounded-xl bg-gradient-to-br from-brand/90 to-accent-blue/80 relative overflow-hidden">
-                <div className="absolute bottom-4 left-5 text-white">
-                  <div className="text-xs uppercase tracking-wider opacity-80">{r.type}</div>
-                  <div className="text-lg font-semibold">{r.title}</div>
-                </div>
-              </div>
-              <p className="mt-5 text-sm text-muted-foreground leading-relaxed flex-1">{r.text}</p>
-              <Button asChild variant="outline" className="mt-5 self-start">
-                <a href={r.href}>
-                  {r.cta} <ArrowRight className="h-4 w-4" />
-                </a>
-              </Button>
-            </article>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
+  return <ReferencesSection locale="ua" />;
 }
 
 function About() {

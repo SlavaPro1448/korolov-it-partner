@@ -37,6 +37,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
+import { ReferencesSection } from "@/components/sections/ReferencesSection";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumbSchema, faqPageSchema, localBusinessSchema } from "@/lib/structured-data";
 import { buildSeoMeta } from "@/lib/seo";
@@ -549,60 +550,7 @@ function Process() {
 
 /* ---------------- REFERENCES ---------------- */
 function References() {
-  const refs = [
-    {
-      title: "Hausverwaltung Natalie Frank",
-      type: "Website & technische Betreuung",
-      text:
-        "Professioneller Webauftritt für eine Immobilienverwaltung mit klarer Struktur, Kontaktmöglichkeit und technischer Einrichtung.",
-      cta: "Projekt ansehen",
-      href: "https://www.hausverwaltung-natalie-frank.de/",
-    },
-    {
-      title: "IT-Unterstützung für Kanzlei / Büro",
-      type: "IT-Support & Wartung",
-      text:
-        "Technische Unterstützung für eine Kanzlei bzw. ein Büro im Geschäftsalltag — mit Fokus auf Zuverlässigkeit, Datenschutzbewusstsein und praktische Lösungen.",
-      cta: "Mehr erfahren",
-      href: "#",
-    },
-  ];
-  return (
-    <section id="referenzen" className="py-20 md:py-28 bg-section scroll-mt-20">
-      <div className="container-page">
-        <SectionHeading
-          eyebrow="Referenzen"
-          title="Ausgewählte Projekte"
-          subtitle="Beispiele aus der bisherigen Zusammenarbeit."
-        />
-        <div className="mt-12 grid md:grid-cols-2 gap-6">
-          {refs.map((r) => (
-            <article key={r.title} className="card-soft p-7 flex flex-col">
-              <div className="aspect-[16/9] rounded-xl bg-gradient-to-br from-brand/90 to-accent-blue/80 relative overflow-hidden">
-                <div className="absolute inset-0 opacity-20"
-                  style={{
-                    backgroundImage:
-                      "radial-gradient(circle at 20% 30%, white 1px, transparent 1.5px), radial-gradient(circle at 70% 60%, white 1px, transparent 1.5px)",
-                    backgroundSize: "40px 40px",
-                  }}
-                />
-                <div className="absolute bottom-4 left-5 text-white">
-                  <div className="text-xs uppercase tracking-wider opacity-80">{r.type}</div>
-                  <div className="text-lg font-semibold">{r.title}</div>
-                </div>
-              </div>
-              <p className="mt-5 text-sm text-muted-foreground leading-relaxed flex-1">{r.text}</p>
-              <Button asChild variant="outline" className="mt-5 self-start">
-                <a href={r.href}>
-                  {r.cta} <ArrowRight className="h-4 w-4" />
-                </a>
-              </Button>
-            </article>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
+  return <ReferencesSection locale="de" />;
 }
 
 /* ---------------- ABOUT ---------------- */
