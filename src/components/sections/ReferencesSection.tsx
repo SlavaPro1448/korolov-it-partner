@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
-import { ArrowRight, ImageOff, Quote } from "lucide-react";
+import { ArrowRight, Briefcase, Quote } from "lucide-react";
 import type { Case } from "@/data/cases";
-import { cases, clientLogos } from "@/data/cases";
+import { cases } from "@/data/cases";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -24,8 +24,6 @@ const copy: Record<
     moreOnRequest: string;
     testimonialsTitle: string;
     testimonialsSubtitle: string;
-    logoTitle: string;
-    logoSubtitle: string;
   }
 > = {
   de: {
@@ -36,8 +34,6 @@ const copy: Record<
     moreOnRequest: "Weitere Projekte auf Anfrage",
     testimonialsTitle: "Kundenstimmen",
     testimonialsSubtitle: "Freigegebene Rückmeldungen aus der Zusammenarbeit.",
-    logoTitle: "Kunden",
-    logoSubtitle: "Ausgewählte Logos (Platzhalter bis zur finalen Freigabe).",
   },
   ru: {
     eyebrow: "Референсы",
@@ -47,8 +43,6 @@ const copy: Record<
     moreOnRequest: "Другие проекты — по запросу",
     testimonialsTitle: "Отзывы клиентов",
     testimonialsSubtitle: "Публикуются только после согласования.",
-    logoTitle: "Клиенты",
-    logoSubtitle: "Выборка логотипов (временные плейсхолдеры до финального согласования).",
   },
   ua: {
     eyebrow: "Референси",
@@ -58,8 +52,6 @@ const copy: Record<
     moreOnRequest: "Інші проєкти — за запитом",
     testimonialsTitle: "Відгуки клієнтів",
     testimonialsSubtitle: "Публікуються тільки після погодження.",
-    logoTitle: "Клієнти",
-    logoSubtitle: "Добірка логотипів (тимчасові плейсхолдери до фінального погодження).",
   },
 };
 
@@ -71,18 +63,23 @@ type CaseCardProps = {
 
 function CaseCard({ item, locale, openLabel }: CaseCardProps) {
   const [hasImageError, setHasImageError] = useState(false);
-  const isLogoThumb = item.thumbnailStyle !== "screenshot";
+  const isIcon = item.thumbnailStyle === "icon";
+  const isLogo = item.thumbnailStyle === "logo";
 
   return (
     <article className="card-soft p-7 flex flex-col">
       <div
         className={cn(
           "relative w-full overflow-hidden rounded-xl border border-border/60 bg-section",
-          isLogoThumb ? "aspect-[4/3] sm:aspect-[5/4]" : "aspect-video",
+          isIcon ? "aspect-[3/2]" : isLogo ? "aspect-[4/3] sm:aspect-[5/4]" : "aspect-video",
         )}
       >
-        {!hasImageError && item.thumbnail ? (
-          isLogoThumb ? (
+        {isIcon ? (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <Briefcase className="h-16 w-16 text-muted-foreground/40" />
+          </div>
+        ) : !hasImageError && item.thumbnail ? (
+          isLogo ? (
             <div className="absolute inset-0 flex min-h-0 min-w-0 items-center justify-center p-4 sm:p-6">
               <img
                 src={item.thumbnail}
@@ -102,9 +99,8 @@ function CaseCard({ item, locale, openLabel }: CaseCardProps) {
             />
           )
         ) : (
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 p-4 text-center text-muted-foreground">
-            <ImageOff className="h-8 w-8" />
-            <span className="text-sm">Bild folgt</span>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <Briefcase className="h-16 w-16 text-muted-foreground/40" />
           </div>
         )}
       </div>
@@ -140,7 +136,7 @@ function CaseCard({ item, locale, openLabel }: CaseCardProps) {
 
 function TestimonialsCarousel({ locale }: { locale: Locale }) {
   const testimonials = useMemo(
-    () => cases.filter((item) => item.featured && item.testimonial),
+    () => cases.filter((item) => item.testimonial),
     [],
   );
 
@@ -178,31 +174,8 @@ function TestimonialsCarousel({ locale }: { locale: Locale }) {
   );
 }
 
-function LogoCloud({ locale }: { locale: Locale }) {
-  return (
-    <div className="mt-14">
-      <h3 className="text-2xl md:text-3xl font-bold text-brand">{copy[locale].logoTitle}</h3>
-      <p className="mt-3 text-muted-foreground">{copy[locale].logoSubtitle}</p>
-      <div className="mt-8 grid grid-cols-2 md:grid-cols-3 gap-4">
-        {clientLogos.map((logo) => (
-          <div key={logo.id} className="card-soft p-5 flex items-center justify-center min-h-24">
-            <img
-              src={logo.src}
-              loading="lazy"
-              alt={logo.name}
-              className="max-h-10 w-auto object-contain grayscale opacity-75"
-            />
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 export function ReferencesSection({ locale }: { locale: Locale }) {
-  const featuredCases = useMemo(() => cases.filter((item) => item.featured), []);
-  const displayedCases = featuredCases.length > 0 ? featuredCases : cases.slice(0, 1);
-  const showMoreOnRequest = displayedCases.length <= 1;
+  const displayedCases = useMemo(() => cases.filter((item) => item.featured), []);
 
   return (
     <section id="referenzen" className="py-20 md:py-28 bg-section scroll-mt-20">
@@ -223,12 +196,7 @@ export function ReferencesSection({ locale }: { locale: Locale }) {
           ))}
         </div>
 
-        {showMoreOnRequest && (
-          <div className="mt-6 text-sm text-muted-foreground">{copy[locale].moreOnRequest}</div>
-        )}
-
         <TestimonialsCarousel locale={locale} />
-        <LogoCloud locale={locale} />
       </div>
     </section>
   );
