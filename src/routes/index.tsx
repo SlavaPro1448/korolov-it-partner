@@ -1,5 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import React, { useState } from "react";
 import {
   ArrowRight,
   CheckCircle2,
@@ -22,6 +22,7 @@ import {
   Check,
   Star,
   ChevronDown,
+  Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -684,12 +685,45 @@ function FAQ() {
 }
 
 /* ---------------- CONTACT ---------------- */
+const EMAIL_FORMAT_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const PHONE_CHARS_RE = /^[\d\s+\-()]*$/;
+
+function validateContactName(value: string): string | undefined {
+  const t = value.trim();
+  if (!t) return "Bitte geben Sie Ihren Namen ein.";
+  if (t.length < 2) return "Der Name muss mindestens 2 Zeichen haben.";
+}
+
+function validateContactEmail(value: string): string | undefined {
+  const t = value.trim();
+  if (!t) return "Bitte geben Sie Ihre E-Mail-Adresse ein.";
+  if (!EMAIL_FORMAT_RE.test(t)) return "Bitte geben Sie eine gültige E-Mail-Adresse ein.";
+}
+
+function validateContactPhone(value: string): string | undefined {
+  const t = value.trim();
+  if (!t) return undefined;
+  if (!PHONE_CHARS_RE.test(t)) return "Nur Ziffern, Leerzeichen und + - ( ) sind erlaubt.";
+}
+
+function validateContactTopic(topic: string): string | undefined {
+  if (!topic) return "Bitte wählen Sie ein Anliegen.";
+}
+
+function validateContactMessage(value: string): string | undefined {
+  const t = value.trim();
+  if (!t) return "Bitte geben Sie eine Nachricht ein.";
+  if (t.length < 10) return "Die Nachricht muss mindestens 10 Zeichen haben.";
+  if (t.length > 2000) return "Die Nachricht darf höchstens 2000 Zeichen haben.";
+}
+
 function Contact() {
-  const [agreed, setAgreed] = useState(false);
+  const [consentChecked, setConsentChecked] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
   const [topic, setTopic] = useState("");
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const topicLabelMap: Record<string, string> = {
     website: "Website erstellen",
@@ -700,22 +734,63 @@ function Contact() {
     sonstiges: "Sonstiges",
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setErrorMessage("");
-    setSubmitted(false);
+  const clearFieldError = (key: string) => {
+    setErrors((prev) => {
+      if (!(key in prev)) return prev;
+      const next = { ...prev };
+      delete next[key];
+      return next;
+    });
+  };
 
-    const form = e.currentTarget as HTMLFormElement;
+  const validateAll = (form: HTMLFormElement) => {
     const data = new FormData(form);
+    const name = String(data.get("name") ?? "");
+    const email = String(data.get("email") ?? "");
+    const phone = String(data.get("phone") ?? "");
+    const message = String(data.get("message") ?? "");
+
+    const next: Record<string, string> = {};
+    const nameErr = validateContactName(name);
+    const emailErr = validateContactEmail(email);
+    const phoneErr = validateContactPhone(phone);
+    const topicErr = validateContactTopic(topic);
+    const messageErr = validateContactMessage(message);
+
+    if (nameErr) next.name = nameErr;
+    if (emailErr) next.email = emailErr;
+    if (phoneErr) next.phone = phoneErr;
+    if (topicErr) next.topic = topicErr;
+    if (messageErr) next.message = messageErr;
+
+    setErrors(next);
+    return Object.keys(next).length === 0;
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setSubmitError("");
+
+    const form = e.currentTarget;
+    if (!validateAll(form)) return;
+
+    const data = new FormData(form);
+    const honey = String(data.get("_honey") ?? "").trim();
+    if (honey) {
+      setSubmitted(true);
+      return;
+    }
+
     const name = String(data.get("name") ?? "").trim();
     const company = String(data.get("company") ?? "").trim();
     const email = String(data.get("email") ?? "").trim();
     const phone = String(data.get("phone") ?? "").trim();
     const message = String(data.get("message") ?? "").trim();
-    const topicLabel = topic ? topicLabelMap[topic] ?? topic : "Nicht angegeben";
+    const topicLabel = topic ? (topicLabelMap[topic] ?? topic) : "Nicht angegeben";
 
     const payload = new FormData();
-    payload.append("_subject", `Neue Anfrage von ${name || "Website-Formular"}`);
+    payload.append("_subject", "Neue Anfrage über die Website");
+    payload.append("_template", "table");
     payload.append("_captcha", "false");
     payload.append("Name", name || "-");
     payload.append("Unternehmen", company || "-");
@@ -725,7 +800,7 @@ function Contact() {
     payload.append("Nachricht", message || "-");
 
     try {
-      setSubmitting(true);
+      setIsSubmitting(true);
       const response = await fetch("https://formsubmit.co/ajax/korolovslava04@gmail.com", {
         method: "POST",
         headers: {
@@ -739,15 +814,12 @@ function Contact() {
       }
 
       setSubmitted(true);
-      form.reset();
-      setTopic("");
-      setAgreed(false);
     } catch {
-      setErrorMessage(
-        "Senden fehlgeschlagen. Bitte versuchen Sie es erneut oder schreiben Sie direkt an korolovslava04@gmail.com.",
+      setSubmitError(
+        `Beim Senden ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut oder schreiben Sie direkt an ${COMPANY.email}.`,
       );
     } finally {
-      setSubmitting(false);
+      setIsSubmitting(false);
     }
   };
 
@@ -764,7 +836,7 @@ function Contact() {
             Einschätzung zurück.
           </p>
           <div className="mt-8 space-y-4">
-            <ContactRow icon={<Mail className="h-5 w-5" />} label="E-Mail" value="info@korolov-it-service.de" />
+            <ContactRow icon={<Mail className="h-5 w-5" />} label="E-Mail" value={COMPANY.email} />
             <ContactRow icon={<Phone className="h-5 w-5" />} label="Telefon / WhatsApp" value={COMPANY.phoneDisplay} />
             <ContactRow icon={<MapPin className="h-5 w-5" />} label="Standort" value="Leverkusen, NRW" />
             <ContactRow icon={<Languages className="h-5 w-5" />} label="Sprachen" value="Deutsch · Russisch · Ukrainisch" />
@@ -772,84 +844,204 @@ function Contact() {
         </div>
 
         <div className="lg:col-span-7">
-          <form onSubmit={handleSubmit} className="card-soft p-6 md:p-8 space-y-5">
-            <div className="grid sm:grid-cols-2 gap-4">
-              <Field label="Name" required>
-                <Input required name="name" placeholder="Ihr Name" />
-              </Field>
-              <Field label="Unternehmen">
-                <Input name="company" placeholder="Firmenname (optional)" />
-              </Field>
+          {submitted ? (
+            <div className="card-soft p-6 md:p-8 space-y-3">
+              <p className="text-lg font-semibold text-brand">✓ Vielen Dank!</p>
+              <p className="text-sm text-foreground/85 leading-relaxed">
+                Ihre Anfrage wurde erfolgreich gesendet. Ich melde mich innerhalb von 24 Stunden bei Ihnen zurück.
+              </p>
             </div>
-            <div className="grid sm:grid-cols-2 gap-4">
-              <Field label="E-Mail" required>
-                <Input required type="email" name="email" placeholder="ihre@email.de" />
-              </Field>
-              <Field label="Telefon">
-                <Input name="phone" placeholder="optional" />
-              </Field>
-            </div>
-            <Field label="Anliegen" required>
-              <Select value={topic} onValueChange={setTopic} required>
-                <SelectTrigger>
-                  <SelectValue placeholder="Bitte wählen" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="website">Website erstellen</SelectItem>
-                  <SelectItem value="wartung">Website-Betreuung</SelectItem>
-                  <SelectItem value="email-domain">E-Mail, Domain & Hosting</SelectItem>
-                  <SelectItem value="it-support">IT-Support</SelectItem>
-                  <SelectItem value="digital-setup">Digital Setup</SelectItem>
-                  <SelectItem value="sonstiges">Sonstiges</SelectItem>
-                </SelectContent>
-              </Select>
+          ) : (
+            <form onSubmit={handleSubmit} className="card-soft p-6 md:p-8 space-y-5" noValidate>
+              <input type="hidden" name="_subject" value="Neue Anfrage über die Website" />
+              <input type="hidden" name="_template" value="table" />
+              <input type="hidden" name="_captcha" value="false" />
               <input type="hidden" name="topic" value={topic} />
-            </Field>
-            <Field label="Nachricht" required>
-              <Textarea
-                required
-                name="message"
-                rows={5}
-                placeholder="Beschreiben Sie kurz Ihr Anliegen…"
+
+              <input
+                type="text"
+                name="_honey"
+                className="sr-only"
+                tabIndex={-1}
+                autoComplete="off"
+                aria-hidden="true"
               />
-            </Field>
 
-            <label className="flex items-start gap-3 text-sm text-muted-foreground">
-              <Checkbox
-                id="dsgvo"
-                checked={agreed}
-                onCheckedChange={(v) => setAgreed(Boolean(v))}
-                required
-              />
-              <span>
-                Ich habe die{" "}
-                <a href="/datenschutz" className="text-accent-blue underline">Datenschutzerklärung</a>{" "}
-                gelesen und stimme zu, dass meine Angaben zur Kontaktaufnahme verarbeitet werden.
-              </span>
-            </label>
-
-            <Button
-              type="submit"
-              variant="brand"
-              size="lg"
-              disabled={!agreed || submitting}
-              className="w-full sm:w-auto"
-            >
-              Anfrage senden <ArrowRight className="h-4 w-4" />
-            </Button>
-
-            {submitted && (
-              <div className="rounded-lg border border-border bg-section p-4 text-sm text-foreground/85">
-                Vielen Dank! Ihre Anfrage wurde erfolgreich gesendet.
+              <div className="grid sm:grid-cols-2 gap-4">
+                <Field label="Name" required fieldId="contact-name" error={errors.name}>
+                  <Input
+                    name="name"
+                    placeholder="Ihr Name"
+                    disabled={isSubmitting}
+                    onBlur={(e) => {
+                      const err = validateContactName(e.target.value);
+                      setErrors((prev) => {
+                        const next = { ...prev };
+                        if (err) next.name = err;
+                        else delete next.name;
+                        return next;
+                      });
+                    }}
+                  />
+                </Field>
+                <Field label="Unternehmen" fieldId="contact-company">
+                  <Input name="company" placeholder="Firmenname (optional)" disabled={isSubmitting} />
+                </Field>
               </div>
-            )}
-
-            {errorMessage && (
-              <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-sm text-foreground/85">
-                {errorMessage}
+              <div className="grid sm:grid-cols-2 gap-4">
+                <Field label="E-Mail" required fieldId="contact-email" error={errors.email}>
+                  <Input
+                    type="email"
+                    name="email"
+                    placeholder="ihre@email.de"
+                    disabled={isSubmitting}
+                    onBlur={(e) => {
+                      const err = validateContactEmail(e.target.value);
+                      setErrors((prev) => {
+                        const next = { ...prev };
+                        if (err) next.email = err;
+                        else delete next.email;
+                        return next;
+                      });
+                    }}
+                  />
+                </Field>
+                <Field label="Telefon" fieldId="contact-phone" error={errors.phone}>
+                  <Input
+                    name="phone"
+                    placeholder="optional"
+                    disabled={isSubmitting}
+                    onBlur={(e) => {
+                      const err = validateContactPhone(e.target.value);
+                      setErrors((prev) => {
+                        const next = { ...prev };
+                        if (err) next.phone = err;
+                        else delete next.phone;
+                        return next;
+                      });
+                    }}
+                  />
+                </Field>
               </div>
-            )}
-          </form>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="contact-topic" className="text-sm text-foreground/80">
+                  Anliegen{" "}
+                  <span className="text-destructive" aria-label="erforderlich">
+                    *
+                  </span>
+                </Label>
+                <Select
+                  value={topic}
+                  onValueChange={(v) => {
+                    setTopic(v);
+                    clearFieldError("topic");
+                  }}
+                  disabled={isSubmitting}
+                >
+                  <SelectTrigger
+                    id="contact-topic"
+                    aria-invalid={!!errors.topic}
+                    aria-describedby={errors.topic ? "contact-topic-error" : undefined}
+                    onBlur={() => {
+                      const err = validateContactTopic(topic);
+                      setErrors((prev) => {
+                        const next = { ...prev };
+                        if (err) next.topic = err;
+                        else delete next.topic;
+                        return next;
+                      });
+                    }}
+                  >
+                    <SelectValue placeholder="Bitte wählen" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="website">Website erstellen</SelectItem>
+                    <SelectItem value="wartung">Website-Betreuung</SelectItem>
+                    <SelectItem value="email-domain">E-Mail, Domain & Hosting</SelectItem>
+                    <SelectItem value="it-support">IT-Support</SelectItem>
+                    <SelectItem value="digital-setup">Digital Setup</SelectItem>
+                    <SelectItem value="sonstiges">Sonstiges</SelectItem>
+                  </SelectContent>
+                </Select>
+                {errors.topic && (
+                  <p id="contact-topic-error" role="alert" className="text-destructive text-xs mt-1">
+                    {errors.topic}
+                  </p>
+                )}
+              </div>
+
+              <Field label="Nachricht" required fieldId="contact-message" error={errors.message}>
+                <Textarea
+                  name="message"
+                  rows={5}
+                  maxLength={2000}
+                  placeholder="Beschreiben Sie kurz Ihr Anliegen…"
+                  disabled={isSubmitting}
+                  onBlur={(e) => {
+                    const err = validateContactMessage(e.target.value);
+                    setErrors((prev) => {
+                      const next = { ...prev };
+                      if (err) next.message = err;
+                      else delete next.message;
+                      return next;
+                    });
+                  }}
+                />
+              </Field>
+
+              <label className="flex items-start gap-3 text-sm text-muted-foreground cursor-pointer">
+                <Checkbox
+                  checked={consentChecked}
+                  onCheckedChange={(v) => setConsentChecked(Boolean(v))}
+                  disabled={isSubmitting}
+                  aria-required="true"
+                  className="mt-0.5"
+                />
+                <span>
+                  Ich habe die{" "}
+                  <Link to="/datenschutz" className="text-accent-blue hover:underline">
+                    Datenschutzerklärung
+                  </Link>{" "}
+                  zur Kenntnis genommen. Ich stimme zu, dass meine Angaben (Name, E-Mail-Adresse sowie ggf. Telefon und
+                  Firmenname) zur Bearbeitung meiner Anfrage erhoben und verarbeitet werden. Diese Einwilligung kann ich
+                  jederzeit für die Zukunft per E-Mail an{" "}
+                  <a href={`mailto:${COMPANY.email}`} className="text-accent-blue hover:underline">
+                    {COMPANY.email}
+                  </a>{" "}
+                  widerrufen.
+                </span>
+              </label>
+
+              <Button
+                type="submit"
+                variant="brand"
+                size="lg"
+                disabled={!consentChecked || isSubmitting}
+                className="w-full sm:w-auto inline-flex items-center gap-2"
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin shrink-0" aria-hidden="true" />
+                    Wird gesendet...
+                  </>
+                ) : (
+                  <>
+                    Anfrage senden <ArrowRight className="h-4 w-4 shrink-0" />
+                  </>
+                )}
+              </Button>
+
+              {submitError && (
+                <div
+                  role="alert"
+                  className="rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-sm text-foreground/85"
+                >
+                  {submitError}
+                </div>
+              )}
+            </form>
+          )}
         </div>
       </div>
     </section>
@@ -873,18 +1065,40 @@ function ContactRow({ icon, label, value }: { icon: React.ReactNode; label: stri
 function Field({
   label,
   required,
+  fieldId,
+  error,
   children,
 }: {
   label: string;
   required?: boolean;
-  children: React.ReactNode;
+  fieldId: string;
+  error?: string;
+  children: React.ReactElement;
 }) {
+  const errorId = `${fieldId}-error`;
   return (
     <div className="space-y-1.5">
-      <Label className="text-sm text-foreground/80">
-        {label} {required && <span className="text-destructive">*</span>}
+      <Label htmlFor={fieldId} className="text-sm text-foreground/80">
+        {label}{" "}
+        {required && (
+          <span className="text-destructive" aria-label="erforderlich">
+            *
+          </span>
+        )}
       </Label>
-      {children}
+      {React.cloneElement(
+        children as React.ReactElement<React.HTMLAttributes<HTMLElement>>,
+        {
+          id: fieldId,
+          "aria-invalid": !!error,
+          "aria-describedby": error ? errorId : undefined,
+        },
+      )}
+      {error && (
+        <p id={errorId} role="alert" className="text-destructive text-xs mt-1">
+          {error}
+        </p>
+      )}
     </div>
   );
 }
