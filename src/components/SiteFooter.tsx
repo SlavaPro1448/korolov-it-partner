@@ -31,7 +31,7 @@ export function SiteFooter({ locale = "de" }: { locale?: Locale }) {
           </div>
           <ul className="space-y-2 text-sm text-white/70">
             <li className="flex items-center gap-2"><Mail className="h-4 w-4" /> info@korolov-it-service.de</li>
-            <li className="flex items-center gap-2"><Phone className="h-4 w-4" /> +49 …</li>
+            <li className="flex items-center gap-2"><Phone className="h-4 w-4" /> +491638251736</li>
             <li className="flex items-center gap-2"><MapPin className="h-4 w-4" /> Leverkusen, NRW</li>
           </ul>
         </div>

@@ -821,7 +821,7 @@ function Contact() {
           </p>
           <div className="mt-8 space-y-4">
             <ContactRow icon={<Mail className="h-5 w-5" />} label="E-Mail" value="info@korolov-it-service.de" />
-            <ContactRow icon={<Phone className="h-5 w-5" />} label="Telefon / WhatsApp" value="+49 …" />
+            <ContactRow icon={<Phone className="h-5 w-5" />} label="Telefon / WhatsApp" value="+491638251736" />
             <ContactRow icon={<MapPin className="h-5 w-5" />} label="Standort" value="Leverkusen, NRW" />
             <ContactRow icon={<Languages className="h-5 w-5" />} label="Sprachen" value="Deutsch · Russisch · Ukrainisch" />
           </div>
