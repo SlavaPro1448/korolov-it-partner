@@ -39,26 +39,17 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumbSchema, faqPageSchema, localBusinessSchema } from "@/lib/structured-data";
+import { buildSeoMeta } from "@/lib/seo";
 
 export const Route = createFileRoute("/ru")({
   head: () => ({
-    meta: [
-      { title: "Korolov IT-Service | Сайты и IT-поддержка в Leverkusen" },
-      {
-        name: "description",
-        content:
-          "Korolov IT-Service помогает малому бизнесу в Leverkusen, Köln и NRW с сайтами, почтой, хостингом, IT-поддержкой и цифровой организацией.",
-      },
-      { property: "og:title", content: "Korolov IT-Service | Сайты и IT-поддержка в Leverkusen" },
-      {
-        property: "og:description",
-        content:
-          "Современные сайты, надежная IT-поддержка и понятное сопровождение для малого бизнеса в Leverkusen, Köln и NRW.",
-      },
-      { property: "og:type", content: "website" },
-      { property: "og:locale", content: "ru_RU" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
+    meta: buildSeoMeta({
+      title: "Korolov IT-Service | Сайты и IT-поддержка в Leverkusen",
+      description:
+        "Korolov IT-Service помогает малому бизнесу в Leverkusen, Köln и NRW с сайтами, почтой, хостингом, IT-поддержкой и цифровой организацией.",
+      path: "/ru",
+      locale: "ru",
+    }),
   }),
   component: RussianHomePage,
 });

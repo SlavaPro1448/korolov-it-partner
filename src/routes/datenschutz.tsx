@@ -2,14 +2,17 @@ import { createFileRoute } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { COMPANY_DETAILS } from "@/config/legal";
+import { buildSeoMeta } from "@/lib/seo";
 
 export const Route = createFileRoute("/datenschutz")({
   head: () => ({
-    meta: [
-      { title: "Datenschutz | Korolov IT-Service" },
-      { name: "description", content: "Datenschutzerklärung von Korolov IT-Service." },
-      { name: "robots", content: "noindex" },
-    ],
+    meta: buildSeoMeta({
+      title: "Datenschutz | Korolov IT-Service",
+      description: "Datenschutzerklärung von Korolov IT-Service.",
+      path: "/datenschutz",
+      locale: "de",
+      noindex: true,
+    }),
   }),
   component: DatenschutzPage,
 });

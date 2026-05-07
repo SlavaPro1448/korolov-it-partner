@@ -39,18 +39,17 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumbSchema, faqPageSchema, localBusinessSchema } from "@/lib/structured-data";
+import { buildSeoMeta } from "@/lib/seo";
 
 export const Route = createFileRoute("/ua")({
   head: () => ({
-    meta: [
-      { title: "Korolov IT-Service | Сайти та IT-підтримка в Leverkusen" },
-      {
-        name: "description",
-        content:
-          "Korolov IT-Service допомагає малому бізнесу в Leverkusen, Köln і NRW із сайтами, поштою, хостингом та IT-підтримкою.",
-      },
-      { property: "og:locale", content: "uk_UA" },
-    ],
+    meta: buildSeoMeta({
+      title: "Korolov IT-Service | Сайти та IT-підтримка в Leverkusen",
+      description:
+        "Korolov IT-Service допомагає малому бізнесу в Leverkusen, Köln і NRW із сайтами, поштою, хостингом та IT-підтримкою.",
+      path: "/ua",
+      locale: "ua",
+    }),
   }),
   component: UkrainianHomePage,
 });

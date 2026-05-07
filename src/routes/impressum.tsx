@@ -4,14 +4,17 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { COMPANY_DETAILS } from "@/config/legal";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumbSchema, organizationSchema } from "@/lib/structured-data";
+import { buildSeoMeta } from "@/lib/seo";
 
 export const Route = createFileRoute("/impressum")({
   head: () => ({
-    meta: [
-      { title: "Impressum | Korolov IT-Service" },
-      { name: "description", content: "Impressum von Korolov IT-Service." },
-      { name: "robots", content: "noindex" },
-    ],
+    meta: buildSeoMeta({
+      title: "Impressum | Korolov IT-Service",
+      description: "Impressum von Korolov IT-Service.",
+      path: "/impressum",
+      locale: "de",
+      noindex: true,
+    }),
   }),
   component: ImpressumPage,
 });

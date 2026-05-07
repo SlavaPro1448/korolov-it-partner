@@ -39,26 +39,17 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumbSchema, faqPageSchema, localBusinessSchema } from "@/lib/structured-data";
+import { buildSeoMeta } from "@/lib/seo";
 
 export const Route = createFileRoute("/")({
   head: () => ({
-    meta: [
-      { title: "Korolov IT-Service | Websites & IT-Support in Leverkusen" },
-      {
-        name: "description",
-        content:
-          "Korolov IT-Service unterstützt kleine Unternehmen in Leverkusen, Köln und NRW bei Websites, E-Mail, Hosting, IT-Support und digitaler Organisation.",
-      },
-      { property: "og:title", content: "Korolov IT-Service | Websites & IT-Support in Leverkusen" },
-      {
-        property: "og:description",
-        content:
-          "Moderne Websites, zuverlässige IT und verständliche Betreuung für kleine Unternehmen in Leverkusen, Köln und NRW.",
-      },
-      { property: "og:type", content: "website" },
-      { property: "og:locale", content: "de_DE" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
+    meta: buildSeoMeta({
+      title: "Korolov IT-Service | Websites & IT-Support in Leverkusen",
+      description:
+        "Korolov IT-Service unterstützt kleine Unternehmen in Leverkusen, Köln und NRW bei Websites, E-Mail, Hosting, IT-Support und digitaler Organisation.",
+      path: "/",
+      locale: "de",
+    }),
   }),
   component: HomePage,
 });
