@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { Mail, MapPin, Phone } from "lucide-react";
+import { COMPANY } from "@/config/legal";
 
 type Locale = "de" | "ru" | "ua";
 
@@ -31,7 +32,9 @@ export function SiteFooter({ locale = "de" }: { locale?: Locale }) {
           </div>
           <ul className="space-y-2 text-sm text-white/70">
             <li className="flex items-center gap-2"><Mail className="h-4 w-4" /> info@korolov-it-service.de</li>
-            <li className="flex items-center gap-2"><Phone className="h-4 w-4" /> +491638251736</li>
+            <li className="flex items-center gap-2">
+              <Phone className="h-4 w-4" /> {COMPANY.phoneDisplay}
+            </li>
             <li className="flex items-center gap-2"><MapPin className="h-4 w-4" /> Leverkusen, NRW</li>
           </ul>
         </div>
@@ -49,6 +52,15 @@ export function SiteFooter({ locale = "de" }: { locale?: Locale }) {
             <li>
               <Link to="/datenschutz" className="hover:text-white transition-colors">
                 {locale === "de" ? "Datenschutz" : locale === "ru" ? "Конфиденциальность" : "Конфіденційність"}
+              </Link>
+            </li>
+            <li>
+              <Link to="/widerruf" className="hover:text-white transition-colors">
+                {locale === "de"
+                  ? "Widerrufsbelehrung"
+                  : locale === "ru"
+                    ? "Отзыв (потребители)"
+                    : "Відкликання (споживачі)"}
               </Link>
             </li>
           </ul>

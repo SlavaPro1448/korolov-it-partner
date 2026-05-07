@@ -37,6 +37,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
+import { COMPANY } from "@/config/legal";
 import { ReferencesSection } from "@/components/sections/ReferencesSection";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumbSchema, faqPageSchema, localBusinessSchema } from "@/lib/structured-data";
@@ -764,7 +765,7 @@ function Contact() {
           </p>
           <div className="mt-8 space-y-4">
             <ContactRow icon={<Mail className="h-5 w-5" />} label="E-Mail" value="info@korolov-it-service.de" />
-            <ContactRow icon={<Phone className="h-5 w-5" />} label="Telefon / WhatsApp" value="+491638251736" />
+            <ContactRow icon={<Phone className="h-5 w-5" />} label="Telefon / WhatsApp" value={COMPANY.phoneDisplay} />
             <ContactRow icon={<MapPin className="h-5 w-5" />} label="Standort" value="Leverkusen, NRW" />
             <ContactRow icon={<Languages className="h-5 w-5" />} label="Sprachen" value="Deutsch · Russisch · Ukrainisch" />
           </div>

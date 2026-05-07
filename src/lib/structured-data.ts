@@ -1,4 +1,4 @@
-import { COMPANY_DETAILS } from "@/config/legal";
+import { COMPANY } from "@/config/legal";
 
 type SupportedLocale = "de" | "ru" | "uk";
 
@@ -47,14 +47,14 @@ export function localBusinessSchema(locale: SupportedLocale = "de") {
     image: `${SITE_URL}/og-image.jpg`,
     "@id": `${SITE_URL}/#business`,
     url: SITE_URL,
-    telephone: COMPANY_DETAILS.phone,
-    email: COMPANY_DETAILS.email,
+    telephone: COMPANY.phoneDisplay,
+    email: COMPANY.email,
     priceRange: "€€",
     address: {
       "@type": "PostalAddress",
-      streetAddress: COMPANY_DETAILS.street,
+      streetAddress: COMPANY.street,
       addressLocality: "Leverkusen",
-      postalCode: COMPANY_DETAILS.zip,
+      postalCode: COMPANY.zip,
       addressCountry: "DE",
     },
     geo: {
@@ -87,17 +87,17 @@ export function organizationSchema(locale: SupportedLocale = "de") {
     description: descriptionByLocale[locale],
     url: SITE_URL,
     logo: `${SITE_URL}/logo.svg`,
-    email: COMPANY_DETAILS.email,
-    telephone: COMPANY_DETAILS.phone,
+    email: COMPANY.email,
+    telephone: COMPANY.phoneDisplay,
     founder: {
       "@type": "Person",
       name: "Viacheslav Korolov",
     },
     address: {
       "@type": "PostalAddress",
-      streetAddress: COMPANY_DETAILS.street,
+      streetAddress: COMPANY.street,
       addressLocality: "Leverkusen",
-      postalCode: COMPANY_DETAILS.zip,
+      postalCode: COMPANY.zip,
       addressCountry: "DE",
     },
     areaServed: areaServedByLocale[locale],

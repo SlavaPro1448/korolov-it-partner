@@ -37,6 +37,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
+import { COMPANY } from "@/config/legal";
 import { ReferencesSection } from "@/components/sections/ReferencesSection";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumbSchema, faqPageSchema, localBusinessSchema } from "@/lib/structured-data";
@@ -574,7 +575,7 @@ function Contact() {
           <h2 className="mt-3 text-3xl md:text-4xl font-bold text-brand leading-tight">Запросити безкоштовну консультацію</h2>
           <div className="mt-8 space-y-4">
             <ContactRow icon={<Mail className="h-5 w-5" />} label="E-mail" value="info@korolov-it-service.de" />
-            <ContactRow icon={<Phone className="h-5 w-5" />} label="Телефон / WhatsApp" value="+49 …" />
+            <ContactRow icon={<Phone className="h-5 w-5" />} label="Телефон / WhatsApp" value={COMPANY.phoneDisplay} />
             <ContactRow icon={<MapPin className="h-5 w-5" />} label="Локація" value="Leverkusen, NRW" />
             <ContactRow icon={<Languages className="h-5 w-5" />} label="Мови" value="Deutsch · Русский · Українська" />
             <ContactRow icon={<MessageSquare className="h-5 w-5" />} label="Формат" value="Віддалено та за домовленістю on-site" />
