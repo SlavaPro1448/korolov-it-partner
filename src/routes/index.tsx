@@ -648,12 +648,12 @@ function About() {
         </div>
         <div className="lg:col-span-5">
           <div className="card-soft p-7 bg-gradient-to-br from-white to-section">
-            <div className="h-20 w-20 rounded-2xl overflow-hidden shadow-sm">
+            <div className="w-full max-w-[220px] aspect-[4/5] rounded-2xl overflow-hidden shadow-sm">
               <img
-                src="/images/viacheslav-portrait.jpg"
+                src="/images/viacheslav-portrait-v4.jpeg"
                 alt="Viacheslav Korolov – Inhaber Korolov IT-Service"
                 loading="lazy"
-                className="h-full w-full object-cover"
+                className="h-full w-full object-cover object-center"
               />
             </div>
             <div className="mt-5">
