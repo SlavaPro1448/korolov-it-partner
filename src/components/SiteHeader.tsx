@@ -1,15 +1,9 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "@tanstack/react-router";
 import { Menu, X, Languages } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 type Locale = "de" | "ru" | "ua";
-
-function switchLang(href: string) {
-  if (typeof window !== "undefined") {
-    sessionStorage.setItem("__lang_scrollY", String(window.scrollY));
-    window.location.href = href;
-  }
-}
 
 const navItemsByLocale: Record<Locale, Array<{ label: string; href: string }>> = {
   de: [
@@ -56,9 +50,25 @@ const menuLabelByLocale: Record<Locale, string> = {
 export function SiteHeader({ locale = "de", basePath = "/" }: { locale?: Locale; basePath?: string }) {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const navigate = useNavigate();
   const navItems = navItemsByLocale[locale];
   const cta = ctaByLocale[locale];
   const homePath = locale === "de" ? "/" : locale === "ru" ? "/ru" : "/ua";
+
+  const switchLang = (to: "/" | "/ru" | "/ua") => {
+    if (typeof window === "undefined") return;
+    const y = window.scrollY;
+    const hash = window.location.hash.replace(/^#/, "");
+    setOpen(false);
+    void navigate({
+      to,
+      hash: hash || undefined,
+    }).then(() => {
+      requestAnimationFrame(() => {
+        window.scrollTo({ top: y, behavior: "instant" as ScrollBehavior });
+      });
+    });
+  };
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
