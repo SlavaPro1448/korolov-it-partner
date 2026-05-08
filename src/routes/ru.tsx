@@ -22,6 +22,7 @@ import {
   Check,
   Star,
   ChevronDown,
+  Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -753,9 +754,58 @@ function FAQ() {
 function Contact() {
   const [agreed, setAgreed] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-  const handleSubmit = (e: FormEvent) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
+  const [topic, setTopic] = useState("");
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setSubmitted(true);
+    setSubmitError("");
+
+    const form = e.currentTarget;
+    const data = new FormData(form);
+    const payload = {
+      name: String(data.get("name") ?? "").trim(),
+      company: String(data.get("company") ?? "").trim(),
+      email: String(data.get("email") ?? "").trim(),
+      phone: String(data.get("phone") ?? "").trim(),
+      message: String(data.get("message") ?? "").trim(),
+      topic,
+      consent: agreed,
+      locale: "ru",
+      _honey: String(data.get("_honey") ?? "").trim(),
+    };
+
+    if (payload._honey) {
+      setSubmitted(true);
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+      const result = await response.json().catch(() => null);
+      if (!response.ok || !result?.ok) {
+        setSubmitError(
+          typeof result?.error === "string"
+            ? result.error
+            : "Не удалось отправить сообщение. Попробуйте ещё раз.",
+        );
+        return;
+      }
+      setSubmitted(true);
+    } catch {
+      setSubmitError("Не удалось отправить сообщение. Попробуйте ещё раз.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -814,17 +864,28 @@ function Contact() {
           <form
             onSubmit={handleSubmit}
             className="card-soft p-6 md:p-8 space-y-5"
+            noValidate
             aria-labelledby="contact-heading"
           >
+            <input type="hidden" name="topic" value={topic} />
+            <input
+              type="text"
+              name="_honey"
+              className="sr-only"
+              tabIndex={-1}
+              autoComplete="off"
+              aria-hidden="true"
+            />
             <div className="grid sm:grid-cols-2 gap-4">
               <Field label="Имя" required fieldId="ru-name">
-                <Input required name="name" placeholder="Ваше имя" autoComplete="name" />
+                <Input required name="name" placeholder="Ваше имя" autoComplete="name" disabled={isSubmitting} />
               </Field>
               <Field label="Компания" fieldId="ru-company">
                 <Input
                   name="company"
                   placeholder="Название компании (опционально)"
                   autoComplete="organization"
+                  disabled={isSubmitting}
                 />
               </Field>
             </div>
@@ -836,14 +897,15 @@ function Contact() {
                   name="email"
                   placeholder="your@email.de"
                   autoComplete="email"
+                  disabled={isSubmitting}
                 />
               </Field>
               <Field label="Телефон" fieldId="ru-phone">
-                <Input name="phone" placeholder="опционально" autoComplete="tel" />
+                <Input name="phone" placeholder="опционально" autoComplete="tel" disabled={isSubmitting} />
               </Field>
             </div>
             <Field label="Тема запроса" required fieldId="ru-topic">
-              <Select name="topic">
+              <Select value={topic} onValueChange={setTopic} disabled={isSubmitting}>
                 <SelectTrigger id="ru-topic">
                   <SelectValue placeholder="Выберите вариант" />
                 </SelectTrigger>
@@ -863,6 +925,7 @@ function Contact() {
                 name="message"
                 rows={5}
                 placeholder="Кратко опишите вашу задачу..."
+                disabled={isSubmitting}
               />
             </Field>
 
@@ -876,6 +939,7 @@ function Contact() {
                 onCheckedChange={(v) => setAgreed(Boolean(v))}
                 required
                 aria-required="true"
+                disabled={isSubmitting}
               />
               <span>
                 Я ознакомился(ась) с{" "}
@@ -890,11 +954,29 @@ function Contact() {
               type="submit"
               variant="brand"
               size="lg"
-              disabled={!agreed}
-              className="w-full sm:w-auto"
+              disabled={!agreed || isSubmitting}
+              className="w-full sm:w-auto inline-flex items-center gap-2"
             >
-              Отправить заявку <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin shrink-0" aria-hidden="true" />
+                  Отправка...
+                </>
+              ) : (
+                <>
+                  Отправить заявку <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                </>
+              )}
             </Button>
+
+            {submitError && (
+              <div
+                role="alert"
+                className="rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-sm text-foreground/85"
+              >
+                {submitError}
+              </div>
+            )}
 
             {submitted && (
               <div
@@ -902,13 +984,7 @@ function Contact() {
                 aria-live="polite"
                 className="rounded-lg border border-border bg-section p-4 text-sm text-foreground/85"
               >
-                Форма пока не подключена к сервису отправки.
-                <br />
-                Пожалуйста, напишите напрямую на{" "}
-                <a className="text-accent-blue underline" href={`mailto:${COMPANY.email}`}>
-                  {COMPANY.email}
-                </a>
-                .
+                Спасибо! Ваше сообщение успешно отправлено. Я свяжусь с вами в ближайшее время.
               </div>
             )}
           </form>

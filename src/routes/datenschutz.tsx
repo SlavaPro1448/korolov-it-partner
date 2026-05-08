@@ -170,30 +170,17 @@ function DatenschutzPage() {
             <section>
               <h2 className="text-lg font-semibold text-brand mb-3">5. Kontaktaufnahme</h2>
               <h3 className="font-semibold text-brand mt-4 mb-2">Kontaktformular</h3>
-              {/*
-              ВАЖНО: Этот раздел описывает текущее состояние (formsubmit.co).
-              При переходе на собственный Python-backend замените содержимое
-              этого подраздела.
-            */}
               <p>
                 Wenn Sie das Kontaktformular auf dieser Website nutzen, werden die von Ihnen
                 eingegebenen Daten (Name, E-Mail-Adresse, ggf. Telefonnummer, Firmenname und Inhalt
                 der Nachricht) zur Bearbeitung Ihrer Anfrage verarbeitet.
               </p>
               <p className="mt-3">
-                Die technische Übermittlung der Formulardaten erfolgt derzeit über den Dienst{" "}
-                <strong>{COMPANY.formProcessor.provider}</strong>. Der Anbieter hat seinen Sitz in
-                den {COMPANY.formProcessor.country}. Die Übermittlung in ein Drittland erfolgt auf
-                Grundlage von Standardvertragsklauseln nach Art. 46 Abs. 2 lit. c DSGVO. Weitere
-                Informationen finden Sie in der Datenschutzerklärung des Anbieters:{" "}
-                <a
-                  href={COMPANY.formProcessor.privacyUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-accent-blue hover:underline break-all"
-                >
-                  {COMPANY.formProcessor.privacyUrl}
-                </a>
+                Die Übermittlung der Formulardaten erfolgt an eine serverseitige API auf dieser
+                Website (`/api/contact`). Die anschließende Zustellung der Nachricht erfolgt über die
+                SMTP-Infrastruktur von <strong>{COMPANY.mailProvider.provider}</strong>. Dabei werden
+                technisch notwendige Metadaten (insbesondere IP-Adresse und User-Agent) zur
+                Missbrauchsprävention und Fehleranalyse verarbeitet.
               </p>
               <p className="mt-3">
                 Rechtsgrundlage der Verarbeitung ist Art. 6 Abs. 1 lit. b DSGVO (Durchführung
@@ -201,6 +188,10 @@ function DatenschutzPage() {
                 an der Beantwortung Ihrer Anfrage). Die Daten werden gelöscht, sobald Ihre Anfrage
                 abschließend bearbeitet ist und keine gesetzlichen Aufbewahrungspflichten
                 entgegenstehen.
+              </p>
+              <p className="mt-3">
+                Optional kann eine Eingangsbestätigung an die von Ihnen angegebene E-Mail-Adresse
+                versendet werden. Diese erfolgt ausschließlich im Zusammenhang mit Ihrer Anfrage.
               </p>
 
               <h3 className="font-semibold text-brand mt-5 mb-2">E-Mail, Telefon und WhatsApp</h3>

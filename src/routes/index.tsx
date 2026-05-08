@@ -810,15 +810,6 @@ function Contact() {
   const [topic, setTopic] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const topicLabelMap: Record<string, string> = {
-    website: "Website erstellen",
-    wartung: "Website-Betreuung",
-    "email-domain": "E-Mail, Domain & Hosting",
-    "it-support": "IT-Support",
-    "digital-setup": "Digital Setup",
-    sonstiges: "Sonstiges",
-  };
-
   const clearFieldError = (key: string) => {
     setErrors((prev) => {
       if (!(key in prev)) return prev;
@@ -871,30 +862,38 @@ function Contact() {
     const email = String(data.get("email") ?? "").trim();
     const phone = String(data.get("phone") ?? "").trim();
     const message = String(data.get("message") ?? "").trim();
-    const topicLabel = topic ? (topicLabelMap[topic] ?? topic) : "Nicht angegeben";
-
-    const payload = new FormData();
-    payload.append("_subject", "Neue Anfrage über die Website");
-    payload.append("_template", "table");
-    payload.append("_captcha", "false");
-    payload.append("Name", name || "-");
-    payload.append("Unternehmen", company || "-");
-    payload.append("E-Mail", email || "-");
-    payload.append("Telefon", phone || "-");
-    payload.append("Anliegen", topicLabel);
-    payload.append("Nachricht", message || "-");
+    const payload = {
+      name,
+      company,
+      email,
+      phone,
+      topic,
+      message,
+      consent: consentChecked,
+      locale: "de",
+      _honey: honey,
+    };
 
     try {
       setIsSubmitting(true);
-      const response = await fetch("https://formsubmit.co/ajax/korolovslava04@gmail.com", {
+      const response = await fetch("/api/contact", {
         method: "POST",
         headers: {
+          "Content-Type": "application/json",
           Accept: "application/json",
         },
-        body: payload,
+        body: JSON.stringify(payload),
       });
 
-      if (!response.ok) {
+      const result = await response.json().catch(() => null);
+      if (!response.ok || !result?.ok) {
+        if (result?.errors && typeof result.errors === "object") {
+          setErrors((prev) => ({ ...prev, ...result.errors }));
+        }
+        if (result?.error && typeof result.error === "string") {
+          setSubmitError(result.error);
+          return;
+        }
         throw new Error("request_failed");
       }
 
@@ -979,9 +978,6 @@ function Contact() {
               noValidate
               aria-labelledby="contact-heading"
             >
-              <input type="hidden" name="_subject" value="Neue Anfrage über die Website" />
-              <input type="hidden" name="_template" value="table" />
-              <input type="hidden" name="_captcha" value="false" />
               <input type="hidden" name="topic" value={topic} />
 
               <input

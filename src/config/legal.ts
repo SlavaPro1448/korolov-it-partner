@@ -52,15 +52,6 @@ export const COMPANY = {
     privacyUrl: "https://www.ionos.de/terms-gtc/datenschutzerklaerung",
   },
 
-  // Текущая обработка форм (formsubmit.co)
-  // ВАЖНО: при переходе на собственный Python-backend нужно обновить
-  // соответствующий раздел в datenschutz.tsx (помечен комментарием).
-  formProcessor: {
-    provider: "FormSubmit (Greenfish Software Inc.)",
-    country: "USA",
-    privacyUrl: "https://formsubmit.co/legal",
-  },
-
   // Шрифты
   fontProvider: {
     provider: "Bunny Fonts (BunnyWay d.o.o.)",
