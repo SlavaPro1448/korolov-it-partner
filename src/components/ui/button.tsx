@@ -5,7 +5,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-blue focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
@@ -20,8 +20,7 @@ const buttonVariants = cva(
           "btn-shine bg-[var(--brand)] text-[var(--brand-foreground)] shadow-sm hover:bg-[color-mix(in_oklab,var(--brand)_88%,white)]",
         accent:
           "btn-shine bg-[var(--accent-blue)] text-white shadow-sm hover:bg-[color-mix(in_oklab,var(--accent-blue)_88%,black)]",
-        soft:
-          "hover-lift bg-section text-brand hover:bg-[color-mix(in_oklab,var(--section)_85%,var(--accent-blue))]",
+        soft: "hover-lift bg-section text-brand hover:bg-[color-mix(in_oklab,var(--section)_85%,var(--accent-blue))]",
       },
       size: {
         default: "h-10 px-5 py-2",

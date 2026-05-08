@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState, type FormEvent, type ReactNode } from "react";
+import React, { useState, type FormEvent, type ReactNode } from "react";
 import {
   ArrowRight,
   CheckCircle2,
@@ -64,12 +64,10 @@ function RussianHomePage() {
       <JsonLd data={localBusinessSchema("ru")} />
       <JsonLd data={faqPageSchema(faqItems)} />
       <JsonLd
-        data={breadcrumbSchema([
-          { name: "Главная", item: "https://korolov-it-service.de/ru" },
-        ])}
+        data={breadcrumbSchema([{ name: "Главная", item: "https://korolov-it-service.de/ru" }])}
       />
       <SiteHeader locale="ru" basePath="/ru" />
-      <main className="flex-1">
+      <main id="main" tabIndex={-1} className="flex-1 focus:outline-none">
         <Hero />
         <Problem />
         <Services />
@@ -88,19 +86,22 @@ function RussianHomePage() {
 
 function Hero() {
   return (
-    <section className="hero-grid-bg relative overflow-hidden">
+    <section className="hero-grid-bg relative overflow-hidden" aria-labelledby="hero-heading">
       <div className="container-page py-20 md:py-28 lg:py-32 grid lg:grid-cols-12 gap-12 items-center">
         <div className="lg:col-span-7 fade-in-up">
           <div className="inline-flex items-center gap-2 rounded-full border border-border bg-white/70 backdrop-blur px-3 py-1 text-xs text-muted-foreground">
-            <Sparkles className="h-3.5 w-3.5 text-accent-blue" />
+            <Sparkles className="h-3.5 w-3.5 text-accent-blue" aria-hidden="true" />
             IT-партнер для малого бизнеса в NRW
           </div>
-          <h1 className="mt-6 text-4xl md:text-5xl lg:text-6xl font-bold text-brand leading-[1.05]">
+          <h1
+            id="hero-heading"
+            className="mt-6 text-4xl md:text-5xl lg:text-6xl font-bold text-brand leading-[1.05]"
+          >
             Больше заявок с сайта и IT-поддержки из Леверкузена
           </h1>
           <p className="mt-6 text-lg text-muted-foreground max-w-2xl leading-relaxed">
-            Помогаю малому бизнесу в Леверкузене с сайтом, деловой почтой, хостингом и
-            IT-поддержкой - просто и надежно.
+            Помогаю малому бизнесу в Леверкузене с сайтом, деловой почтой, хостингом и IT-поддержкой
+            - просто и надежно.
           </p>
           <div className="mt-8 flex flex-col sm:flex-row gap-3">
             <Button
@@ -110,26 +111,21 @@ function Hero() {
               className="w-full sm:w-auto h-14 px-8 text-base bg-accent-blue hover:bg-accent-blue/90 shadow-lg shadow-accent-blue/30"
             >
               <a href="#kontakt">
-                Запросить бесплатную консультацию <ArrowRight className="h-4 w-4" />
+                Запросить бесплатную консультацию{" "}
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </a>
             </Button>
-            <Button
-              asChild
-              variant="ghost"
-              size="default"
-              className="w-full sm:w-auto"
-            >
+            <Button asChild variant="ghost" size="default" className="w-full sm:w-auto">
               <a href="#leistungen">Посмотреть услуги</a>
             </Button>
           </div>
           <ul className="mt-10 grid sm:grid-cols-3 gap-4 max-w-2xl">
-            {[
-              "Личный контакт",
-              "Сайт + IT",
-              "DE · RU · UA",
-            ].map((t) => (
+            {["Личный контакт", "Сайт + IT", "DE · RU · UA"].map((t) => (
               <li key={t} className="flex items-start gap-2 text-sm text-foreground/80">
-                <CheckCircle2 className="h-5 w-5 text-accent-teal shrink-0 mt-0.5" />
+                <CheckCircle2
+                  className="h-5 w-5 text-accent-teal shrink-0 mt-0.5"
+                  aria-hidden="true"
+                />
                 {t}
               </li>
             ))}
@@ -146,7 +142,7 @@ function Hero() {
 
 function HeroCard() {
   return (
-    <div className="relative">
+    <div className="relative" aria-hidden="true">
       <div className="absolute -inset-4 bg-gradient-to-tr from-accent-blue/10 to-transparent rounded-3xl blur-2xl" />
       <div className="relative card-soft p-6 md:p-7">
         <div className="flex items-center justify-between">
@@ -158,10 +154,30 @@ function HeroCard() {
           <div className="text-xs text-muted-foreground">korolov-it-service.de</div>
         </div>
         <div className="mt-5 space-y-3">
-          <MiniRow icon={<Globe className="h-4 w-4" />} label="Сайт" value="активен · SSL" tone="teal" />
-          <MiniRow icon={<Mail className="h-4 w-4" />} label="Деловая почта" value="info@…de" tone="blue" />
-          <MiniRow icon={<ShieldCheck className="h-4 w-4" />} label="Бэкапы и обновления" value="актуально" tone="teal" />
-          <MiniRow icon={<LifeBuoy className="h-4 w-4" />} label="Техподдержка" value="на связи" tone="blue" />
+          <MiniRow
+            icon={<Globe className="h-4 w-4" />}
+            label="Сайт"
+            value="активен · SSL"
+            tone="teal"
+          />
+          <MiniRow
+            icon={<Mail className="h-4 w-4" />}
+            label="Деловая почта"
+            value="info@…de"
+            tone="blue"
+          />
+          <MiniRow
+            icon={<ShieldCheck className="h-4 w-4" />}
+            label="Бэкапы и обновления"
+            value="актуально"
+            tone="teal"
+          />
+          <MiniRow
+            icon={<LifeBuoy className="h-4 w-4" />}
+            label="Техподдержка"
+            value="на связи"
+            tone="blue"
+          />
         </div>
         <div className="mt-6 p-4 rounded-xl bg-section">
           <div className="flex items-center gap-2 text-xs uppercase tracking-wider text-muted-foreground">
@@ -216,21 +232,27 @@ function Problem() {
     },
   ];
   return (
-    <section className="py-20 md:py-28">
+    <section className="py-20 md:py-28" aria-labelledby="problem-heading">
       <div className="container-page max-w-5xl">
-        <h2 className="text-3xl md:text-4xl font-bold text-brand leading-tight">
+        <h2
+          id="problem-heading"
+          className="text-3xl md:text-4xl font-bold text-brand leading-tight"
+        >
           Многим небольшим компаниям не нужна большая агентство — нужен{" "}
           <span className="text-accent-blue">надежный технический партнер</span>.
         </h2>
         <p className="mt-5 text-lg text-muted-foreground max-w-3xl">
           Устаревший сайт, проблемы с почтой, неработающие формы и отсутствие ответственного за IT
-          человека в команде. Именно здесь я подключаюсь: практично, понятно и с учетом задач
-          вашего бизнеса.
+          человека в команде. Именно здесь я подключаюсь: практично, понятно и с учетом задач вашего
+          бизнеса.
         </p>
         <div className="mt-10 grid md:grid-cols-3 gap-5">
           {items.map((it) => (
             <div key={it.title} className="card-soft p-6">
-              <div className="h-10 w-10 rounded-lg bg-section flex items-center justify-center text-accent-blue">
+              <div
+                className="h-10 w-10 rounded-lg bg-section flex items-center justify-center text-accent-blue"
+                aria-hidden="true"
+              >
                 <CheckCircle2 className="h-5 w-5" />
               </div>
               <h3 className="mt-4 font-semibold text-brand">{it.title}</h3>
@@ -247,52 +269,51 @@ const services = [
   {
     icon: Globe,
     title: "Создание сайтов",
-    text:
-      "Современные, быстрые и адаптивные сайты для компаний, самозанятых и локальных услуг.",
+    text: "Современные, быстрые и адаптивные сайты для компаний, самозанятых и локальных услуг.",
     tags: ["Адаптивный дизайн", "SEO-основа", "Форма обратной связи", "SSL"],
   },
   {
     icon: Wrench,
     title: "Поддержка и обслуживание",
-    text:
-      "После запуска остаюсь вашим техническим контактом: обновления, бэкапы, мелкие доработки и помощь.",
+    text: "После запуска остаюсь вашим техническим контактом: обновления, бэкапы, мелкие доработки и помощь.",
     tags: ["Обновления", "Резервные копии", "Технический контроль"],
   },
   {
     icon: Mail,
     title: "Почта, домен и хостинг",
-    text:
-      "Настройка деловой почты, домена, хостинга, DNS, SPF, DKIM, DMARC и отправки форм.",
+    text: "Настройка деловой почты, домена, хостинга, DNS, SPF, DKIM, DMARC и отправки форм.",
     tags: ["Домен", "Business E-mail", "DNS", "SMTP"],
   },
   {
     icon: LifeBuoy,
     title: "IT-поддержка для малого бизнеса",
-    text:
-      "Помощь с компьютерами, сетью, принтерами, облаком, резервным копированием и повседневными IT-вопросами.",
+    text: "Помощь с компьютерами, сетью, принтерами, облаком, резервным копированием и повседневными IT-вопросами.",
     tags: ["Удаленно", "На месте", "Сеть", "Облако"],
   },
   {
     icon: FileText,
     title: "Цифровые документы и порядок",
-    text:
-      "Структура для счетов, коммерческих предложений, PDF-шаблонов, QR-кодов и хранения документов.",
+    text: "Структура для счетов, коммерческих предложений, PDF-шаблонов, QR-кодов и хранения документов.",
     tags: ["Счета", "Предложения", "PDF", "QR-коды"],
   },
   {
     icon: ShieldCheck,
     title: "Техническая реализация под DSGVO",
-    text:
-      "Техническое внедрение SSL, cookie-баннера, форм, страниц Impressum и Datenschutz.",
+    text: "Техническое внедрение SSL, cookie-баннера, форм, страниц Impressum и Datenschutz.",
     tags: ["SSL", "Cookie-баннер", "Datenschutz", "Impressum"],
   },
 ];
 
 function Services() {
   return (
-    <section id="leistungen" className="py-20 md:py-28 bg-section scroll-mt-20">
+    <section
+      id="leistungen"
+      className="py-20 md:py-28 bg-section scroll-mt-20"
+      aria-labelledby="services-heading"
+    >
       <div className="container-page">
         <SectionHeading
+          headingId="services-heading"
           eyebrow="Услуги"
           title="Цифровые решения для повседневных бизнес-задач"
           subtitle="От сайта до регулярного технического сопровождения."
@@ -300,14 +321,20 @@ function Services() {
         <div className="mt-12 grid md:grid-cols-2 lg:grid-cols-3 gap-5">
           {services.map((s) => (
             <article key={s.title} className="card-soft p-6 flex flex-col">
-              <div className="h-11 w-11 rounded-xl bg-brand/5 text-accent-blue flex items-center justify-center">
+              <div
+                className="h-11 w-11 rounded-xl bg-brand/5 text-accent-blue flex items-center justify-center"
+                aria-hidden="true"
+              >
                 <s.icon className="h-5 w-5" />
               </div>
               <h3 className="mt-4 font-semibold text-brand text-lg">{s.title}</h3>
               <p className="mt-2 text-sm text-muted-foreground leading-relaxed flex-1">{s.text}</p>
               <div className="mt-5 flex flex-wrap gap-1.5">
                 {s.tags.map((t) => (
-                  <span key={t} className="text-xs px-2.5 py-1 rounded-full bg-section text-foreground/70 border border-border">
+                  <span
+                    key={t}
+                    className="text-xs px-2.5 py-1 rounded-full bg-section text-foreground/70 border border-border"
+                  >
                     {t}
                   </span>
                 ))}
@@ -321,23 +348,59 @@ function Services() {
 }
 
 const audiences = [
-  { icon: UserCheck, title: "Самозанятые и предприниматели", text: "Нужен профессиональный старт и надежная техническая база." },
-  { icon: HardHat, title: "Мастера и локальные сервисы", text: "Понятный сайт с услугами, контактами и локальным акцентом." },
-  { icon: Building2, title: "Управляющие компании и сервисы недвижимости", text: "Структурная подача услуг и техническая поддержка в ежедневной работе." },
-  { icon: Scale, title: "Юридические и консалтинговые офисы", text: "Солидный цифровой образ, безопасная почта и надежный IT-контакт." },
-  { icon: Users, title: "Компании без собственного IT-отдела", text: "Один ответственный специалист по сайту, почте, хостингу и техвопросам." },
-  { icon: Languages, title: "Многоязычные предприниматели в Германии", text: "Консультации и реализация на немецком, русском и украинском." },
+  {
+    icon: UserCheck,
+    title: "Самозанятые и предприниматели",
+    text: "Нужен профессиональный старт и надежная техническая база.",
+  },
+  {
+    icon: HardHat,
+    title: "Мастера и локальные сервисы",
+    text: "Понятный сайт с услугами, контактами и локальным акцентом.",
+  },
+  {
+    icon: Building2,
+    title: "Управляющие компании и сервисы недвижимости",
+    text: "Структурная подача услуг и техническая поддержка в ежедневной работе.",
+  },
+  {
+    icon: Scale,
+    title: "Юридические и консалтинговые офисы",
+    text: "Солидный цифровой образ, безопасная почта и надежный IT-контакт.",
+  },
+  {
+    icon: Users,
+    title: "Компании без собственного IT-отдела",
+    text: "Один ответственный специалист по сайту, почте, хостингу и техвопросам.",
+  },
+  {
+    icon: Languages,
+    title: "Многоязычные предприниматели в Германии",
+    text: "Консультации и реализация на немецком, русском и украинском.",
+  },
 ];
 
 function ForWhom() {
   return (
-    <section id="fuer-wen" className="py-20 md:py-28 scroll-mt-20">
+    <section
+      id="fuer-wen"
+      className="py-20 md:py-28 scroll-mt-20"
+      aria-labelledby="forwhom-heading"
+    >
       <div className="container-page">
-        <SectionHeading eyebrow="Для кого" title="Кому подходит Korolov IT-Service" subtitle="С кем я чаще всего работаю." />
+        <SectionHeading
+          headingId="forwhom-heading"
+          eyebrow="Для кого"
+          title="Кому подходит Korolov IT-Service"
+          subtitle="С кем я чаще всего работаю."
+        />
         <div className="mt-12 grid md:grid-cols-2 lg:grid-cols-3 gap-5">
           {audiences.map((a) => (
             <div key={a.title} className="card-soft p-6">
-              <div className="h-10 w-10 rounded-lg bg-section text-accent-teal flex items-center justify-center">
+              <div
+                className="h-10 w-10 rounded-lg bg-section text-accent-teal flex items-center justify-center"
+                aria-hidden="true"
+              >
                 <a.icon className="h-5 w-5" />
               </div>
               <h3 className="mt-4 font-semibold text-brand">{a.title}</h3>
@@ -356,7 +419,13 @@ const packages = [
     price: "от 890 €",
     suffix: "netto",
     desc: "Для самозанятых и небольших компаний, которым нужен профессиональный старт.",
-    features: ["1-3 страницы", "Адаптивный дизайн", "Форма контакта", "SSL и подключение домена", "Базовое SEO"],
+    features: [
+      "1-3 страницы",
+      "Адаптивный дизайн",
+      "Форма контакта",
+      "SSL и подключение домена",
+      "Базовое SEO",
+    ],
     recommended: false,
   },
   {
@@ -364,7 +433,13 @@ const packages = [
     price: "от 1.500 €",
     suffix: "netto",
     desc: "Для компаний с несколькими услугами и более сложной структурой.",
-    features: ["4-7 страниц", "Индивидуальная структура", "Страницы услуг", "Форма и почтовая интеграция", "SEO-структура"],
+    features: [
+      "4-7 страниц",
+      "Индивидуальная структура",
+      "Страницы услуг",
+      "Форма и почтовая интеграция",
+      "SEO-структура",
+    ],
     recommended: true,
   },
   {
@@ -372,7 +447,13 @@ const packages = [
     price: "от 390 €",
     suffix: "netto",
     desc: "Для аккуратной настройки домена, почты и базовой IT-инфраструктуры.",
-    features: ["Домен и хостинг", "Деловая почта", "SPF, DKIM, DMARC", "Подпись e-mail", "Отправка формы"],
+    features: [
+      "Домен и хостинг",
+      "Деловая почта",
+      "SPF, DKIM, DMARC",
+      "Подпись e-mail",
+      "Отправка формы",
+    ],
     recommended: false,
   },
   {
@@ -394,18 +475,32 @@ const packages = [
 
 function Pricing() {
   return (
-    <section id="preise" className="py-20 md:py-28 bg-section scroll-mt-20">
+    <section
+      id="preise"
+      className="py-20 md:py-28 bg-section scroll-mt-20"
+      aria-labelledby="pricing-heading"
+    >
       <div className="container-page">
-        <SectionHeading eyebrow="Пакеты и цены" title="Прозрачные стартовые тарифы" subtitle="Финальное предложение формируется после бесплатной консультации." />
+        <SectionHeading
+          headingId="pricing-heading"
+          eyebrow="Пакеты и цены"
+          title="Прозрачные стартовые тарифы"
+          subtitle="Финальное предложение формируется после бесплатной консультации."
+        />
         <div className="mt-12 grid md:grid-cols-2 xl:grid-cols-4 gap-5">
           {packages.map((p) => (
-            <div key={p.name} className={`relative card-soft p-6 flex flex-col ${p.recommended ? "ring-2 ring-accent-blue border-accent-blue" : ""}`}>
+            <div
+              key={p.name}
+              className={`relative card-soft p-6 flex flex-col ${p.recommended ? "ring-2 ring-accent-blue border-accent-blue" : ""}`}
+            >
               {p.recommended && (
                 <div className="absolute -top-3 left-6 inline-flex items-center gap-1 rounded-full bg-accent-blue text-white text-xs font-medium px-2.5 py-1">
-                  <Star className="h-3 w-3" /> Рекомендовано
+                  <Star className="h-3 w-3" aria-hidden="true" /> Рекомендовано
                 </div>
               )}
-              <div className="text-sm font-medium text-accent-blue uppercase tracking-wider">{p.name}</div>
+              <div className="text-sm font-medium text-accent-blue uppercase tracking-wider">
+                {p.name}
+              </div>
               <div className="mt-3 flex items-baseline gap-1.5">
                 <div className="text-3xl font-bold text-brand">{p.price}</div>
                 <div className="text-sm text-muted-foreground">{p.suffix}</div>
@@ -414,7 +509,10 @@ function Pricing() {
               <ul className="mt-5 space-y-2.5 flex-1">
                 {p.features.map((f) => (
                   <li key={f} className="flex items-start gap-2 text-sm text-foreground/85">
-                    <Check className="h-4 w-4 text-accent-teal shrink-0 mt-0.5" />
+                    <Check
+                      className="h-4 w-4 text-accent-teal shrink-0 mt-0.5"
+                      aria-hidden="true"
+                    />
                     {f}
                   </li>
                 ))}
@@ -434,22 +532,41 @@ function Pricing() {
 }
 
 const steps = [
-  { title: "Бесплатная первичная консультация", text: "Обсуждаем ваш бизнес, текущую ситуацию и цели." },
-  { title: "Краткий анализ и рекомендации", text: "Определяю оптимальное решение: сайт, почта, поддержка или комплекс." },
-  { title: "Прозрачное предложение", text: "Вы получаете четкий объем работ, стоимость и следующие шаги." },
+  {
+    title: "Бесплатная первичная консультация",
+    text: "Обсуждаем ваш бизнес, текущую ситуацию и цели.",
+  },
+  {
+    title: "Краткий анализ и рекомендации",
+    text: "Определяю оптимальное решение: сайт, почта, поддержка или комплекс.",
+  },
+  {
+    title: "Прозрачное предложение",
+    text: "Вы получаете четкий объем работ, стоимость и следующие шаги.",
+  },
   { title: "Реализация", text: "Выполняю согласованные задачи структурно и последовательно." },
-  { title: "Передача и сопровождение", text: "После запуска объясняю, как все работает, и при необходимости сопровождаю дальше." },
+  {
+    title: "Передача и сопровождение",
+    text: "После запуска объясняю, как все работает, и при необходимости сопровождаю дальше.",
+  },
 ];
 
 function Process() {
   return (
-    <section id="ablauf" className="py-20 md:py-28 scroll-mt-20">
+    <section id="ablauf" className="py-20 md:py-28 scroll-mt-20" aria-labelledby="process-heading">
       <div className="container-page">
-        <SectionHeading eyebrow="Этапы" title="Как строится сотрудничество" subtitle="Понятно, структурно и без сюрпризов." />
+        <SectionHeading
+          headingId="process-heading"
+          eyebrow="Этапы"
+          title="Как строится сотрудничество"
+          subtitle="Понятно, структурно и без сюрпризов."
+        />
         <ol className="mt-12 grid gap-5 lg:grid-cols-5 md:grid-cols-2">
           {steps.map((s, i) => (
             <li key={s.title} className="card-soft p-6 relative">
-              <div className="text-xs uppercase tracking-wider text-muted-foreground">Шаг {i + 1}</div>
+              <div className="text-xs uppercase tracking-wider text-muted-foreground">
+                Шаг {i + 1}
+              </div>
               <div className="mt-2 h-9 w-9 rounded-lg bg-brand text-brand-foreground flex items-center justify-center font-semibold">
                 {i + 1}
               </div>
@@ -475,16 +592,27 @@ function About() {
     "Консультации возможны на немецком, русском и украинском",
   ];
   return (
-    <section id="ueber-mich" className="py-20 md:py-28 scroll-mt-20">
+    <section
+      id="ueber-mich"
+      className="py-20 md:py-28 scroll-mt-20"
+      aria-labelledby="about-heading"
+    >
       <div className="container-page grid lg:grid-cols-12 gap-12 items-start">
         <div className="lg:col-span-7">
-          <div className="text-sm font-medium text-accent-blue uppercase tracking-wider">Обо мне</div>
-          <h2 className="mt-3 text-3xl md:text-4xl font-bold text-brand leading-tight">О Korolov IT-Service</h2>
+          <div className="text-sm font-medium text-accent-blue uppercase tracking-wider">
+            Обо мне
+          </div>
+          <h2
+            id="about-heading"
+            className="mt-3 text-3xl md:text-4xl font-bold text-brand leading-tight"
+          >
+            О Korolov IT-Service
+          </h2>
           <div className="mt-6 space-y-4 text-foreground/85 leading-relaxed">
             <p>
-              Меня зовут <span className="font-medium text-brand">Viacheslav Korolov</span>. Я помогаю
-              малому бизнесу, самозанятым и локальным сервисам в Leverkusen, Köln и NRW с сайтами,
-              деловой почтой и IT-задачами.
+              Меня зовут <span className="font-medium text-brand">Viacheslav Korolov</span>. Я
+              помогаю малому бизнесу, самозанятым и локальным сервисам в Leverkusen, Köln и NRW с
+              сайтами, деловой почтой и IT-задачами.
             </p>
             <p>
               Моя цель — сделать технические темы понятными и решить их практично. Вы получаете
@@ -494,7 +622,10 @@ function About() {
           <ul className="mt-8 grid sm:grid-cols-2 gap-3">
             {trust.map((t) => (
               <li key={t} className="flex items-start gap-2 text-sm text-foreground/85">
-                <CheckCircle2 className="h-5 w-5 text-accent-teal shrink-0 mt-0.5" />
+                <CheckCircle2
+                  className="h-5 w-5 text-accent-teal shrink-0 mt-0.5"
+                  aria-hidden="true"
+                />
                 {t}
               </li>
             ))}
@@ -517,9 +648,17 @@ function About() {
               </div>
             </div>
             <div className="mt-6 space-y-2.5 text-sm text-foreground/80">
-              <div className="flex items-center gap-2"><MapPin className="h-4 w-4 text-accent-blue" /> Leverkusen, NRW</div>
-              <div className="flex items-center gap-2"><Languages className="h-4 w-4 text-accent-blue" /> Deutsch · Русский · Українська</div>
-              <div className="flex items-center gap-2"><MessageSquare className="h-4 w-4 text-accent-blue" /> Личный контакт без посредников</div>
+              <div className="flex items-center gap-2">
+                <MapPin className="h-4 w-4 text-accent-blue" aria-hidden="true" /> Leverkusen, NRW
+              </div>
+              <div className="flex items-center gap-2">
+                <Languages className="h-4 w-4 text-accent-blue" aria-hidden="true" /> Deutsch ·
+                Русский · Українська
+              </div>
+              <div className="flex items-center gap-2">
+                <MessageSquare className="h-4 w-4 text-accent-blue" aria-hidden="true" /> Личный
+                контакт без посредников
+              </div>
             </div>
           </div>
         </div>
@@ -529,30 +668,79 @@ function About() {
 }
 
 const faqs = [
-  { q: "Сколько времени занимает создание сайта?", a: "Простой сайт обычно занимает от нескольких дней до нескольких недель — в зависимости от контента и согласований." },
-  { q: "Можно ли потом вносить изменения?", a: "Да, можно договориться о регулярной поддержке и небольших доработках." },
-  { q: "Вы помогаете с доменом и почтой?", a: "Да, помогаю с доменом, хостингом, почтой, DNS и настройкой отправки форм." },
-  { q: "Насколько сайт соответствует DSGVO?", a: "Я помогаю с технической DSGVO-ориентированной реализацией. Юридические тексты лучше дополнительно проверить у профильного сервиса или юриста." },
-  { q: "Работаете ли вы офлайн?", a: "В зависимости от проекта возможна удаленная работа и выезд по Leverkusen и Köln." },
-  { q: "Можно ли получить консультацию на русском или украинском?", a: "Да, консультации возможны на немецком, русском и украинском языках." },
+  {
+    q: "Сколько времени занимает создание сайта?",
+    a: "Простой сайт обычно занимает от нескольких дней до нескольких недель — в зависимости от контента и согласований.",
+  },
+  {
+    q: "Можно ли потом вносить изменения?",
+    a: "Да, можно договориться о регулярной поддержке и небольших доработках.",
+  },
+  {
+    q: "Вы помогаете с доменом и почтой?",
+    a: "Да, помогаю с доменом, хостингом, почтой, DNS и настройкой отправки форм.",
+  },
+  {
+    q: "Насколько сайт соответствует DSGVO?",
+    a: "Я помогаю с технической DSGVO-ориентированной реализацией. Юридические тексты лучше дополнительно проверить у профильного сервиса или юриста.",
+  },
+  {
+    q: "Работаете ли вы офлайн?",
+    a: "В зависимости от проекта возможна удаленная работа и выезд по Leverkusen и Köln.",
+  },
+  {
+    q: "Можно ли получить консультацию на русском или украинском?",
+    a: "Да, консультации возможны на немецком, русском и украинском языках.",
+  },
 ];
 
 function FAQ() {
   const [open, setOpen] = useState<number | null>(0);
   return (
-    <section className="py-20 md:py-28 bg-section">
+    <section
+      id="faq"
+      className="py-20 md:py-28 bg-section scroll-mt-20"
+      aria-labelledby="faq-heading"
+    >
       <div className="container-page max-w-3xl">
-        <SectionHeading eyebrow="FAQ" title="Частые вопросы" subtitle="Ответы на основные вопросы перед первым разговором." />
+        <SectionHeading
+          headingId="faq-heading"
+          eyebrow="FAQ"
+          title="Частые вопросы"
+          subtitle="Ответы на основные вопросы перед первым разговором."
+        />
         <div className="mt-10 space-y-3">
           {faqs.map((f, i) => {
             const isOpen = open === i;
+            const panelId = `faq-panel-${i}`;
+            const buttonId = `faq-button-${i}`;
             return (
               <div key={f.q} className="card-soft overflow-hidden">
-                <button onClick={() => setOpen(isOpen ? null : i)} className="w-full flex items-center justify-between text-left p-5 gap-4" aria-expanded={isOpen}>
-                  <span className="font-medium text-brand">{f.q}</span>
-                  <ChevronDown className={`h-5 w-5 text-muted-foreground shrink-0 transition-transform ${isOpen ? "rotate-180" : ""}`} />
-                </button>
-                {isOpen && <div className="px-5 pb-5 -mt-1 text-sm text-muted-foreground leading-relaxed">{f.a}</div>}
+                <h3 className="m-0">
+                  <button
+                    id={buttonId}
+                    onClick={() => setOpen(isOpen ? null : i)}
+                    className="w-full flex items-center justify-between text-left p-5 gap-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-blue rounded-md"
+                    aria-expanded={isOpen}
+                    aria-controls={panelId}
+                    type="button"
+                  >
+                    <span className="font-medium text-brand">{f.q}</span>
+                    <ChevronDown
+                      className={`h-5 w-5 text-muted-foreground shrink-0 transition-transform ${isOpen ? "rotate-180" : ""}`}
+                      aria-hidden="true"
+                    />
+                  </button>
+                </h3>
+                <div
+                  id={panelId}
+                  role="region"
+                  aria-labelledby={buttonId}
+                  hidden={!isOpen}
+                  className="px-5 pb-5 -mt-1 text-sm text-muted-foreground leading-relaxed"
+                >
+                  {f.a}
+                </div>
               </div>
             );
           })}
@@ -571,43 +759,92 @@ function Contact() {
   };
 
   return (
-    <section id="kontakt" className="py-20 md:py-28 scroll-mt-20">
+    <section id="kontakt" className="py-20 md:py-28 scroll-mt-20" aria-labelledby="contact-heading">
       <div className="container-page grid lg:grid-cols-12 gap-10">
         <div className="lg:col-span-5">
-          <div className="text-sm font-medium text-accent-blue uppercase tracking-wider">Контакты</div>
-          <h2 className="mt-3 text-3xl md:text-4xl font-bold text-brand leading-tight">Запросить бесплатную консультацию</h2>
+          <div className="text-sm font-medium text-accent-blue uppercase tracking-wider">
+            Контакты
+          </div>
+          <h2
+            id="contact-heading"
+            className="mt-3 text-3xl md:text-4xl font-bold text-brand leading-tight"
+          >
+            Запросить бесплатную консультацию
+          </h2>
           <p className="mt-5 text-muted-foreground leading-relaxed">
             Коротко опишите задачу, и я свяжусь с первичной оценкой.
           </p>
           <div className="mt-8 space-y-4">
-            <ContactRow icon={<Mail className="h-5 w-5" />} label="E-mail" value="info@korolov-it-service.de" />
-            <ContactRow icon={<Phone className="h-5 w-5" />} label="Телефон / WhatsApp" value={COMPANY.phoneDisplay} />
-            <ContactRow icon={<MapPin className="h-5 w-5" />} label="Локация" value="Leverkusen, NRW" />
-            <ContactRow icon={<Languages className="h-5 w-5" />} label="Языки" value="Deutsch · Русский · Українська" />
+            <ContactRow
+              icon={<Mail className="h-5 w-5" aria-hidden="true" />}
+              label="E-mail"
+              value={COMPANY.email}
+              href={`mailto:${COMPANY.email}`}
+              ariaLabel="Отправить e-mail"
+            />
+            <ContactRow
+              icon={<Phone className="h-5 w-5" aria-hidden="true" />}
+              label="Телефон"
+              value={COMPANY.phoneDisplay}
+              href={COMPANY.phoneHref}
+              ariaLabel="Позвонить"
+            />
+            <ContactRow
+              icon={<MessageSquare className="h-5 w-5" aria-hidden="true" />}
+              label="WhatsApp"
+              value="Написать в WhatsApp"
+              href={COMPANY.whatsappHref}
+              external
+              ariaLabel="Написать в WhatsApp"
+            />
+            <ContactRow
+              icon={<MapPin className="h-5 w-5" aria-hidden="true" />}
+              label="Локация"
+              value="Leverkusen, NRW"
+            />
+            <ContactRow
+              icon={<Languages className="h-5 w-5" aria-hidden="true" />}
+              label="Языки"
+              value="Deutsch · Русский · Українська"
+            />
           </div>
         </div>
 
         <div className="lg:col-span-7">
-          <form onSubmit={handleSubmit} className="card-soft p-6 md:p-8 space-y-5">
+          <form
+            onSubmit={handleSubmit}
+            className="card-soft p-6 md:p-8 space-y-5"
+            aria-labelledby="contact-heading"
+          >
             <div className="grid sm:grid-cols-2 gap-4">
-              <Field label="Имя" required>
-                <Input required name="name" placeholder="Ваше имя" />
+              <Field label="Имя" required fieldId="ru-name">
+                <Input required name="name" placeholder="Ваше имя" autoComplete="name" />
               </Field>
-              <Field label="Компания">
-                <Input name="company" placeholder="Название компании (опционально)" />
+              <Field label="Компания" fieldId="ru-company">
+                <Input
+                  name="company"
+                  placeholder="Название компании (опционально)"
+                  autoComplete="organization"
+                />
               </Field>
             </div>
             <div className="grid sm:grid-cols-2 gap-4">
-              <Field label="E-mail" required>
-                <Input required type="email" name="email" placeholder="your@email.de" />
+              <Field label="E-mail" required fieldId="ru-email">
+                <Input
+                  required
+                  type="email"
+                  name="email"
+                  placeholder="your@email.de"
+                  autoComplete="email"
+                />
               </Field>
-              <Field label="Телефон">
-                <Input name="phone" placeholder="опционально" />
+              <Field label="Телефон" fieldId="ru-phone">
+                <Input name="phone" placeholder="опционально" autoComplete="tel" />
               </Field>
             </div>
-            <Field label="Тема запроса" required>
+            <Field label="Тема запроса" required fieldId="ru-topic">
               <Select name="topic">
-                <SelectTrigger>
+                <SelectTrigger id="ru-topic">
                   <SelectValue placeholder="Выберите вариант" />
                 </SelectTrigger>
                 <SelectContent>
@@ -620,30 +857,56 @@ function Contact() {
                 </SelectContent>
               </Select>
             </Field>
-            <Field label="Сообщение" required>
-              <Textarea required name="message" rows={5} placeholder="Кратко опишите вашу задачу..." />
+            <Field label="Сообщение" required fieldId="ru-message">
+              <Textarea
+                required
+                name="message"
+                rows={5}
+                placeholder="Кратко опишите вашу задачу..."
+              />
             </Field>
 
-            <label className="flex items-start gap-3 text-sm text-muted-foreground">
-              <Checkbox id="dsgvo-ru" checked={agreed} onCheckedChange={(v) => setAgreed(Boolean(v))} required />
+            <label
+              htmlFor="dsgvo-ru"
+              className="flex items-start gap-3 text-sm text-muted-foreground cursor-pointer"
+            >
+              <Checkbox
+                id="dsgvo-ru"
+                checked={agreed}
+                onCheckedChange={(v) => setAgreed(Boolean(v))}
+                required
+                aria-required="true"
+              />
               <span>
                 Я ознакомился(ась) с{" "}
-                <a href="/datenschutz" className="text-accent-blue underline">политикой конфиденциальности</a>{" "}
+                <a href="/datenschutz" className="text-accent-blue underline">
+                  политикой конфиденциальности
+                </a>{" "}
                 и соглашаюсь на обработку данных для связи.
               </span>
             </label>
 
-            <Button type="submit" variant="brand" size="lg" disabled={!agreed} className="w-full sm:w-auto">
-              Отправить заявку <ArrowRight className="h-4 w-4" />
+            <Button
+              type="submit"
+              variant="brand"
+              size="lg"
+              disabled={!agreed}
+              className="w-full sm:w-auto"
+            >
+              Отправить заявку <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Button>
 
             {submitted && (
-              <div className="rounded-lg border border-border bg-section p-4 text-sm text-foreground/85">
+              <div
+                role="status"
+                aria-live="polite"
+                className="rounded-lg border border-border bg-section p-4 text-sm text-foreground/85"
+              >
                 Форма пока не подключена к сервису отправки.
                 <br />
                 Пожалуйста, напишите напрямую на{" "}
-                <a className="text-accent-blue underline" href="mailto:info@korolov-it-service.de">
-                  info@korolov-it-service.de
+                <a className="text-accent-blue underline" href={`mailto:${COMPANY.email}`}>
+                  {COMPANY.email}
                 </a>
                 .
               </div>
@@ -655,15 +918,44 @@ function Contact() {
   );
 }
 
-function ContactRow({ icon, label, value }: { icon: ReactNode; label: string; value: string }) {
+function ContactRow({
+  icon,
+  label,
+  value,
+  href,
+  ariaLabel,
+  external,
+}: {
+  icon: ReactNode;
+  label: string;
+  value: string;
+  href?: string;
+  ariaLabel?: string;
+  external?: boolean;
+}) {
   return (
     <div className="flex items-start gap-3">
-      <div className="h-10 w-10 rounded-lg bg-section text-accent-blue flex items-center justify-center shrink-0">
+      <div
+        className="h-10 w-10 rounded-lg bg-section text-accent-blue flex items-center justify-center shrink-0"
+        aria-hidden="true"
+      >
         {icon}
       </div>
       <div>
         <div className="text-xs uppercase tracking-wider text-muted-foreground">{label}</div>
-        <div className="text-sm font-medium text-foreground">{value}</div>
+        {href ? (
+          <a
+            href={href}
+            aria-label={ariaLabel}
+            target={external ? "_blank" : undefined}
+            rel={external ? "noopener noreferrer" : undefined}
+            className="text-sm font-medium text-foreground hover:text-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-blue rounded-sm transition-colors"
+          >
+            {value}
+          </a>
+        ) : (
+          <div className="text-sm font-medium text-foreground">{value}</div>
+        )}
       </div>
     </div>
   );
@@ -672,18 +964,29 @@ function ContactRow({ icon, label, value }: { icon: ReactNode; label: string; va
 function Field({
   label,
   required,
+  fieldId,
   children,
 }: {
   label: string;
   required?: boolean;
+  fieldId: string;
   children: ReactNode;
 }) {
+  const child = children as React.ReactElement<React.HTMLAttributes<HTMLElement>>;
   return (
     <div className="space-y-1.5">
-      <Label className="text-sm text-foreground/80">
-        {label} {required && <span className="text-destructive">*</span>}
+      <Label htmlFor={fieldId} className="text-sm text-foreground/80">
+        {label}{" "}
+        {required && (
+          <span className="text-destructive" aria-label="обязательно">
+            *
+          </span>
+        )}
       </Label>
-      {children}
+      {React.cloneElement(child, {
+        id: fieldId,
+        ...(required ? { "aria-required": "true" } : {}),
+      })}
     </div>
   );
 }
@@ -692,15 +995,19 @@ function SectionHeading({
   eyebrow,
   title,
   subtitle,
+  headingId,
 }: {
   eyebrow: string;
   title: string;
   subtitle?: string;
+  headingId?: string;
 }) {
   return (
     <div className="max-w-3xl">
       <div className="text-sm font-medium text-accent-blue uppercase tracking-wider">{eyebrow}</div>
-      <h2 className="mt-3 text-3xl md:text-4xl font-bold text-brand leading-tight">{title}</h2>
+      <h2 id={headingId} className="mt-3 text-3xl md:text-4xl font-bold text-brand leading-tight">
+        {title}
+      </h2>
       {subtitle && <p className="mt-4 text-lg text-muted-foreground">{subtitle}</p>}
     </div>
   );

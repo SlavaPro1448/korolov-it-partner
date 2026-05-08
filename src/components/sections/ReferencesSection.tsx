@@ -75,7 +75,7 @@ function CaseCard({ item, locale, openLabel }: CaseCardProps) {
         )}
       >
         {isIcon ? (
-          <div className="absolute inset-0 flex items-center justify-center">
+          <div className="absolute inset-0 flex items-center justify-center" aria-hidden="true">
             <Briefcase className="h-16 w-16 text-muted-foreground/40" />
           </div>
         ) : !hasImageError && item.thumbnail ? (
@@ -99,18 +99,22 @@ function CaseCard({ item, locale, openLabel }: CaseCardProps) {
             />
           )
         ) : (
-          <div className="absolute inset-0 flex items-center justify-center">
+          <div className="absolute inset-0 flex items-center justify-center" aria-hidden="true">
             <Briefcase className="h-16 w-16 text-muted-foreground/40" />
           </div>
         )}
       </div>
 
       <div className="mt-5">
-        <div className="text-xs uppercase tracking-wider text-muted-foreground">{item.industry}</div>
+        <div className="text-xs uppercase tracking-wider text-muted-foreground">
+          {item.industry}
+        </div>
         <h3 className="mt-1 text-lg font-semibold text-brand">{item.client}</h3>
       </div>
 
-      <p className="mt-3 text-sm text-muted-foreground leading-relaxed flex-1">{item.summary[locale]}</p>
+      <p className="mt-3 text-sm text-muted-foreground leading-relaxed flex-1">
+        {item.summary[locale]}
+      </p>
 
       <div className="mt-4 flex flex-wrap gap-1.5">
         {item.servicesProvided.map((service) => (
@@ -125,8 +129,13 @@ function CaseCard({ item, locale, openLabel }: CaseCardProps) {
 
       {item.liveUrl && (
         <Button asChild variant="outline" className="mt-5 self-start">
-          <a href={item.liveUrl} target="_blank" rel="noreferrer">
-            {openLabel} <ArrowRight className="h-4 w-4" />
+          <a
+            href={item.liveUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`${openLabel}: ${item.client}`}
+          >
+            {openLabel} <ArrowRight className="h-4 w-4" aria-hidden="true" />
           </a>
         </Button>
       )}
@@ -135,10 +144,7 @@ function CaseCard({ item, locale, openLabel }: CaseCardProps) {
 }
 
 function TestimonialsCarousel({ locale }: { locale: Locale }) {
-  const testimonials = useMemo(
-    () => cases.filter((item) => item.testimonial),
-    [],
-  );
+  const testimonials = useMemo(() => cases.filter((item) => item.testimonial), []);
 
   if (testimonials.length === 0) {
     return null;
@@ -146,20 +152,28 @@ function TestimonialsCarousel({ locale }: { locale: Locale }) {
 
   return (
     <div className="mt-14">
-      <h3 className="text-2xl md:text-3xl font-bold text-brand">{copy[locale].testimonialsTitle}</h3>
+      <h3 id="testimonials-heading" className="text-2xl md:text-3xl font-bold text-brand">
+        {copy[locale].testimonialsTitle}
+      </h3>
       <p className="mt-3 text-muted-foreground">{copy[locale].testimonialsSubtitle}</p>
-      <Carousel className="mt-8 px-10" opts={{ loop: testimonials.length > 1 }}>
+      <Carousel
+        className="mt-8 px-10"
+        opts={{ loop: testimonials.length > 1 }}
+        aria-labelledby="testimonials-heading"
+      >
         <CarouselContent>
           {testimonials.map((item) => (
             <CarouselItem key={`testimonial-${item.id}`}>
-              <div className="card-soft p-6 md:p-7">
-                <Quote className="h-5 w-5 text-accent-blue" />
-                <p className="mt-4 text-foreground/90 leading-relaxed">"{item.testimonial?.quote[locale]}"</p>
-                <div className="mt-5 text-sm">
+              <figure className="card-soft p-6 md:p-7">
+                <Quote className="h-5 w-5 text-accent-blue" aria-hidden="true" />
+                <blockquote className="mt-4 text-foreground/90 leading-relaxed">
+                  {item.testimonial?.quote[locale]}
+                </blockquote>
+                <figcaption className="mt-5 text-sm">
                   <div className="font-medium text-brand">{item.testimonial?.author}</div>
                   <div className="text-muted-foreground">{item.testimonial?.role}</div>
-                </div>
-              </div>
+                </figcaption>
+              </figure>
             </CarouselItem>
           ))}
         </CarouselContent>
@@ -178,13 +192,20 @@ export function ReferencesSection({ locale }: { locale: Locale }) {
   const displayedCases = useMemo(() => cases.filter((item) => item.featured), []);
 
   return (
-    <section id="referenzen" className="py-20 md:py-28 bg-section scroll-mt-20">
+    <section
+      id="referenzen"
+      className="py-20 md:py-28 bg-section scroll-mt-20"
+      aria-labelledby="references-heading"
+    >
       <div className="container-page">
         <div className="max-w-3xl">
           <div className="text-sm font-medium text-accent-blue uppercase tracking-wider">
             {copy[locale].eyebrow}
           </div>
-          <h2 className="mt-3 text-3xl md:text-4xl font-bold text-brand leading-tight">
+          <h2
+            id="references-heading"
+            className="mt-3 text-3xl md:text-4xl font-bold text-brand leading-tight"
+          >
             {copy[locale].title}
           </h2>
           <p className="mt-4 text-lg text-muted-foreground">{copy[locale].subtitle}</p>
@@ -192,7 +213,12 @@ export function ReferencesSection({ locale }: { locale: Locale }) {
 
         <div className="mt-12 grid md:grid-cols-2 gap-6">
           {displayedCases.map((item) => (
-            <CaseCard key={item.id} item={item} locale={locale} openLabel={copy[locale].openProject} />
+            <CaseCard
+              key={item.id}
+              item={item}
+              locale={locale}
+              openLabel={copy[locale].openProject}
+            />
           ))}
         </div>
 

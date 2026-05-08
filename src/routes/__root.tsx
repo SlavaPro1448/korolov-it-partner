@@ -1,4 +1,4 @@
-import { Outlet, Link, createRootRoute } from "@tanstack/react-router";
+import { Outlet, Link, createRootRoute, useRouterState } from "@tanstack/react-router";
 import { useEffect } from "react";
 
 import appCss from "../styles.css?url";
@@ -15,7 +15,7 @@ function NotFoundComponent() {
         <div className="mt-6">
           <Link
             to="/"
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-blue focus-visible:ring-offset-2"
           >
             Go home
           </Link>
@@ -33,15 +33,21 @@ export const Route = createRootRoute({
   notFoundComponent: NotFoundComponent,
 });
 
+function getSkipLinkLabel(pathname: string): string {
+  if (pathname.startsWith("/ru")) return "Перейти к содержимому";
+  if (pathname.startsWith("/ua")) return "Перейти до вмісту";
+  return "Zum Inhalt springen";
+}
+
 function RootComponent() {
-  // Restore scroll position after language switch
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+
   useEffect(() => {
     if (typeof window === "undefined") return;
     const savedY = sessionStorage.getItem("__lang_scrollY");
     if (savedY) {
       sessionStorage.removeItem("__lang_scrollY");
       const y = parseInt(savedY, 10);
-      // Wait for layout to settle, then scroll
       requestAnimationFrame(() => {
         window.scrollTo({ top: y, behavior: "instant" as ScrollBehavior });
       });
@@ -52,9 +58,7 @@ function RootComponent() {
     if (typeof window === "undefined") return;
     const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
 
-    const targets = document.querySelectorAll<HTMLElement>(
-      "main section, section, [data-reveal]",
-    );
+    const targets = document.querySelectorAll<HTMLElement>("main section, section, [data-reveal]");
 
     targets.forEach((el) => {
       if (!el.classList.contains("reveal")) {
@@ -81,7 +85,6 @@ function RootComponent() {
 
     targets.forEach((el) => {
       const rect = el.getBoundingClientRect();
-      // Already in view on initial load → reveal immediately (e.g. hero)
       if (rect.top < window.innerHeight * 0.9) {
         el.classList.add("reveal-visible");
       } else {
@@ -92,5 +95,12 @@ function RootComponent() {
     return () => io.disconnect();
   }, []);
 
-  return <Outlet />;
+  return (
+    <>
+      <a href="#main" className="skip-link">
+        {getSkipLinkLabel(pathname)}
+      </a>
+      <Outlet />
+    </>
+  );
 }

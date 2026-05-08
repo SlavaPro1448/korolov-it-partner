@@ -65,12 +65,10 @@ function HomePage() {
       <JsonLd data={localBusinessSchema("de")} />
       <JsonLd data={faqPageSchema(faqItems)} />
       <JsonLd
-        data={breadcrumbSchema([
-          { name: "Startseite", item: "https://korolov-it-service.de/" },
-        ])}
+        data={breadcrumbSchema([{ name: "Startseite", item: "https://korolov-it-service.de/" }])}
       />
       <SiteHeader />
-      <main className="flex-1">
+      <main id="main" tabIndex={-1} className="flex-1 focus:outline-none">
         <Hero />
         <Problem />
         <Services />
@@ -90,14 +88,17 @@ function HomePage() {
 /* ---------------- HERO ---------------- */
 function Hero() {
   return (
-    <section className="hero-grid-bg relative overflow-hidden">
+    <section className="hero-grid-bg relative overflow-hidden" aria-labelledby="hero-heading">
       <div className="container-page py-20 md:py-28 lg:py-32 grid lg:grid-cols-12 gap-12 items-center">
         <div className="lg:col-span-7 fade-in-up">
           <div className="inline-flex items-center gap-2 rounded-full border border-border bg-white/70 backdrop-blur px-3 py-1 text-xs text-muted-foreground">
-            <Sparkles className="h-3.5 w-3.5 text-accent-blue" />
+            <Sparkles className="h-3.5 w-3.5 text-accent-blue" aria-hidden="true" />
             IT-Partner für kleine Unternehmen in NRW
           </div>
-          <h1 className="mt-6 text-4xl md:text-5xl lg:text-6xl font-bold text-brand leading-[1.05]">
+          <h1
+            id="hero-heading"
+            className="mt-6 text-4xl md:text-5xl lg:text-6xl font-bold text-brand leading-[1.05]"
+          >
             Mehr Kundenanfragen mit Website und IT-Support aus Leverkusen
           </h1>
           <p className="mt-6 text-lg text-muted-foreground max-w-2xl leading-relaxed">
@@ -112,26 +113,21 @@ function Hero() {
               className="w-full sm:w-auto h-14 px-8 text-base bg-accent-blue hover:bg-accent-blue/90 shadow-lg shadow-accent-blue/30"
             >
               <a href="#kontakt">
-                Kostenloses Erstgespräch anfragen <ArrowRight className="h-4 w-4" />
+                Kostenloses Erstgespräch anfragen{" "}
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </a>
             </Button>
-            <Button
-              asChild
-              variant="ghost"
-              size="default"
-              className="w-full sm:w-auto"
-            >
+            <Button asChild variant="ghost" size="default" className="w-full sm:w-auto">
               <a href="#leistungen">Leistungen ansehen</a>
             </Button>
           </div>
           <ul className="mt-10 grid sm:grid-cols-3 gap-4 max-w-2xl">
-            {[
-              "Persönlicher Ansprechpartner",
-              "Website + IT",
-              "DE · RU · UA",
-            ].map((t) => (
+            {["Persönlicher Ansprechpartner", "Website + IT", "DE · RU · UA"].map((t) => (
               <li key={t} className="flex items-start gap-2 text-sm text-foreground/80">
-                <CheckCircle2 className="h-5 w-5 text-accent-teal shrink-0 mt-0.5" />
+                <CheckCircle2
+                  className="h-5 w-5 text-accent-teal shrink-0 mt-0.5"
+                  aria-hidden="true"
+                />
                 {t}
               </li>
             ))}
@@ -148,7 +144,7 @@ function Hero() {
 
 function HeroCard() {
   return (
-    <div className="relative">
+    <div className="relative" aria-hidden="true">
       <div className="absolute -inset-4 bg-gradient-to-tr from-accent-blue/10 to-transparent rounded-3xl blur-2xl" />
       <div className="relative card-soft p-6 md:p-7">
         <div className="flex items-center justify-between">
@@ -160,17 +156,38 @@ function HeroCard() {
           <div className="text-xs text-muted-foreground">korolov-it-service.de</div>
         </div>
         <div className="mt-5 space-y-3">
-          <MiniRow icon={<Globe className="h-4 w-4" />} label="Website online" value="aktiv · SSL" tone="teal" />
-          <MiniRow icon={<Mail className="h-4 w-4" />} label="Geschäftliche E-Mail" value="info@…de" tone="blue" />
-          <MiniRow icon={<ShieldCheck className="h-4 w-4" />} label="Backups & Updates" value="aktuell" tone="teal" />
-          <MiniRow icon={<LifeBuoy className="h-4 w-4" />} label="Technischer Support" value="erreichbar" tone="blue" />
+          <MiniRow
+            icon={<Globe className="h-4 w-4" />}
+            label="Website online"
+            value="aktiv · SSL"
+            tone="teal"
+          />
+          <MiniRow
+            icon={<Mail className="h-4 w-4" />}
+            label="Geschäftliche E-Mail"
+            value="info@…de"
+            tone="blue"
+          />
+          <MiniRow
+            icon={<ShieldCheck className="h-4 w-4" />}
+            label="Backups & Updates"
+            value="aktuell"
+            tone="teal"
+          />
+          <MiniRow
+            icon={<LifeBuoy className="h-4 w-4" />}
+            label="Technischer Support"
+            value="erreichbar"
+            tone="blue"
+          />
         </div>
         <div className="mt-6 p-4 rounded-xl bg-section">
           <div className="flex items-center gap-2 text-xs uppercase tracking-wider text-muted-foreground">
             <Languages className="h-3.5 w-3.5" /> Beratung
           </div>
           <div className="mt-1 text-sm text-foreground">
-            Auf <span className="font-medium">Deutsch</span>, <span className="font-medium">Russisch</span> und{" "}
+            Auf <span className="font-medium">Deutsch</span>,{" "}
+            <span className="font-medium">Russisch</span> und{" "}
             <span className="font-medium">Ukrainisch</span> möglich.
           </div>
         </div>
@@ -218,21 +235,27 @@ function Problem() {
     },
   ];
   return (
-    <section className="py-20 md:py-28">
+    <section className="py-20 md:py-28" aria-labelledby="problem-heading">
       <div className="container-page max-w-5xl">
-        <h2 className="text-3xl md:text-4xl font-bold text-brand leading-tight">
+        <h2
+          id="problem-heading"
+          className="text-3xl md:text-4xl font-bold text-brand leading-tight"
+        >
           Viele kleine Unternehmen brauchen keine große Agentur — sondern{" "}
           <span className="text-accent-blue">zuverlässige technische Unterstützung</span>.
         </h2>
         <p className="mt-5 text-lg text-muted-foreground max-w-3xl">
-          Website veraltet, E-Mail-Probleme, Kontaktformulare funktionieren nicht, Updates bleiben liegen
-          oder niemand fühlt sich für die Technik verantwortlich. Genau hier unterstütze ich:
+          Website veraltet, E-Mail-Probleme, Kontaktformulare funktionieren nicht, Updates bleiben
+          liegen oder niemand fühlt sich für die Technik verantwortlich. Genau hier unterstütze ich:
           praktisch, verständlich und mit Blick auf den Alltag Ihres Unternehmens.
         </p>
         <div className="mt-10 grid md:grid-cols-3 gap-5">
           {items.map((it) => (
             <div key={it.title} className="card-soft p-6">
-              <div className="h-10 w-10 rounded-lg bg-section flex items-center justify-center text-accent-blue">
+              <div
+                className="h-10 w-10 rounded-lg bg-section flex items-center justify-center text-accent-blue"
+                aria-hidden="true"
+              >
                 <CheckCircle2 className="h-5 w-5" />
               </div>
               <h3 className="mt-4 font-semibold text-brand">{it.title}</h3>
@@ -250,52 +273,51 @@ const services = [
   {
     icon: Globe,
     title: "Website-Erstellung",
-    text:
-      "Moderne, schnelle und mobil optimierte Websites für Unternehmen, Selbstständige und Dienstleister. Klar strukturiert, seriös gestaltet und auf Ihre Leistungen abgestimmt.",
+    text: "Moderne, schnelle und mobil optimierte Websites für Unternehmen, Selbstständige und Dienstleister. Klar strukturiert, seriös gestaltet und auf Ihre Leistungen abgestimmt.",
     tags: ["Responsive Design", "SEO-Basis", "Kontaktformular", "SSL"],
   },
   {
     icon: Wrench,
     title: "Website-Pflege & Wartung",
-    text:
-      "Auch nach dem Launch bleibe ich Ihr technischer Ansprechpartner. Ich unterstütze bei Updates, Backups, kleinen Änderungen, Formularprüfung und technischen Problemen.",
+    text: "Auch nach dem Launch bleibe ich Ihr technischer Ansprechpartner. Ich unterstütze bei Updates, Backups, kleinen Änderungen, Formularprüfung und technischen Problemen.",
     tags: ["Updates", "Backups", "technische Prüfung"],
   },
   {
     icon: Mail,
     title: "E-Mail, Domain & Hosting",
-    text:
-      "Einrichtung von geschäftlichen E-Mail-Adressen, Domain, Hosting, DNS, SPF, DKIM, DMARC und Formularversand — damit Ihre digitale Kommunikation zuverlässig funktioniert.",
+    text: "Einrichtung von geschäftlichen E-Mail-Adressen, Domain, Hosting, DNS, SPF, DKIM, DMARC und Formularversand — damit Ihre digitale Kommunikation zuverlässig funktioniert.",
     tags: ["Domain", "Business E-Mail", "DNS", "SMTP"],
   },
   {
     icon: LifeBuoy,
     title: "IT-Support für kleine Unternehmen",
-    text:
-      "Hilfe bei Computern, Netzwerk, Druckern, Cloud, Datensicherung und alltäglichen technischen Fragen — verständlich, praktisch und lösungsorientiert.",
+    text: "Hilfe bei Computern, Netzwerk, Druckern, Cloud, Datensicherung und alltäglichen technischen Fragen — verständlich, praktisch und lösungsorientiert.",
     tags: ["Remote", "vor Ort", "Netzwerk", "Cloud"],
   },
   {
     icon: FileText,
     title: "Digitale Dokumente & Ordnung",
-    text:
-      "Struktur für Rechnungen, Angebote, PDF-Vorlagen, QR-Codes und digitale Ablage — damit Ihre Unterlagen übersichtlich und professionell bleiben.",
+    text: "Struktur für Rechnungen, Angebote, PDF-Vorlagen, QR-Codes und digitale Ablage — damit Ihre Unterlagen übersichtlich und professionell bleiben.",
     tags: ["Rechnungen", "Angebote", "PDF", "QR-Codes"],
   },
   {
     icon: ShieldCheck,
     title: "Technische DSGVO-orientierte Umsetzung",
-    text:
-      "Technische Einbindung von SSL, Cookie-Banner, Kontaktformularen, Impressum- und Datenschutzseiten. Rechtliche Inhalte können über spezialisierte Generatoren oder juristische Beratung ergänzt und geprüft werden.",
+    text: "Technische Einbindung von SSL, Cookie-Banner, Kontaktformularen, Impressum- und Datenschutzseiten. Rechtliche Inhalte können über spezialisierte Generatoren oder juristische Beratung ergänzt und geprüft werden.",
     tags: ["SSL", "Cookie-Banner", "Datenschutz", "Impressum"],
   },
 ];
 
 function Services() {
   return (
-    <section id="leistungen" className="py-20 md:py-28 bg-section scroll-mt-20">
+    <section
+      id="leistungen"
+      className="py-20 md:py-28 bg-section scroll-mt-20"
+      aria-labelledby="services-heading"
+    >
       <div className="container-page">
         <SectionHeading
+          headingId="services-heading"
           eyebrow="Leistungen"
           title="Digitale Lösungen für den Geschäftsalltag"
           subtitle="Von der Website bis zur laufenden technischen Betreuung — digitale Lösungen für den Geschäftsalltag kleiner Unternehmen."
@@ -303,7 +325,10 @@ function Services() {
         <div className="mt-12 grid md:grid-cols-2 lg:grid-cols-3 gap-5">
           {services.map((s) => (
             <article key={s.title} className="card-soft p-6 flex flex-col">
-              <div className="h-11 w-11 rounded-xl bg-brand/5 text-accent-blue flex items-center justify-center">
+              <div
+                className="h-11 w-11 rounded-xl bg-brand/5 text-accent-blue flex items-center justify-center"
+                aria-hidden="true"
+              >
                 <s.icon className="h-5 w-5" />
               </div>
               <h3 className="mt-4 font-semibold text-brand text-lg">{s.title}</h3>
@@ -362,9 +387,14 @@ const audiences = [
 
 function ForWhom() {
   return (
-    <section id="fuer-wen" className="py-20 md:py-28 scroll-mt-20">
+    <section
+      id="fuer-wen"
+      className="py-20 md:py-28 scroll-mt-20"
+      aria-labelledby="forwhom-heading"
+    >
       <div className="container-page">
         <SectionHeading
+          headingId="forwhom-heading"
           eyebrow="Für wen"
           title="Für wen ist Korolov IT-Service geeignet?"
           subtitle="Wer typischerweise mit mir zusammenarbeitet."
@@ -372,7 +402,10 @@ function ForWhom() {
         <div className="mt-12 grid md:grid-cols-2 lg:grid-cols-3 gap-5">
           {audiences.map((a) => (
             <div key={a.title} className="card-soft p-6">
-              <div className="h-10 w-10 rounded-lg bg-section text-accent-teal flex items-center justify-center">
+              <div
+                className="h-10 w-10 rounded-lg bg-section text-accent-teal flex items-center justify-center"
+                aria-hidden="true"
+              >
                 <a.icon className="h-5 w-5" />
               </div>
               <h3 className="mt-4 font-semibold text-brand">{a.title}</h3>
@@ -452,9 +485,14 @@ const packages = [
 
 function Pricing() {
   return (
-    <section id="preise" className="py-20 md:py-28 bg-section scroll-mt-20">
+    <section
+      id="preise"
+      className="py-20 md:py-28 bg-section scroll-mt-20"
+      aria-labelledby="pricing-heading"
+    >
       <div className="container-page">
         <SectionHeading
+          headingId="pricing-heading"
           eyebrow="Pakete & Preise"
           title="Transparente Einstiegspakete"
           subtitle="Jedes Projekt wird nach dem kostenlosen Erstgespräch konkret angeboten."
@@ -469,10 +507,12 @@ function Pricing() {
             >
               {p.recommended && (
                 <div className="absolute -top-3 left-6 inline-flex items-center gap-1 rounded-full bg-accent-blue text-white text-xs font-medium px-2.5 py-1">
-                  <Star className="h-3 w-3" /> Empfohlen
+                  <Star className="h-3 w-3" aria-hidden="true" /> Empfohlen
                 </div>
               )}
-              <div className="text-sm font-medium text-accent-blue uppercase tracking-wider">{p.name}</div>
+              <div className="text-sm font-medium text-accent-blue uppercase tracking-wider">
+                {p.name}
+              </div>
               <div className="mt-3 flex items-baseline gap-1.5">
                 <div className="text-3xl font-bold text-brand">{p.price}</div>
                 <div className="text-sm text-muted-foreground">{p.suffix}</div>
@@ -481,14 +521,15 @@ function Pricing() {
               <ul className="mt-5 space-y-2.5 flex-1">
                 {p.features.map((f) => (
                   <li key={f} className="flex items-start gap-2 text-sm text-foreground/85">
-                    <Check className="h-4 w-4 text-accent-teal shrink-0 mt-0.5" />
+                    <Check
+                      className="h-4 w-4 text-accent-teal shrink-0 mt-0.5"
+                      aria-hidden="true"
+                    />
                     {f}
                   </li>
                 ))}
               </ul>
-              {p.note && (
-                <p className="mt-4 text-xs text-muted-foreground italic">{p.note}</p>
-              )}
+              {p.note && <p className="mt-4 text-xs text-muted-foreground italic">{p.note}</p>}
               <Button asChild variant={p.recommended ? "brand" : "outline"} className="mt-6">
                 <a href="#kontakt">Anfragen</a>
               </Button>
@@ -526,9 +567,10 @@ const steps = [
 
 function Process() {
   return (
-    <section id="ablauf" className="py-20 md:py-28 scroll-mt-20">
+    <section id="ablauf" className="py-20 md:py-28 scroll-mt-20" aria-labelledby="process-heading">
       <div className="container-page">
         <SectionHeading
+          headingId="process-heading"
           eyebrow="Ablauf"
           title="So läuft die Zusammenarbeit ab"
           subtitle="Klar, strukturiert und ohne Überraschungen."
@@ -536,7 +578,9 @@ function Process() {
         <ol className="mt-12 grid gap-5 lg:grid-cols-5 md:grid-cols-2">
           {steps.map((s, i) => (
             <li key={s.title} className="card-soft p-6 relative">
-              <div className="text-xs uppercase tracking-wider text-muted-foreground">Schritt {i + 1}</div>
+              <div className="text-xs uppercase tracking-wider text-muted-foreground">
+                Schritt {i + 1}
+              </div>
               <div className="mt-2 h-9 w-9 rounded-lg bg-brand text-brand-foreground flex items-center justify-center font-semibold">
                 {i + 1}
               </div>
@@ -564,17 +608,26 @@ function About() {
     "Beratung auf Deutsch, Russisch und Ukrainisch möglich",
   ];
   return (
-    <section id="ueber-mich" className="py-20 md:py-28 scroll-mt-20">
+    <section
+      id="ueber-mich"
+      className="py-20 md:py-28 scroll-mt-20"
+      aria-labelledby="about-heading"
+    >
       <div className="container-page grid lg:grid-cols-12 gap-12 items-start">
         <div className="lg:col-span-7">
-          <div className="text-sm font-medium text-accent-blue uppercase tracking-wider">Über mich</div>
-          <h2 className="mt-3 text-3xl md:text-4xl font-bold text-brand leading-tight">
+          <div className="text-sm font-medium text-accent-blue uppercase tracking-wider">
+            Über mich
+          </div>
+          <h2
+            id="about-heading"
+            className="mt-3 text-3xl md:text-4xl font-bold text-brand leading-tight"
+          >
             Über Korolov IT-Service
           </h2>
           <div className="mt-6 space-y-4 text-foreground/85 leading-relaxed">
             <p>
-              Mein Name ist <span className="font-medium text-brand">Viacheslav Korolov</span>.
-              Mit Korolov IT-Service unterstütze ich kleine Unternehmen, Selbstständige und lokale
+              Mein Name ist <span className="font-medium text-brand">Viacheslav Korolov</span>. Mit
+              Korolov IT-Service unterstütze ich kleine Unternehmen, Selbstständige und lokale
               Dienstleister in Leverkusen, Köln und NRW bei Websites, geschäftlicher E-Mail,
               IT-Fragen und digitaler Organisation.
             </p>
@@ -587,7 +640,10 @@ function About() {
           <ul className="mt-8 grid sm:grid-cols-2 gap-3">
             {trust.map((t) => (
               <li key={t} className="flex items-start gap-2 text-sm text-foreground/85">
-                <CheckCircle2 className="h-5 w-5 text-accent-teal shrink-0 mt-0.5" />
+                <CheckCircle2
+                  className="h-5 w-5 text-accent-teal shrink-0 mt-0.5"
+                  aria-hidden="true"
+                />
                 {t}
               </li>
             ))}
@@ -610,9 +666,17 @@ function About() {
               </div>
             </div>
             <div className="mt-6 space-y-2.5 text-sm text-foreground/80">
-              <div className="flex items-center gap-2"><MapPin className="h-4 w-4 text-accent-blue" /> Leverkusen, NRW</div>
-              <div className="flex items-center gap-2"><Languages className="h-4 w-4 text-accent-blue" /> Deutsch · Русский · Українська</div>
-              <div className="flex items-center gap-2"><MessageSquare className="h-4 w-4 text-accent-blue" /> Direkter Ansprechpartner</div>
+              <div className="flex items-center gap-2">
+                <MapPin className="h-4 w-4 text-accent-blue" aria-hidden="true" /> Leverkusen, NRW
+              </div>
+              <div className="flex items-center gap-2">
+                <Languages className="h-4 w-4 text-accent-blue" aria-hidden="true" /> Deutsch ·
+                Русский · Українська
+              </div>
+              <div className="flex items-center gap-2">
+                <MessageSquare className="h-4 w-4 text-accent-blue" aria-hidden="true" /> Direkter
+                Ansprechpartner
+              </div>
             </div>
           </div>
         </div>
@@ -652,29 +716,50 @@ const faqs = [
 function FAQ() {
   const [open, setOpen] = useState<number | null>(0);
   return (
-    <section className="py-20 md:py-28 bg-section">
+    <section
+      id="faq"
+      className="py-20 md:py-28 bg-section scroll-mt-20"
+      aria-labelledby="faq-heading"
+    >
       <div className="container-page max-w-3xl">
-        <SectionHeading eyebrow="FAQ" title="Häufige Fragen" subtitle="Antworten auf die häufigsten Fragen vor dem Erstgespräch." />
+        <SectionHeading
+          headingId="faq-heading"
+          eyebrow="FAQ"
+          title="Häufige Fragen"
+          subtitle="Antworten auf die häufigsten Fragen vor dem Erstgespräch."
+        />
         <div className="mt-10 space-y-3">
           {faqs.map((f, i) => {
             const isOpen = open === i;
+            const panelId = `faq-panel-${i}`;
+            const buttonId = `faq-button-${i}`;
             return (
               <div key={f.q} className="card-soft overflow-hidden">
-                <button
-                  onClick={() => setOpen(isOpen ? null : i)}
-                  className="w-full flex items-center justify-between text-left p-5 gap-4"
-                  aria-expanded={isOpen}
+                <h3 className="m-0">
+                  <button
+                    id={buttonId}
+                    onClick={() => setOpen(isOpen ? null : i)}
+                    className="w-full flex items-center justify-between text-left p-5 gap-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-blue rounded-md"
+                    aria-expanded={isOpen}
+                    aria-controls={panelId}
+                    type="button"
+                  >
+                    <span className="font-medium text-brand">{f.q}</span>
+                    <ChevronDown
+                      className={`h-5 w-5 text-muted-foreground shrink-0 transition-transform ${isOpen ? "rotate-180" : ""}`}
+                      aria-hidden="true"
+                    />
+                  </button>
+                </h3>
+                <div
+                  id={panelId}
+                  role="region"
+                  aria-labelledby={buttonId}
+                  hidden={!isOpen}
+                  className="px-5 pb-5 -mt-1 text-sm text-muted-foreground leading-relaxed"
                 >
-                  <span className="font-medium text-brand">{f.q}</span>
-                  <ChevronDown
-                    className={`h-5 w-5 text-muted-foreground shrink-0 transition-transform ${isOpen ? "rotate-180" : ""}`}
-                  />
-                </button>
-                {isOpen && (
-                  <div className="px-5 pb-5 -mt-1 text-sm text-muted-foreground leading-relaxed">
-                    {f.a}
-                  </div>
-                )}
+                  {f.a}
+                </div>
               </div>
             );
           })}
@@ -824,11 +909,16 @@ function Contact() {
   };
 
   return (
-    <section id="kontakt" className="py-20 md:py-28 scroll-mt-20">
+    <section id="kontakt" className="py-20 md:py-28 scroll-mt-20" aria-labelledby="contact-heading">
       <div className="container-page grid lg:grid-cols-12 gap-10">
         <div className="lg:col-span-5">
-          <div className="text-sm font-medium text-accent-blue uppercase tracking-wider">Kontakt</div>
-          <h2 className="mt-3 text-3xl md:text-4xl font-bold text-brand leading-tight">
+          <div className="text-sm font-medium text-accent-blue uppercase tracking-wider">
+            Kontakt
+          </div>
+          <h2
+            id="contact-heading"
+            className="mt-3 text-3xl md:text-4xl font-bold text-brand leading-tight"
+          >
             Kostenloses Erstgespräch anfragen
           </h2>
           <p className="mt-5 text-muted-foreground leading-relaxed">
@@ -836,23 +926,59 @@ function Contact() {
             Einschätzung zurück.
           </p>
           <div className="mt-8 space-y-4">
-            <ContactRow icon={<Mail className="h-5 w-5" />} label="E-Mail" value={COMPANY.email} />
-            <ContactRow icon={<Phone className="h-5 w-5" />} label="Telefon / WhatsApp" value={COMPANY.phoneDisplay} />
-            <ContactRow icon={<MapPin className="h-5 w-5" />} label="Standort" value="Leverkusen, NRW" />
-            <ContactRow icon={<Languages className="h-5 w-5" />} label="Sprachen" value="Deutsch · Russisch · Ukrainisch" />
+            <ContactRow
+              icon={<Mail className="h-5 w-5" aria-hidden="true" />}
+              label="E-Mail"
+              value={COMPANY.email}
+              href={`mailto:${COMPANY.email}`}
+              ariaLabel="E-Mail an Korolov IT-Service senden"
+            />
+            <ContactRow
+              icon={<Phone className="h-5 w-5" aria-hidden="true" />}
+              label="Telefon"
+              value={COMPANY.phoneDisplay}
+              href={COMPANY.phoneHref}
+              ariaLabel="Korolov IT-Service anrufen"
+            />
+            <ContactRow
+              icon={<MessageSquare className="h-5 w-5" aria-hidden="true" />}
+              label="WhatsApp"
+              value="WhatsApp-Nachricht senden"
+              href={COMPANY.whatsappHref}
+              external
+              ariaLabel="Über WhatsApp schreiben"
+            />
+            <ContactRow
+              icon={<MapPin className="h-5 w-5" aria-hidden="true" />}
+              label="Standort"
+              value="Leverkusen, NRW"
+            />
+            <ContactRow
+              icon={<Languages className="h-5 w-5" aria-hidden="true" />}
+              label="Sprachen"
+              value="Deutsch · Russisch · Ukrainisch"
+            />
           </div>
         </div>
 
         <div className="lg:col-span-7">
           {submitted ? (
-            <div className="card-soft p-6 md:p-8 space-y-3">
-              <p className="text-lg font-semibold text-brand">✓ Vielen Dank!</p>
+            <div role="status" aria-live="polite" className="card-soft p-6 md:p-8 space-y-3">
+              <p className="text-lg font-semibold text-brand">
+                <span aria-hidden="true">✓</span> Vielen Dank!
+              </p>
               <p className="text-sm text-foreground/85 leading-relaxed">
-                Ihre Anfrage wurde erfolgreich gesendet. Ich melde mich innerhalb von 24 Stunden bei Ihnen zurück.
+                Ihre Anfrage wurde erfolgreich gesendet. Ich melde mich innerhalb von 24 Stunden bei
+                Ihnen zurück.
               </p>
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className="card-soft p-6 md:p-8 space-y-5" noValidate>
+            <form
+              onSubmit={handleSubmit}
+              className="card-soft p-6 md:p-8 space-y-5"
+              noValidate
+              aria-labelledby="contact-heading"
+            >
               <input type="hidden" name="_subject" value="Neue Anfrage über die Website" />
               <input type="hidden" name="_template" value="table" />
               <input type="hidden" name="_captcha" value="false" />
@@ -885,7 +1011,11 @@ function Contact() {
                   />
                 </Field>
                 <Field label="Unternehmen" fieldId="contact-company">
-                  <Input name="company" placeholder="Firmenname (optional)" disabled={isSubmitting} />
+                  <Input
+                    name="company"
+                    placeholder="Firmenname (optional)"
+                    disabled={isSubmitting}
+                  />
                 </Field>
               </div>
               <div className="grid sm:grid-cols-2 gap-4">
@@ -965,7 +1095,11 @@ function Contact() {
                   </SelectContent>
                 </Select>
                 {errors.topic && (
-                  <p id="contact-topic-error" role="alert" className="text-destructive text-xs mt-1">
+                  <p
+                    id="contact-topic-error"
+                    role="alert"
+                    className="text-destructive text-xs mt-1"
+                  >
                     {errors.topic}
                   </p>
                 )}
@@ -990,8 +1124,12 @@ function Contact() {
                 />
               </Field>
 
-              <label className="flex items-start gap-3 text-sm text-muted-foreground cursor-pointer">
+              <label
+                htmlFor="contact-consent"
+                className="flex items-start gap-3 text-sm text-muted-foreground cursor-pointer"
+              >
                 <Checkbox
+                  id="contact-consent"
                   checked={consentChecked}
                   onCheckedChange={(v) => setConsentChecked(Boolean(v))}
                   disabled={isSubmitting}
@@ -1003,9 +1141,10 @@ function Contact() {
                   <Link to="/datenschutz" className="text-accent-blue hover:underline">
                     Datenschutzerklärung
                   </Link>{" "}
-                  zur Kenntnis genommen. Ich stimme zu, dass meine Angaben (Name, E-Mail-Adresse sowie ggf. Telefon und
-                  Firmenname) zur Bearbeitung meiner Anfrage erhoben und verarbeitet werden. Diese Einwilligung kann ich
-                  jederzeit für die Zukunft per E-Mail an{" "}
+                  zur Kenntnis genommen. Ich stimme zu, dass meine Angaben (Name, E-Mail-Adresse
+                  sowie ggf. Telefon und Firmenname) zur Bearbeitung meiner Anfrage erhoben und
+                  verarbeitet werden. Diese Einwilligung kann ich jederzeit für die Zukunft per
+                  E-Mail an{" "}
                   <a href={`mailto:${COMPANY.email}`} className="text-accent-blue hover:underline">
                     {COMPANY.email}
                   </a>{" "}
@@ -1027,7 +1166,7 @@ function Contact() {
                   </>
                 ) : (
                   <>
-                    Anfrage senden <ArrowRight className="h-4 w-4 shrink-0" />
+                    Anfrage senden <ArrowRight className="h-4 w-4 shrink-0" aria-hidden="true" />
                   </>
                 )}
               </Button>
@@ -1048,15 +1187,44 @@ function Contact() {
   );
 }
 
-function ContactRow({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
+function ContactRow({
+  icon,
+  label,
+  value,
+  href,
+  ariaLabel,
+  external,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+  href?: string;
+  ariaLabel?: string;
+  external?: boolean;
+}) {
   return (
     <div className="flex items-start gap-3">
-      <div className="h-10 w-10 rounded-lg bg-section text-accent-blue flex items-center justify-center shrink-0">
+      <div
+        className="h-10 w-10 rounded-lg bg-section text-accent-blue flex items-center justify-center shrink-0"
+        aria-hidden="true"
+      >
         {icon}
       </div>
       <div>
         <div className="text-xs uppercase tracking-wider text-muted-foreground">{label}</div>
-        <div className="text-sm font-medium text-foreground">{value}</div>
+        {href ? (
+          <a
+            href={href}
+            aria-label={ariaLabel}
+            target={external ? "_blank" : undefined}
+            rel={external ? "noopener noreferrer" : undefined}
+            className="text-sm font-medium text-foreground hover:text-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-blue rounded-sm transition-colors"
+          >
+            {value}
+          </a>
+        ) : (
+          <div className="text-sm font-medium text-foreground">{value}</div>
+        )}
       </div>
     </div>
   );
@@ -1086,14 +1254,11 @@ function Field({
           </span>
         )}
       </Label>
-      {React.cloneElement(
-        children as React.ReactElement<React.HTMLAttributes<HTMLElement>>,
-        {
-          id: fieldId,
-          "aria-invalid": !!error,
-          "aria-describedby": error ? errorId : undefined,
-        },
-      )}
+      {React.cloneElement(children as React.ReactElement<React.HTMLAttributes<HTMLElement>>, {
+        id: fieldId,
+        "aria-invalid": !!error,
+        "aria-describedby": error ? errorId : undefined,
+      })}
       {error && (
         <p id={errorId} role="alert" className="text-destructive text-xs mt-1">
           {error}
@@ -1108,15 +1273,19 @@ function SectionHeading({
   eyebrow,
   title,
   subtitle,
+  headingId,
 }: {
   eyebrow: string;
   title: string;
   subtitle?: string;
+  headingId?: string;
 }) {
   return (
     <div className="max-w-3xl">
       <div className="text-sm font-medium text-accent-blue uppercase tracking-wider">{eyebrow}</div>
-      <h2 className="mt-3 text-3xl md:text-4xl font-bold text-brand leading-tight">{title}</h2>
+      <h2 id={headingId} className="mt-3 text-3xl md:text-4xl font-bold text-brand leading-tight">
+        {title}
+      </h2>
       {subtitle && <p className="mt-4 text-lg text-muted-foreground">{subtitle}</p>}
     </div>
   );

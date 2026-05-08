@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState, type FormEvent, type ReactNode } from "react";
+import React, { useState, type FormEvent, type ReactNode } from "react";
 import {
   ArrowRight,
   CheckCircle2,
@@ -64,12 +64,10 @@ function UkrainianHomePage() {
       <JsonLd data={localBusinessSchema("uk")} />
       <JsonLd data={faqPageSchema(faqItems)} />
       <JsonLd
-        data={breadcrumbSchema([
-          { name: "Головна", item: "https://korolov-it-service.de/ua" },
-        ])}
+        data={breadcrumbSchema([{ name: "Головна", item: "https://korolov-it-service.de/ua" }])}
       />
       <SiteHeader locale="ua" basePath="/ua" />
-      <main className="flex-1">
+      <main id="main" tabIndex={-1} className="flex-1 focus:outline-none">
         <Hero />
         <Problem />
         <Services />
@@ -88,14 +86,17 @@ function UkrainianHomePage() {
 
 function Hero() {
   return (
-    <section className="hero-grid-bg relative overflow-hidden">
+    <section className="hero-grid-bg relative overflow-hidden" aria-labelledby="hero-heading">
       <div className="container-page py-20 md:py-28 lg:py-32 grid lg:grid-cols-12 gap-12 items-center">
         <div className="lg:col-span-7">
           <div className="inline-flex items-center gap-2 rounded-full border border-border bg-white/70 backdrop-blur px-3 py-1 text-xs text-muted-foreground">
-            <Sparkles className="h-3.5 w-3.5 text-accent-blue" />
+            <Sparkles className="h-3.5 w-3.5 text-accent-blue" aria-hidden="true" />
             IT-партнер для малого бізнесу в NRW
           </div>
-          <h1 className="mt-6 text-4xl md:text-5xl lg:text-6xl font-bold text-brand leading-[1.05]">
+          <h1
+            id="hero-heading"
+            className="mt-6 text-4xl md:text-5xl lg:text-6xl font-bold text-brand leading-[1.05]"
+          >
             Більше заявок із сайту та IT-підтримки з Леверкузена
           </h1>
           <p className="mt-6 text-lg text-muted-foreground max-w-2xl leading-relaxed">
@@ -110,26 +111,21 @@ function Hero() {
               className="w-full sm:w-auto h-14 px-8 text-base bg-accent-blue hover:bg-accent-blue/90 shadow-lg shadow-accent-blue/30"
             >
               <a href="#kontakt">
-                Замовити безкоштовну консультацію <ArrowRight className="h-4 w-4" />
+                Замовити безкоштовну консультацію{" "}
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </a>
             </Button>
-            <Button
-              asChild
-              variant="ghost"
-              size="default"
-              className="w-full sm:w-auto"
-            >
+            <Button asChild variant="ghost" size="default" className="w-full sm:w-auto">
               <a href="#leistungen">Переглянути послуги</a>
             </Button>
           </div>
           <ul className="mt-10 grid sm:grid-cols-3 gap-4 max-w-2xl">
-            {[
-              "Особистий контакт",
-              "Сайт + IT",
-              "DE · RU · UA",
-            ].map((t) => (
+            {["Особистий контакт", "Сайт + IT", "DE · RU · UA"].map((t) => (
               <li key={t} className="flex items-start gap-2 text-sm text-foreground/80">
-                <CheckCircle2 className="h-5 w-5 text-accent-teal shrink-0 mt-0.5" />
+                <CheckCircle2
+                  className="h-5 w-5 text-accent-teal shrink-0 mt-0.5"
+                  aria-hidden="true"
+                />
                 {t}
               </li>
             ))}
@@ -145,14 +141,34 @@ function Hero() {
 
 function HeroCard() {
   return (
-    <div className="relative">
+    <div className="relative" aria-hidden="true">
       <div className="absolute -inset-4 bg-gradient-to-tr from-accent-blue/10 to-transparent rounded-3xl blur-2xl" />
       <div className="relative card-soft p-6 md:p-7">
         <div className="mt-1 space-y-3">
-          <MiniRow icon={<Globe className="h-4 w-4" />} label="Сайт компанії" value="активний · SSL" tone="teal" />
-          <MiniRow icon={<Mail className="h-4 w-4" />} label="Ділова пошта" value="info@…de" tone="blue" />
-          <MiniRow icon={<ShieldCheck className="h-4 w-4" />} label="Бекапи й оновлення" value="актуально" tone="teal" />
-          <MiniRow icon={<LifeBuoy className="h-4 w-4" />} label="Техпідтримка" value="на зв'язку" tone="blue" />
+          <MiniRow
+            icon={<Globe className="h-4 w-4" />}
+            label="Сайт компанії"
+            value="активний · SSL"
+            tone="teal"
+          />
+          <MiniRow
+            icon={<Mail className="h-4 w-4" />}
+            label="Ділова пошта"
+            value="info@…de"
+            tone="blue"
+          />
+          <MiniRow
+            icon={<ShieldCheck className="h-4 w-4" />}
+            label="Бекапи й оновлення"
+            value="актуально"
+            tone="teal"
+          />
+          <MiniRow
+            icon={<LifeBuoy className="h-4 w-4" />}
+            label="Техпідтримка"
+            value="на зв'язку"
+            tone="blue"
+          />
         </div>
       </div>
     </div>
@@ -183,15 +199,27 @@ function MiniRow({
 
 function Problem() {
   const items = [
-    { title: "Пояснюю просто", text: "Без складного технічного жаргону: зрозуміло, що і навіщо робиться." },
-    { title: "Роблю системно", text: "Охайна реалізація з фокусом на надійність, безпеку та стабільність." },
-    { title: "Підтримую після запуску", text: "За потреби беру на себе регулярний технічний супровід." },
+    {
+      title: "Пояснюю просто",
+      text: "Без складного технічного жаргону: зрозуміло, що і навіщо робиться.",
+    },
+    {
+      title: "Роблю системно",
+      text: "Охайна реалізація з фокусом на надійність, безпеку та стабільність.",
+    },
+    {
+      title: "Підтримую після запуску",
+      text: "За потреби беру на себе регулярний технічний супровід.",
+    },
   ];
 
   return (
-    <section className="py-20 md:py-28">
+    <section className="py-20 md:py-28" aria-labelledby="problem-heading">
       <div className="container-page max-w-5xl">
-        <h2 className="text-3xl md:text-4xl font-bold text-brand leading-tight">
+        <h2
+          id="problem-heading"
+          className="text-3xl md:text-4xl font-bold text-brand leading-tight"
+        >
           Невеликому бізнесу частіше потрібен не великий підрядник, а{" "}
           <span className="text-accent-blue">надійний технічний партнер</span>.
         </h2>
@@ -203,7 +231,7 @@ function Problem() {
         <div className="mt-10 grid md:grid-cols-3 gap-5">
           {items.map((it) => (
             <div key={it.title} className="card-soft p-6">
-              <CheckCircle2 className="h-5 w-5 text-accent-blue" />
+              <CheckCircle2 className="h-5 w-5 text-accent-blue" aria-hidden="true" />
               <h3 className="mt-4 font-semibold text-brand">{it.title}</h3>
               <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{it.text}</p>
             </div>
@@ -218,63 +246,71 @@ const services = [
   {
     icon: Globe,
     title: "Створення сайтів",
-    text:
-      "Сучасні, швидкі та адаптивні сайти для компаній, самозайнятих і локальних сервісів. Чітка структура та професійний вигляд під ваші послуги.",
+    text: "Сучасні, швидкі та адаптивні сайти для компаній, самозайнятих і локальних сервісів. Чітка структура та професійний вигляд під ваші послуги.",
     tags: ["Responsive Design", "SEO-основа", "Форма зворотного зв'язку", "SSL"],
   },
   {
     icon: Wrench,
     title: "Підтримка та обслуговування сайту",
-    text:
-      "Після запуску залишаюся вашим технічним контактним спеціалістом: оновлення, резервні копії, невеликі зміни та перевірка форм.",
+    text: "Після запуску залишаюся вашим технічним контактним спеціалістом: оновлення, резервні копії, невеликі зміни та перевірка форм.",
     tags: ["Оновлення", "Бекапи", "Технічний контроль"],
   },
   {
     icon: Mail,
     title: "Пошта, домен та хостинг",
-    text:
-      "Налаштування ділової пошти, домену, хостингу, DNS, SPF, DKIM, DMARC і стабільної відправки форм.",
+    text: "Налаштування ділової пошти, домену, хостингу, DNS, SPF, DKIM, DMARC і стабільної відправки форм.",
     tags: ["Домен", "Business E-mail", "DNS", "SMTP"],
   },
   {
     icon: LifeBuoy,
     title: "IT-підтримка для малого бізнесу",
-    text:
-      "Допомога з комп'ютерами, мережею, принтерами, хмарою, резервним копіюванням і щоденними технічними питаннями.",
+    text: "Допомога з комп'ютерами, мережею, принтерами, хмарою, резервним копіюванням і щоденними технічними питаннями.",
     tags: ["Віддалено", "On-site", "Мережа", "Хмара"],
   },
   {
     icon: FileText,
     title: "Цифрові документи та порядок",
-    text:
-      "Структура для рахунків, комерційних пропозицій, PDF-шаблонів, QR-кодів і цифрового архіву документів.",
+    text: "Структура для рахунків, комерційних пропозицій, PDF-шаблонів, QR-кодів і цифрового архіву документів.",
     tags: ["Рахунки", "Пропозиції", "PDF", "QR-коди"],
   },
   {
     icon: ShieldCheck,
     title: "Технічна реалізація DSGVO",
-    text:
-      "Технічне впровадження SSL, cookie-банера, форм, сторінок Impressum і Datenschutz. Юридичні тексти бажано додатково перевірити в профільному сервісі або у юриста.",
+    text: "Технічне впровадження SSL, cookie-банера, форм, сторінок Impressum і Datenschutz. Юридичні тексти бажано додатково перевірити в профільному сервісі або у юриста.",
     tags: ["SSL", "Cookie-банер", "Datenschutz", "Impressum"],
   },
 ];
 
 function Services() {
   return (
-    <section id="leistungen" className="py-20 md:py-28 bg-section scroll-mt-20">
+    <section
+      id="leistungen"
+      className="py-20 md:py-28 bg-section scroll-mt-20"
+      aria-labelledby="services-heading"
+    >
       <div className="container-page">
-        <SectionHeading eyebrow="Послуги" title="Цифрові рішення для щоденних бізнес-завдань" />
+        <SectionHeading
+          headingId="services-heading"
+          eyebrow="Послуги"
+          title="Цифрові рішення для щоденних бізнес-завдань"
+        />
         <div className="mt-12 grid md:grid-cols-2 lg:grid-cols-3 gap-5">
           {services.map((s) => (
             <article key={s.title} className="card-soft p-6 flex flex-col">
-              <div className="h-11 w-11 rounded-xl bg-brand/5 text-accent-blue flex items-center justify-center">
+              <div
+                className="h-11 w-11 rounded-xl bg-brand/5 text-accent-blue flex items-center justify-center"
+                aria-hidden="true"
+              >
                 <s.icon className="h-5 w-5" />
               </div>
               <h3 className="mt-4 font-semibold text-brand text-lg">{s.title}</h3>
               <p className="mt-2 text-sm text-muted-foreground leading-relaxed flex-1">{s.text}</p>
               <div className="mt-5 flex flex-wrap gap-1.5">
                 {s.tags.map((t) => (
-                  <span key={t} className="text-xs px-2.5 py-1 rounded-full bg-section text-foreground/70 border border-border">
+                  <span
+                    key={t}
+                    className="text-xs px-2.5 py-1 rounded-full bg-section text-foreground/70 border border-border"
+                  >
                     {t}
                   </span>
                 ))}
@@ -288,23 +324,55 @@ function Services() {
 }
 
 const audiences = [
-  { icon: UserCheck, title: "Підприємці та самозайняті", text: "Професійний старт із надійною технічною основою." },
-  { icon: HardHat, title: "Локальні сервіси та майстри", text: "Зрозумілий сайт з послугами та контактами." },
-  { icon: Building2, title: "Керуючі компанії та сервіси нерухомості", text: "Структурована подача послуг і технічна підтримка в щоденній роботі." },
-  { icon: Scale, title: "Офіси, практики та консультаційні служби", text: "Професійний онлайн-образ, безпечна пошта й надійний технічний контакт." },
-  { icon: Users, title: "Невеликі компанії без власного IT-відділу", text: "Один відповідальний спеціаліст із сайту, пошти, хостингу й щоденних IT-питань." },
-  { icon: Languages, title: "Багатомовні підприємці в Німеччині", text: "Консультації та реалізація німецькою, російською та українською." },
+  {
+    icon: UserCheck,
+    title: "Підприємці та самозайняті",
+    text: "Професійний старт із надійною технічною основою.",
+  },
+  {
+    icon: HardHat,
+    title: "Локальні сервіси та майстри",
+    text: "Зрозумілий сайт з послугами та контактами.",
+  },
+  {
+    icon: Building2,
+    title: "Керуючі компанії та сервіси нерухомості",
+    text: "Структурована подача послуг і технічна підтримка в щоденній роботі.",
+  },
+  {
+    icon: Scale,
+    title: "Офіси, практики та консультаційні служби",
+    text: "Професійний онлайн-образ, безпечна пошта й надійний технічний контакт.",
+  },
+  {
+    icon: Users,
+    title: "Невеликі компанії без власного IT-відділу",
+    text: "Один відповідальний спеціаліст із сайту, пошти, хостингу й щоденних IT-питань.",
+  },
+  {
+    icon: Languages,
+    title: "Багатомовні підприємці в Німеччині",
+    text: "Консультації та реалізація німецькою, російською та українською.",
+  },
 ];
 
 function ForWhom() {
   return (
-    <section id="fuer-wen" className="py-20 md:py-28 scroll-mt-20">
+    <section
+      id="fuer-wen"
+      className="py-20 md:py-28 scroll-mt-20"
+      aria-labelledby="forwhom-heading"
+    >
       <div className="container-page">
-        <SectionHeading eyebrow="Для кого" title="Кому підходить Korolov IT-Service" />
+        <SectionHeading
+          headingId="forwhom-heading"
+          eyebrow="Для кого"
+          title="Кому підходить Korolov IT-Service"
+        />
         <div className="mt-12 grid md:grid-cols-2 lg:grid-cols-3 gap-5">
           {audiences.map((a) => (
             <div key={a.title} className="card-soft p-6">
-              <a.icon className="h-5 w-5 text-accent-teal" />
+              <a.icon className="h-5 w-5 text-accent-teal" aria-hidden="true" />
               <h3 className="mt-4 font-semibold text-brand">{a.title}</h3>
               <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{a.text}</p>
             </div>
@@ -321,7 +389,13 @@ const packages = [
     price: "від 890 €",
     suffix: "netto",
     desc: "Для самозайнятих і невеликих компаній, яким потрібен професійний старт.",
-    features: ["1-3 сторінки", "Адаптивний дизайн", "Контактна форма", "SSL та підключення домену", "Базове SEO"],
+    features: [
+      "1-3 сторінки",
+      "Адаптивний дизайн",
+      "Контактна форма",
+      "SSL та підключення домену",
+      "Базове SEO",
+    ],
     recommended: false,
   },
   {
@@ -329,7 +403,14 @@ const packages = [
     price: "від 1.500 €",
     suffix: "netto",
     desc: "Для компаній із кількома напрямами послуг і більш складною структурою.",
-    features: ["4-7 сторінок", "Індивідуальна структура", "Сторінки послуг", "Контактна форма та e-mail інтеграція", "SEO-основа", "Допомога з текстами за домовленістю"],
+    features: [
+      "4-7 сторінок",
+      "Індивідуальна структура",
+      "Сторінки послуг",
+      "Контактна форма та e-mail інтеграція",
+      "SEO-основа",
+      "Допомога з текстами за домовленістю",
+    ],
     recommended: true,
   },
   {
@@ -337,7 +418,14 @@ const packages = [
     price: "від 390 €",
     suffix: "netto",
     desc: "Для чистого налаштування домену, пошти та технічної бази компанії.",
-    features: ["Налаштування домену та хостингу", "Ділова e-mail адреса", "SPF, DKIM, DMARC", "Підпис e-mail", "Відправка форм", "Базове налаштування Google Business Profile"],
+    features: [
+      "Налаштування домену та хостингу",
+      "Ділова e-mail адреса",
+      "SPF, DKIM, DMARC",
+      "Підпис e-mail",
+      "Відправка форм",
+      "Базове налаштування Google Business Profile",
+    ],
     recommended: false,
   },
   {
@@ -345,7 +433,13 @@ const packages = [
     price: "від 79 €",
     suffix: "/ місяць",
     desc: "Регулярна технічна підтримка після запуску.",
-    features: ["Оновлення та резервні копії", "Регулярна технічна перевірка", "Невеликі зміни за домовленістю", "Перевірка форм", "Постійний технічний контакт"],
+    features: [
+      "Оновлення та резервні копії",
+      "Регулярна технічна перевірка",
+      "Невеликі зміни за домовленістю",
+      "Перевірка форм",
+      "Постійний технічний контакт",
+    ],
     note: "Обсяг робіт і час реакції узгоджуються індивідуально.",
     recommended: false,
   },
@@ -353,18 +447,31 @@ const packages = [
 
 function Pricing() {
   return (
-    <section id="preise" className="py-20 md:py-28 bg-section scroll-mt-20">
+    <section
+      id="preise"
+      className="py-20 md:py-28 bg-section scroll-mt-20"
+      aria-labelledby="pricing-heading"
+    >
       <div className="container-page">
-        <SectionHeading eyebrow="Пакети та ціни" title="Прозорі стартові пропозиції" />
+        <SectionHeading
+          headingId="pricing-heading"
+          eyebrow="Пакети та ціни"
+          title="Прозорі стартові пропозиції"
+        />
         <div className="mt-12 grid md:grid-cols-2 xl:grid-cols-4 gap-5">
           {packages.map((p) => (
-            <div key={p.name} className={`relative card-soft p-6 flex flex-col ${p.recommended ? "ring-2 ring-accent-blue border-accent-blue" : ""}`}>
+            <div
+              key={p.name}
+              className={`relative card-soft p-6 flex flex-col ${p.recommended ? "ring-2 ring-accent-blue border-accent-blue" : ""}`}
+            >
               {p.recommended && (
                 <div className="absolute -top-3 left-6 inline-flex items-center gap-1 rounded-full bg-accent-blue text-white text-xs font-medium px-2.5 py-1">
-                  <Star className="h-3 w-3" /> Рекомендовано
+                  <Star className="h-3 w-3" aria-hidden="true" /> Рекомендовано
                 </div>
               )}
-              <div className="text-sm font-medium text-accent-blue uppercase tracking-wider">{p.name}</div>
+              <div className="text-sm font-medium text-accent-blue uppercase tracking-wider">
+                {p.name}
+              </div>
               <div className="mt-3 flex items-baseline gap-1.5">
                 <div className="text-3xl font-bold text-brand">{p.price}</div>
                 <div className="text-sm text-muted-foreground">{p.suffix}</div>
@@ -373,7 +480,10 @@ function Pricing() {
               <ul className="mt-5 space-y-2.5 flex-1">
                 {p.features.map((f) => (
                   <li key={f} className="flex items-start gap-2 text-sm text-foreground/85">
-                    <Check className="h-4 w-4 text-accent-teal shrink-0 mt-0.5" />
+                    <Check
+                      className="h-4 w-4 text-accent-teal shrink-0 mt-0.5"
+                      aria-hidden="true"
+                    />
                     {f}
                   </li>
                 ))}
@@ -417,13 +527,20 @@ function Process() {
   ];
 
   return (
-    <section id="ablauf" className="py-20 md:py-28 scroll-mt-20">
+    <section id="ablauf" className="py-20 md:py-28 scroll-mt-20" aria-labelledby="process-heading">
       <div className="container-page">
-        <SectionHeading eyebrow="Етапи" title="Як проходить співпраця" subtitle="Чітко, структуровано й без сюрпризів." />
+        <SectionHeading
+          headingId="process-heading"
+          eyebrow="Етапи"
+          title="Як проходить співпраця"
+          subtitle="Чітко, структуровано й без сюрпризів."
+        />
         <ol className="mt-12 grid gap-5 lg:grid-cols-5 md:grid-cols-2">
           {steps.map((step, i) => (
             <li key={step.title} className="card-soft p-6 relative">
-              <div className="text-xs uppercase tracking-wider text-muted-foreground">Крок {i + 1}</div>
+              <div className="text-xs uppercase tracking-wider text-muted-foreground">
+                Крок {i + 1}
+              </div>
               <div className="mt-2 h-9 w-9 rounded-lg bg-brand text-brand-foreground flex items-center justify-center font-semibold">
                 {i + 1}
               </div>
@@ -449,29 +566,41 @@ function About() {
     "Консультації німецькою, російською та українською",
   ];
   return (
-    <section id="ueber-mich" className="py-20 md:py-28 scroll-mt-20">
+    <section
+      id="ueber-mich"
+      className="py-20 md:py-28 scroll-mt-20"
+      aria-labelledby="about-heading"
+    >
       <div className="container-page grid lg:grid-cols-12 gap-12 items-start">
         <div className="lg:col-span-7">
-          <div className="text-sm font-medium text-accent-blue uppercase tracking-wider">Про мене</div>
-          <h2 className="mt-3 text-3xl md:text-4xl font-bold text-brand leading-tight">
+          <div className="text-sm font-medium text-accent-blue uppercase tracking-wider">
+            Про мене
+          </div>
+          <h2
+            id="about-heading"
+            className="mt-3 text-3xl md:text-4xl font-bold text-brand leading-tight"
+          >
             Про Korolov IT-Service
           </h2>
           <div className="mt-6 space-y-4 text-foreground/85 leading-relaxed">
             <p>
               Мене звати <span className="font-medium text-brand">Viacheslav Korolov</span>. Я
-              допомагаю малому бізнесу, приватним фахівцям і локальним сервісам у Leverkusen, Köln та NRW
-              із сайтами, діловою поштою, IT-питаннями та цифровою організацією.
+              допомагаю малому бізнесу, приватним фахівцям і локальним сервісам у Leverkusen, Köln
+              та NRW із сайтами, діловою поштою, IT-питаннями та цифровою організацією.
             </p>
             <p>
               Моя мета - вирішувати технічні задачі просто і практично. Багатьом компаніям не
-              потрібна велика агенція, а потрібен надійний партнер, який пояснює, реалізує
-              і залишається на зв'язку після запуску.
+              потрібна велика агенція, а потрібен надійний партнер, який пояснює, реалізує і
+              залишається на зв'язку після запуску.
             </p>
           </div>
           <ul className="mt-8 grid sm:grid-cols-2 gap-3">
             {trust.map((t) => (
               <li key={t} className="flex items-start gap-2 text-sm text-foreground/85">
-                <CheckCircle2 className="h-5 w-5 text-accent-teal shrink-0 mt-0.5" />
+                <CheckCircle2
+                  className="h-5 w-5 text-accent-teal shrink-0 mt-0.5"
+                  aria-hidden="true"
+                />
                 {t}
               </li>
             ))}
@@ -494,9 +623,17 @@ function About() {
               </div>
             </div>
             <div className="mt-6 space-y-2.5 text-sm text-foreground/80">
-              <div className="flex items-center gap-2"><MapPin className="h-4 w-4 text-accent-blue" /> Leverkusen, NRW</div>
-              <div className="flex items-center gap-2"><Languages className="h-4 w-4 text-accent-blue" /> Deutsch · Русский · Українська</div>
-              <div className="flex items-center gap-2"><MessageSquare className="h-4 w-4 text-accent-blue" /> Прямий контакт без посередників</div>
+              <div className="flex items-center gap-2">
+                <MapPin className="h-4 w-4 text-accent-blue" aria-hidden="true" /> Leverkusen, NRW
+              </div>
+              <div className="flex items-center gap-2">
+                <Languages className="h-4 w-4 text-accent-blue" aria-hidden="true" /> Deutsch ·
+                Русский · Українська
+              </div>
+              <div className="flex items-center gap-2">
+                <MessageSquare className="h-4 w-4 text-accent-blue" aria-hidden="true" /> Прямий
+                контакт без посередників
+              </div>
             </div>
           </div>
         </div>
@@ -536,19 +673,50 @@ function FAQ() {
   const [open, setOpen] = useState<number | null>(0);
 
   return (
-    <section className="py-20 md:py-28 bg-section">
+    <section
+      id="faq"
+      className="py-20 md:py-28 bg-section scroll-mt-20"
+      aria-labelledby="faq-heading"
+    >
       <div className="container-page max-w-3xl">
-        <SectionHeading eyebrow="FAQ" title="Часті запитання" subtitle="Відповіді на найпоширеніші запитання перед першою консультацією." />
+        <SectionHeading
+          headingId="faq-heading"
+          eyebrow="FAQ"
+          title="Часті запитання"
+          subtitle="Відповіді на найпоширеніші запитання перед першою консультацією."
+        />
         <div className="mt-10 space-y-3">
           {faqs.map((f, i) => {
             const isOpen = open === i;
+            const panelId = `faq-panel-${i}`;
+            const buttonId = `faq-button-${i}`;
             return (
               <div key={f.q} className="card-soft overflow-hidden">
-                <button onClick={() => setOpen(isOpen ? null : i)} className="w-full flex items-center justify-between text-left p-5 gap-4" aria-expanded={isOpen}>
-                  <span className="font-medium text-brand">{f.q}</span>
-                  <ChevronDown className={`h-5 w-5 text-muted-foreground shrink-0 transition-transform ${isOpen ? "rotate-180" : ""}`} />
-                </button>
-                {isOpen && <div className="px-5 pb-5 -mt-1 text-sm text-muted-foreground leading-relaxed">{f.a}</div>}
+                <h3 className="m-0">
+                  <button
+                    id={buttonId}
+                    onClick={() => setOpen(isOpen ? null : i)}
+                    className="w-full flex items-center justify-between text-left p-5 gap-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-blue rounded-md"
+                    aria-expanded={isOpen}
+                    aria-controls={panelId}
+                    type="button"
+                  >
+                    <span className="font-medium text-brand">{f.q}</span>
+                    <ChevronDown
+                      className={`h-5 w-5 text-muted-foreground shrink-0 transition-transform ${isOpen ? "rotate-180" : ""}`}
+                      aria-hidden="true"
+                    />
+                  </button>
+                </h3>
+                <div
+                  id={panelId}
+                  role="region"
+                  aria-labelledby={buttonId}
+                  hidden={!isOpen}
+                  className="px-5 pb-5 -mt-1 text-sm text-muted-foreground leading-relaxed"
+                >
+                  {f.a}
+                </div>
               </div>
             );
           })}
@@ -568,41 +736,89 @@ function Contact() {
   };
 
   return (
-    <section id="kontakt" className="py-20 md:py-28 scroll-mt-20">
+    <section id="kontakt" className="py-20 md:py-28 scroll-mt-20" aria-labelledby="contact-heading">
       <div className="container-page grid lg:grid-cols-12 gap-10">
         <div className="lg:col-span-5">
-          <div className="text-sm font-medium text-accent-blue uppercase tracking-wider">Контакти</div>
-          <h2 className="mt-3 text-3xl md:text-4xl font-bold text-brand leading-tight">Запросити безкоштовну консультацію</h2>
+          <div className="text-sm font-medium text-accent-blue uppercase tracking-wider">
+            Контакти
+          </div>
+          <h2
+            id="contact-heading"
+            className="mt-3 text-3xl md:text-4xl font-bold text-brand leading-tight"
+          >
+            Запросити безкоштовну консультацію
+          </h2>
           <div className="mt-8 space-y-4">
-            <ContactRow icon={<Mail className="h-5 w-5" />} label="E-mail" value="info@korolov-it-service.de" />
-            <ContactRow icon={<Phone className="h-5 w-5" />} label="Телефон / WhatsApp" value={COMPANY.phoneDisplay} />
-            <ContactRow icon={<MapPin className="h-5 w-5" />} label="Локація" value="Leverkusen, NRW" />
-            <ContactRow icon={<Languages className="h-5 w-5" />} label="Мови" value="Deutsch · Русский · Українська" />
-            <ContactRow icon={<MessageSquare className="h-5 w-5" />} label="Формат" value="Віддалено та за домовленістю on-site" />
+            <ContactRow
+              icon={<Mail className="h-5 w-5" aria-hidden="true" />}
+              label="E-mail"
+              value={COMPANY.email}
+              href={`mailto:${COMPANY.email}`}
+              ariaLabel="Надіслати e-mail"
+            />
+            <ContactRow
+              icon={<Phone className="h-5 w-5" aria-hidden="true" />}
+              label="Телефон"
+              value={COMPANY.phoneDisplay}
+              href={COMPANY.phoneHref}
+              ariaLabel="Зателефонувати"
+            />
+            <ContactRow
+              icon={<MessageSquare className="h-5 w-5" aria-hidden="true" />}
+              label="WhatsApp"
+              value="Написати в WhatsApp"
+              href={COMPANY.whatsappHref}
+              external
+              ariaLabel="Написати в WhatsApp"
+            />
+            <ContactRow
+              icon={<MapPin className="h-5 w-5" aria-hidden="true" />}
+              label="Локація"
+              value="Leverkusen, NRW"
+            />
+            <ContactRow
+              icon={<Languages className="h-5 w-5" aria-hidden="true" />}
+              label="Мови"
+              value="Deutsch · Русский · Українська"
+            />
           </div>
         </div>
 
         <div className="lg:col-span-7">
-          <form onSubmit={handleSubmit} className="card-soft p-6 md:p-8 space-y-5">
+          <form
+            onSubmit={handleSubmit}
+            className="card-soft p-6 md:p-8 space-y-5"
+            aria-labelledby="contact-heading"
+          >
             <div className="grid sm:grid-cols-2 gap-4">
-              <Field label="Ім'я" required>
-                <Input required name="name" placeholder="Ваше ім'я" />
+              <Field label="Ім'я" required fieldId="ua-name">
+                <Input required name="name" placeholder="Ваше ім'я" autoComplete="name" />
               </Field>
-              <Field label="Компанія">
-                <Input name="company" placeholder="Назва компанії (опціонально)" />
+              <Field label="Компанія" fieldId="ua-company">
+                <Input
+                  name="company"
+                  placeholder="Назва компанії (опціонально)"
+                  autoComplete="organization"
+                />
               </Field>
             </div>
             <div className="grid sm:grid-cols-2 gap-4">
-              <Field label="E-mail" required>
-                <Input required type="email" name="email" placeholder="your@email.de" />
+              <Field label="E-mail" required fieldId="ua-email">
+                <Input
+                  required
+                  type="email"
+                  name="email"
+                  placeholder="your@email.de"
+                  autoComplete="email"
+                />
               </Field>
-              <Field label="Телефон">
-                <Input name="phone" placeholder="опціонально" />
+              <Field label="Телефон" fieldId="ua-phone">
+                <Input name="phone" placeholder="опціонально" autoComplete="tel" />
               </Field>
             </div>
-            <Field label="Тема звернення" required>
+            <Field label="Тема звернення" required fieldId="ua-topic">
               <Select name="topic">
-                <SelectTrigger>
+                <SelectTrigger id="ua-topic">
                   <SelectValue placeholder="Оберіть варіант" />
                 </SelectTrigger>
                 <SelectContent>
@@ -614,30 +830,56 @@ function Contact() {
                 </SelectContent>
               </Select>
             </Field>
-            <Field label="Повідомлення" required>
-              <Textarea required name="message" rows={5} placeholder="Коротко опишіть вашу задачу..." />
+            <Field label="Повідомлення" required fieldId="ua-message">
+              <Textarea
+                required
+                name="message"
+                rows={5}
+                placeholder="Коротко опишіть вашу задачу..."
+              />
             </Field>
 
-            <label className="flex items-start gap-3 text-sm text-muted-foreground">
-              <Checkbox id="dsgvo-ua" checked={agreed} onCheckedChange={(v) => setAgreed(Boolean(v))} required />
+            <label
+              htmlFor="dsgvo-ua"
+              className="flex items-start gap-3 text-sm text-muted-foreground cursor-pointer"
+            >
+              <Checkbox
+                id="dsgvo-ua"
+                checked={agreed}
+                onCheckedChange={(v) => setAgreed(Boolean(v))}
+                required
+                aria-required="true"
+              />
               <span>
                 Я ознайомився(лась) з{" "}
-                <a href="/datenschutz" className="text-accent-blue underline">політикою конфіденційності</a>{" "}
+                <a href="/datenschutz" className="text-accent-blue underline">
+                  політикою конфіденційності
+                </a>{" "}
                 та погоджуюся на обробку даних для зв'язку.
               </span>
             </label>
 
-            <Button type="submit" variant="brand" size="lg" disabled={!agreed} className="w-full sm:w-auto">
-              Надіслати заявку <ArrowRight className="h-4 w-4" />
+            <Button
+              type="submit"
+              variant="brand"
+              size="lg"
+              disabled={!agreed}
+              className="w-full sm:w-auto"
+            >
+              Надіслати заявку <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Button>
 
             {submitted && (
-              <div className="rounded-lg border border-border bg-section p-4 text-sm text-foreground/85">
+              <div
+                role="status"
+                aria-live="polite"
+                className="rounded-lg border border-border bg-section p-4 text-sm text-foreground/85"
+              >
                 Форма поки що не підключена до сервісу відправки.
                 <br />
                 Напишіть, будь ласка, напряму на{" "}
-                <a className="text-accent-blue underline" href="mailto:info@korolov-it-service.de">
-                  info@korolov-it-service.de
+                <a className="text-accent-blue underline" href={`mailto:${COMPANY.email}`}>
+                  {COMPANY.email}
                 </a>
                 .
               </div>
@@ -649,15 +891,44 @@ function Contact() {
   );
 }
 
-function ContactRow({ icon, label, value }: { icon: ReactNode; label: string; value: string }) {
+function ContactRow({
+  icon,
+  label,
+  value,
+  href,
+  ariaLabel,
+  external,
+}: {
+  icon: ReactNode;
+  label: string;
+  value: string;
+  href?: string;
+  ariaLabel?: string;
+  external?: boolean;
+}) {
   return (
     <div className="flex items-start gap-3">
-      <div className="h-10 w-10 rounded-lg bg-section text-accent-blue flex items-center justify-center shrink-0">
+      <div
+        className="h-10 w-10 rounded-lg bg-section text-accent-blue flex items-center justify-center shrink-0"
+        aria-hidden="true"
+      >
         {icon}
       </div>
       <div>
         <div className="text-xs uppercase tracking-wider text-muted-foreground">{label}</div>
-        <div className="text-sm font-medium text-foreground">{value}</div>
+        {href ? (
+          <a
+            href={href}
+            aria-label={ariaLabel}
+            target={external ? "_blank" : undefined}
+            rel={external ? "noopener noreferrer" : undefined}
+            className="text-sm font-medium text-foreground hover:text-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-blue rounded-sm transition-colors"
+          >
+            {value}
+          </a>
+        ) : (
+          <div className="text-sm font-medium text-foreground">{value}</div>
+        )}
       </div>
     </div>
   );
@@ -666,18 +937,29 @@ function ContactRow({ icon, label, value }: { icon: ReactNode; label: string; va
 function Field({
   label,
   required,
+  fieldId,
   children,
 }: {
   label: string;
   required?: boolean;
+  fieldId: string;
   children: ReactNode;
 }) {
+  const child = children as React.ReactElement<React.HTMLAttributes<HTMLElement>>;
   return (
     <div className="space-y-1.5">
-      <Label className="text-sm text-foreground/80">
-        {label} {required && <span className="text-destructive">*</span>}
+      <Label htmlFor={fieldId} className="text-sm text-foreground/80">
+        {label}{" "}
+        {required && (
+          <span className="text-destructive" aria-label="обов'язково">
+            *
+          </span>
+        )}
       </Label>
-      {children}
+      {React.cloneElement(child, {
+        id: fieldId,
+        ...(required ? { "aria-required": "true" } : {}),
+      })}
     </div>
   );
 }
@@ -686,15 +968,19 @@ function SectionHeading({
   eyebrow,
   title,
   subtitle,
+  headingId,
 }: {
   eyebrow: string;
   title: string;
   subtitle?: string;
+  headingId?: string;
 }) {
   return (
     <div className="max-w-3xl">
       <div className="text-sm font-medium text-accent-blue uppercase tracking-wider">{eyebrow}</div>
-      <h2 className="mt-3 text-3xl md:text-4xl font-bold text-brand leading-tight">{title}</h2>
+      <h2 id={headingId} className="mt-3 text-3xl md:text-4xl font-bold text-brand leading-tight">
+        {title}
+      </h2>
       {subtitle && <p className="mt-4 text-lg text-muted-foreground">{subtitle}</p>}
     </div>
   );
