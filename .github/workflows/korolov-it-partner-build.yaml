@@ -40,6 +40,46 @@ jobs:
           npm ci
           npm run build
 
+      - name: Create PHP runtime config
+        shell: bash
+        env:
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          MAIL_FROM: ${{ secrets.MAIL_FROM }}
+          MAIL_TO: ${{ secrets.MAIL_TO }}
+          MAIL_SUBJECT: ${{ secrets.MAIL_SUBJECT }}
+        run: |
+          mkdir -p dist/api
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+
+          config = {
+              "SMTP_HOST": os.environ.get("SMTP_HOST", ""),
+              "SMTP_PORT": os.environ.get("SMTP_PORT", ""),
+              "SMTP_USER": os.environ.get("SMTP_USER", ""),
+              "SMTP_PASS": os.environ.get("SMTP_PASS", ""),
+              "MAIL_FROM": os.environ.get("MAIL_FROM", ""),
+              "MAIL_TO": os.environ.get("MAIL_TO", ""),
+              "MAIL_SUBJECT": os.environ.get("MAIL_SUBJECT", ""),
+          }
+
+          def php_string(value: str) -> str:
+              return "'" + value.replace("\\", "\\\\").replace("'", "\\'") + "'"
+
+          content = "<?php\nreturn [\n"
+          for key, value in config.items():
+              content += f"    '{key}' => {php_string(value)},\n"
+          content += "];\n"
+
+          Path("dist/api/runtime-config.php").write_text(content, encoding="utf-8")
+          PY
+
+          test -f dist/api/runtime-config.php
+          echo "runtime-config.php created"
+
 # Please do not touch the following action
       - name: Store deployment content
         uses: ionos-deploy-now/artifact-action@v1
