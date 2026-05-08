@@ -7,6 +7,7 @@ header('Content-Type: application/json; charset=utf-8');
 
 $GLOBALS['CONTACT_RESPONSE_SENT'] = false;
 $GLOBALS['CONTACT_ENV_FILE'] = null;
+$GLOBALS['CONTACT_RUNTIME_CONFIG'] = [];
 
 function respond(int $status, bool $success, string $message, array $extra = []): void
 {
@@ -25,20 +26,9 @@ function respond(int $status, bool $success, string $message, array $extra = [])
     exit;
 }
 
-function loadEnvFile(): ?string
+function loadEnvFile(array $paths): ?string
 {
-    $candidates = [
-        __DIR__ . '/../.env',
-        __DIR__ . '/../../.env',
-        dirname(__DIR__) . '/.env',
-    ];
-
-    $documentRoot = (string) ($_SERVER['DOCUMENT_ROOT'] ?? '');
-    if ($documentRoot !== '') {
-        $candidates[] = rtrim($documentRoot, DIRECTORY_SEPARATOR) . '/.env';
-    }
-
-    foreach ($candidates as $path) {
+    foreach ($paths as $path) {
         if (!is_file($path) || !is_readable($path)) {
             continue;
         }
@@ -86,6 +76,25 @@ function loadEnvFile(): ?string
     return null;
 }
 
+function loadRuntimeConfig(array $paths): array
+{
+    foreach ($paths as $path) {
+        if (!is_file($path) || !is_readable($path)) {
+            continue;
+        }
+
+        $config = require $path;
+        if (!is_array($config)) {
+            error_log('[contact.php] runtime-config.php is not an array: ' . $path);
+            continue;
+        }
+
+        return [$path, $config];
+    }
+
+    return [null, []];
+}
+
 function envValue(string $key, ?string $default = null): ?string
 {
     $val = getenv($key);
@@ -99,6 +108,19 @@ function envValue(string $key, ?string $default = null): ?string
         return trim((string) $_SERVER[$key]);
     }
     return $default;
+}
+
+function configValue(string $key, ?string $default = null): ?string
+{
+    $runtimeConfig = $GLOBALS['CONTACT_RUNTIME_CONFIG'];
+    if (is_array($runtimeConfig) && array_key_exists($key, $runtimeConfig)) {
+        $value = trim((string) $runtimeConfig[$key]);
+        if ($value !== '') {
+            return $value;
+        }
+    }
+
+    return envValue($key, $default);
 }
 
 set_error_handler(static function (int $severity, string $message, string $file, int $line): bool {
@@ -271,14 +293,37 @@ function check_rate_limit(string $ip, int $maxRequests = 5, int $windowSeconds =
     return true;
 }
 
-$loadedEnvPath = loadEnvFile();
+$documentRoot = rtrim((string) ($_SERVER['DOCUMENT_ROOT'] ?? ''), DIRECTORY_SEPARATOR);
+$configPaths = [
+    __DIR__ . '/runtime-config.php',
+    __DIR__ . '/.env',
+    __DIR__ . '/../.env',
+    $documentRoot !== '' ? $documentRoot . '/api/runtime-config.php' : '',
+    $documentRoot !== '' ? $documentRoot . '/api/.env' : '',
+    $documentRoot !== '' ? $documentRoot . '/.env' : '',
+];
+$configPaths = array_values(array_filter($configPaths, static fn($p) => $p !== ''));
+
+$runtimeConfigPaths = [];
+$envPaths = [];
+foreach ($configPaths as $path) {
+    if (str_ends_with($path, 'runtime-config.php')) {
+        $runtimeConfigPaths[] = $path;
+    } else {
+        $envPaths[] = $path;
+    }
+}
+
+[$runtimeConfigPath, $runtimeConfig] = loadRuntimeConfig($runtimeConfigPaths);
+$GLOBALS['CONTACT_RUNTIME_CONFIG'] = $runtimeConfig;
+$loadedEnvPath = loadEnvFile($envPaths);
 $GLOBALS['CONTACT_ENV_FILE'] = $loadedEnvPath;
 
 $requiredEnvKeys = ['SMTP_HOST', 'SMTP_PORT', 'SMTP_USER', 'SMTP_PASS', 'MAIL_FROM', 'MAIL_TO', 'MAIL_SUBJECT'];
 $envPresence = [];
 $missingEnvKeys = [];
 foreach ($requiredEnvKeys as $key) {
-    $exists = envValue($key) !== null;
+    $exists = configValue($key) !== null;
     $envPresence[$key] = $exists;
     if (!$exists) {
         $missingEnvKeys[] = $key;
@@ -293,8 +338,10 @@ if ($isDebugRequest) {
             'php_version' => PHP_VERSION,
             'document_root' => (string) ($_SERVER['DOCUMENT_ROOT'] ?? ''),
             'current_dir' => __DIR__,
+            'runtime_config_found' => $runtimeConfigPath !== null,
+            'runtime_config_path' => $runtimeConfigPath,
             'env_file_found' => $loadedEnvPath !== null,
-            'env_file_path' => $loadedEnvPath,
+            'env_checked_paths' => $envPaths,
             'env' => $envPresence,
             'missing_env' => $missingEnvKeys,
             'stream_socket_client_available' => function_exists('stream_socket_client'),
@@ -364,13 +411,13 @@ if (!check_rate_limit($ip, 5, 600)) {
 }
 
 $userAgent = sanitize_text((string) ($_SERVER['HTTP_USER_AGENT'] ?? 'unknown'));
-$smtpHost = sanitize_header_value((string) envValue('SMTP_HOST', 'smtp.ionos.de'));
-$smtpPort = (int) ((string) envValue('SMTP_PORT', '465'));
-$smtpUser = (string) envValue('SMTP_USER', '');
-$smtpPass = (string) envValue('SMTP_PASS', '');
-$mailFrom = sanitize_header_value((string) envValue('MAIL_FROM', $smtpUser));
-$mailTo = sanitize_header_value((string) envValue('MAIL_TO', $smtpUser));
-$mailSubject = sanitize_header_value((string) envValue('MAIL_SUBJECT', 'Neue Anfrage über die Website'));
+$smtpHost = sanitize_header_value((string) configValue('SMTP_HOST', 'smtp.ionos.de'));
+$smtpPort = (int) ((string) configValue('SMTP_PORT', '465'));
+$smtpUser = (string) configValue('SMTP_USER', '');
+$smtpPass = (string) configValue('SMTP_PASS', '');
+$mailFrom = sanitize_header_value((string) configValue('MAIL_FROM', $smtpUser));
+$mailTo = sanitize_header_value((string) configValue('MAIL_TO', $smtpUser));
+$mailSubject = sanitize_header_value((string) configValue('MAIL_SUBJECT', 'Neue Anfrage über die Website'));
 
 $subjectSuffix = $topic !== '' ? ' - ' . $topic : '';
 $finalSubject = sanitize_header_value($mailSubject . $subjectSuffix);

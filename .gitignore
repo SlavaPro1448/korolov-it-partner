@@ -18,6 +18,9 @@ dist-ssr
 .env
 .env.local
 .env.*.local
+public/api/runtime-config.php
+dist/api/runtime-config.php
+runtime-config.php
 
 # Wrangler / Cloudflare
 .wrangler/
