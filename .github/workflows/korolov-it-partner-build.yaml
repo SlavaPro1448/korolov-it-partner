@@ -27,18 +27,10 @@ jobs:
         with:
           submodules: 'recursive'
 
-      - name: Render templates
-        uses: ionos-deploy-now/template-renderer-action@v2
-        id: template
-        with:
-          input-directory: .deploy-now/korolov-it-partner
-          output-directory: ${{ env.DEPLOYMENT_FOLDER }}
-          intermediate-data-file: ${{ env.DEPLOYMENT_FOLDER }}/.template-renderer-data
-
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: v22.x
+          node-version: v20.x
 
       - name: Build Node assets
         env:
@@ -48,38 +40,13 @@ jobs:
           npm ci
           npm run build
 
-      - name: Create PHP runtime config
-        shell: bash
-        env:
-          SMTP_HOST: ${{ secrets.SMTP_HOST }}
-          SMTP_PORT: ${{ secrets.SMTP_PORT }}
-          SMTP_USER: ${{ secrets.SMTP_USER }}
-          SMTP_PASS: ${{ secrets.SMTP_PASS }}
-          MAIL_FROM: ${{ secrets.MAIL_FROM }}
-          MAIL_TO: ${{ secrets.MAIL_TO }}
-          MAIL_SUBJECT: ${{ secrets.MAIL_SUBJECT }}
-        run: |
-          mkdir -p dist/api
-          php -r '
-          $config = [
-            "SMTP_HOST" => getenv("SMTP_HOST") ?: "",
-            "SMTP_PORT" => getenv("SMTP_PORT") ?: "",
-            "SMTP_USER" => getenv("SMTP_USER") ?: "",
-            "SMTP_PASS" => getenv("SMTP_PASS") ?: "",
-            "MAIL_FROM" => getenv("MAIL_FROM") ?: "",
-            "MAIL_TO" => getenv("MAIL_TO") ?: "",
-            "MAIL_SUBJECT" => getenv("MAIL_SUBJECT") ?: "",
-          ];
-          file_put_contents("dist/api/runtime-config.php", "<?php\nreturn " . var_export($config, true) . ";\n");
-          '
-
 # Please do not touch the following action
       - name: Store deployment content
         uses: ionos-deploy-now/artifact-action@v1
         with:
           api-key: ${{ secrets.IONOS_API_KEY }}
           service-host: api-eu.ionos.space
-          project-id: c1a06653-f567-4fa4-b49c-754e99eb85d4
+          project-id: 8be5fa14-eb4c-4737-b0a5-8e346985fbe0
           branch-id: ${{ inputs.branch-id }}
           version: ${{ github.sha }}
           folder: ${{ env.DEPLOYMENT_FOLDER }}
