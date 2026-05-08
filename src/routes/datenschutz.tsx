@@ -177,7 +177,7 @@ function DatenschutzPage() {
               </p>
               <p className="mt-3">
                 Die Übermittlung der Formulardaten erfolgt an eine serverseitige API auf dieser
-                Website (`/api/contact`). Die anschließende Zustellung der Nachricht erfolgt über die
+                Website (`/api/contact.php`). Die anschließende Zustellung der Nachricht erfolgt über die
                 SMTP-Infrastruktur von <strong>{COMPANY.mailProvider.provider}</strong>. Dabei werden
                 technisch notwendige Metadaten (insbesondere IP-Adresse und User-Agent) zur
                 Missbrauchsprävention und Fehleranalyse verarbeitet.

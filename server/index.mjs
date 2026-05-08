@@ -21,7 +21,7 @@ app.get("/api/health", (_req, res) => {
   res.json({ ok: true, ts: new Date().toISOString() });
 });
 
-app.post("/api/contact", async (req, res) => {
+app.post("/api/contact.php", async (req, res) => {
   const meta = {
     ip: req.ip ?? "-",
     userAgent: String(req.headers["user-agent"] ?? "-"),

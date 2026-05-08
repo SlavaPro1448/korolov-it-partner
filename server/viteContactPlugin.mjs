@@ -36,7 +36,7 @@ export function viteContactApiPlugin() {
     name: "korolov-contact-api",
     apply: "serve",
     configureServer(server) {
-      server.middlewares.use("/api/contact", async (req, res, next) => {
+      server.middlewares.use("/api/contact.php", async (req, res, next) => {
         if (req.method !== "POST") {
           if (req.method === "OPTIONS") {
             res.statusCode = 204;

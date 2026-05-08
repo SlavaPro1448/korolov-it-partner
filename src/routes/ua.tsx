@@ -759,7 +759,7 @@ function Contact() {
 
     try {
       setIsSubmitting(true);
-      const response = await fetch("/api/contact", {
+      const response = await fetch("/api/contact.php", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -768,10 +768,12 @@ function Contact() {
         body: JSON.stringify(payload),
       });
       const result = await response.json().catch(() => null);
-      if (!response.ok || !result?.ok) {
+      if (!response.ok || !(result?.success ?? result?.ok)) {
         setSubmitError(
-          typeof result?.error === "string"
-            ? result.error
+          typeof result?.message === "string"
+            ? result.message
+            : typeof result?.error === "string"
+              ? result.error
             : "Не вдалося надіслати повідомлення. Спробуйте ще раз.",
         );
         return;

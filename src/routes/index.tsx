@@ -876,7 +876,7 @@ function Contact() {
 
     try {
       setIsSubmitting(true);
-      const response = await fetch("/api/contact", {
+      const response = await fetch("/api/contact.php", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -886,9 +886,13 @@ function Contact() {
       });
 
       const result = await response.json().catch(() => null);
-      if (!response.ok || !result?.ok) {
+      if (!response.ok || !(result?.success ?? result?.ok)) {
         if (result?.errors && typeof result.errors === "object") {
           setErrors((prev) => ({ ...prev, ...result.errors }));
+        }
+        if (result?.message && typeof result.message === "string") {
+          setSubmitError(result.message);
+          return;
         }
         if (result?.error && typeof result.error === "string") {
           setSubmitError(result.error);
