@@ -112,7 +112,7 @@ function envValue(string $key, ?string $default = null): ?string
 
 function configValue(string $key, ?string $default = null): ?string
 {
-    $runtimeConfig = $GLOBALS['CONTACT_RUNTIME_CONFIG'];
+    $runtimeConfig = $GLOBALS['CONTACT_RUNTIME_CONFIG'] ?? [];
     if (is_array($runtimeConfig) && array_key_exists($key, $runtimeConfig)) {
         $value = trim((string) $runtimeConfig[$key]);
         if ($value !== '') {
@@ -120,7 +120,34 @@ function configValue(string $key, ?string $default = null): ?string
         }
     }
 
-    return envValue($key, $default);
+    $val = getenv($key);
+    if ($val !== false && trim((string) $val) !== '') {
+        return trim((string) $val);
+    }
+
+    if (isset($_ENV[$key]) && trim((string) $_ENV[$key]) !== '') {
+        return trim((string) $_ENV[$key]);
+    }
+
+    if (isset($_SERVER[$key]) && trim((string) $_SERVER[$key]) !== '') {
+        return trim((string) $_SERVER[$key]);
+    }
+
+    return $default;
+}
+
+function smtpConfigValue(string $key, ?string $default = null): ?string
+{
+    $runtimeConfig = $GLOBALS['CONTACT_RUNTIME_CONFIG'] ?? [];
+
+    if (is_array($runtimeConfig) && array_key_exists($key, $runtimeConfig)) {
+        $value = trim((string) $runtimeConfig[$key]);
+        if ($value !== '') {
+            return $value;
+        }
+    }
+
+    return $default;
 }
 
 set_error_handler(static function (int $severity, string $message, string $file, int $line): bool {
@@ -507,13 +534,24 @@ try {
     }
 
     $userAgent = sanitize_text((string) ($_SERVER['HTTP_USER_AGENT'] ?? 'unknown'));
-    $smtpHost = sanitize_header_value((string) configValue('SMTP_HOST', 'smtp.ionos.de'));
-    $smtpPort = (int) ((string) configValue('SMTP_PORT', '465'));
-    $smtpUser = (string) configValue('SMTP_USER', '');
-    $smtpPass = (string) configValue('SMTP_PASS', '');
-    $mailFrom = sanitize_header_value((string) configValue('MAIL_FROM', $smtpUser));
-    $mailTo = sanitize_header_value((string) configValue('MAIL_TO', $smtpUser));
-    $mailSubject = sanitize_header_value((string) configValue('MAIL_SUBJECT', 'Neue Anfrage über die Website'));
+    $smtpHost = sanitize_header_value((string) smtpConfigValue('SMTP_HOST', ''));
+    $smtpPortRaw = (string) smtpConfigValue('SMTP_PORT', '465');
+    $smtpPort = (int) $smtpPortRaw;
+    $smtpUser = (string) smtpConfigValue('SMTP_USER', '');
+    $smtpPass = (string) smtpConfigValue('SMTP_PASS', '');
+    $mailFrom = sanitize_header_value((string) smtpConfigValue('MAIL_FROM', $smtpUser));
+    $mailTo = sanitize_header_value((string) smtpConfigValue('MAIL_TO', $smtpUser));
+    $mailSubject = sanitize_header_value((string) smtpConfigValue('MAIL_SUBJECT', 'Neue Anfrage über die Website'));
+
+    if ($smtpHost === '' || preg_match('/^\d+$/', $smtpHost) === 1) {
+        throw new RuntimeException('Invalid SMTP_HOST. Expected smtp host like smtp.ionos.de or smtp.ionos.com, got invalid/numeric value.');
+    }
+    if ($smtpPort <= 0 || $smtpPort > 65535) {
+        throw new RuntimeException('Invalid SMTP_PORT.');
+    }
+    if ($smtpUser === '' || $smtpPass === '' || $mailFrom === '' || $mailTo === '') {
+        throw new RuntimeException('SMTP credentials or mail addresses are incomplete.');
+    }
 
     $subjectSuffix = $topic !== '' ? ' - ' . $topic : '';
     $finalSubject = sanitize_header_value($mailSubject . $subjectSuffix);
@@ -588,6 +626,12 @@ try {
                 'MAIL_TO' => !empty($mailTo),
                 'MAIL_SUBJECT' => !empty($mailSubject),
             ],
+            'smtp_effective_config' => [
+                'host_is_numeric' => preg_match('/^\d+$/', (string) $smtpHost) === 1,
+                'host_length' => strlen((string) $smtpHost),
+                'host_preview' => ((string) $smtpHost) === '' ? '' : substr((string) $smtpHost, 0, 5) . '...',
+                'port' => $smtpPort,
+            ],
             'request' => [
                 'content_type' => $contentType,
                 'raw_body_length' => strlen($rawBody),
@@ -624,6 +668,12 @@ try {
                 'MAIL_FROM' => !empty($mailFrom ?? null),
                 'MAIL_TO' => !empty($mailTo ?? null),
                 'MAIL_SUBJECT' => !empty($mailSubject ?? null),
+            ],
+            'smtp_effective_config' => [
+                'host_is_numeric' => preg_match('/^\d+$/', (string) ($smtpHost ?? '')) === 1,
+                'host_length' => strlen((string) ($smtpHost ?? '')),
+                'host_preview' => ((string) ($smtpHost ?? '')) === '' ? '' : substr((string) ($smtpHost ?? ''), 0, 5) . '...',
+                'port' => (int) ($smtpPort ?? 0),
             ],
             'request' => [
                 'content_type' => $contentType,
