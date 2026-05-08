@@ -202,6 +202,11 @@ function sanitize_text(string $value): string
     return trim(str_replace("\0", '', $value));
 }
 
+function escape_html(string $value): string
+{
+    return htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+}
+
 function get_client_ip(): string
 {
     $xff = $_SERVER['HTTP_X_FORWARDED_FOR'] ?? '';
@@ -310,7 +315,7 @@ function smtp_send_mail(
             'Reply-To: ' . $replyTo,
             'Subject: =?UTF-8?B?' . base64_encode($subject) . '?=',
             'MIME-Version: 1.0',
-            'Content-Type: text/plain; charset=UTF-8',
+            'Content-Type: text/html; charset=UTF-8',
             'Content-Transfer-Encoding: 8bit',
         ];
 
@@ -557,16 +562,30 @@ try {
     $finalSubject = sanitize_header_value($mailSubject . $subjectSuffix);
     $replyTo = sanitize_header_value($email);
 
-    $mailBody = "Neue Anfrage über die Website\n\n"
-        . "Name: " . ($name !== '' ? $name : '-') . "\n"
-        . "E-Mail: " . ($email !== '' ? $email : '-') . "\n"
-        . "Telefon: " . ($phone !== '' ? $phone : '-') . "\n"
-        . "Firma: " . ($company !== '' ? $company : '-') . "\n"
-        . "Service: " . ($topic !== '' ? $topic : '-') . "\n\n"
-        . "Nachricht:\n" . $message . "\n\n"
-        . "Datum/Zeit: " . date('Y-m-d H:i:s T') . "\n"
-        . "IP-Adresse: " . $ip . "\n"
-        . "User-Agent: " . $userAgent . "\n";
+    $mailBody = '<!doctype html><html lang="de"><body style="margin:0;padding:24px;background:#f3f4f6;font-family:Arial,sans-serif;color:#111827;">'
+        . '<div style="max-width:720px;margin:0 auto;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;">'
+        . '<div style="padding:18px 22px;background:#111827;color:#ffffff;">'
+        . '<h2 style="margin:0;font-size:20px;line-height:1.3;">Neue Anfrage über die Website</h2>'
+        . '<p style="margin:6px 0 0 0;font-size:13px;opacity:.9;">Korolov IT-Service Kontaktformular</p>'
+        . '</div>'
+        . '<div style="padding:20px 22px;">'
+        . '<table style="width:100%;border-collapse:collapse;font-size:14px;">'
+        . '<tr><td style="padding:8px 0;color:#6b7280;width:160px;">Name</td><td style="padding:8px 0;"><strong>' . escape_html($name !== '' ? $name : '-') . '</strong></td></tr>'
+        . '<tr><td style="padding:8px 0;color:#6b7280;">E-Mail</td><td style="padding:8px 0;"><strong>' . escape_html($email !== '' ? $email : '-') . '</strong></td></tr>'
+        . '<tr><td style="padding:8px 0;color:#6b7280;">Telefon</td><td style="padding:8px 0;"><strong>' . escape_html($phone !== '' ? $phone : '-') . '</strong></td></tr>'
+        . '<tr><td style="padding:8px 0;color:#6b7280;">Firma</td><td style="padding:8px 0;"><strong>' . escape_html($company !== '' ? $company : '-') . '</strong></td></tr>'
+        . '<tr><td style="padding:8px 0;color:#6b7280;">Service</td><td style="padding:8px 0;"><strong>' . escape_html($topic !== '' ? $topic : '-') . '</strong></td></tr>'
+        . '</table>'
+        . '<div style="margin-top:18px;padding:14px;border:1px solid #e5e7eb;border-radius:8px;background:#f9fafb;">'
+        . '<p style="margin:0 0 8px 0;font-size:13px;color:#6b7280;">Nachricht</p>'
+        . '<p style="margin:0;white-space:pre-wrap;line-height:1.5;">' . escape_html($message) . '</p>'
+        . '</div>'
+        . '<div style="margin-top:18px;padding-top:12px;border-top:1px solid #e5e7eb;font-size:12px;color:#6b7280;line-height:1.5;">'
+        . '<div><strong>Datum/Zeit:</strong> ' . escape_html(date('Y-m-d H:i:s T')) . '</div>'
+        . '<div><strong>IP-Adresse:</strong> ' . escape_html($ip) . '</div>'
+        . '<div><strong>User-Agent:</strong> ' . escape_html($userAgent) . '</div>'
+        . '</div>'
+        . '</div></div></body></html>';
 
     $smtpDebug = smtp_send_mail(
         $smtpHost,
