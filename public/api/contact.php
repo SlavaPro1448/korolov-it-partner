@@ -124,8 +124,7 @@ function configValue(string $key, ?string $default = null): ?string
 }
 
 set_error_handler(static function (int $severity, string $message, string $file, int $line): bool {
-    error_log('[contact.php] PHP error: ' . $message . ' in ' . $file . ':' . $line . ' (' . $severity . ')');
-    respond(500, false, 'Beim Senden ist ein Serverfehler aufgetreten.', ['error_code' => 'SERVER_ERROR']);
+    throw new ErrorException($message, 0, $severity, $file, $line);
 });
 
 set_exception_handler(static function (Throwable $exception): void {
@@ -302,9 +301,6 @@ function smtp_send_mail(
     } catch (SmtpException $e) {
         $smtpDebug['failed_step'] = $e->failedStep;
         $smtpDebug['last_response'] = $e->lastResponse;
-        if ($debugMode) {
-            throw new SmtpException($e->errorCode, $e->failedStep, $e->lastResponse, $e->getMessage(), $smtpDebug['steps']);
-        }
         throw new SmtpException($e->errorCode, $e->failedStep, $e->lastResponse, $e->getMessage(), $smtpDebug['steps']);
     } catch (Throwable $e) {
         $smtpDebug['failed_step'] = $smtpDebug['failed_step'] ?? 'unknown';
@@ -389,7 +385,7 @@ foreach ($requiredEnvKeys as $key) {
     }
 }
 
-$isDebugRequest = (($_GET['debug'] ?? '') === '1');
+$debugMode = isset($_GET['debug']) && $_GET['debug'] === '1';
 $requestMethod = (string) ($_SERVER['REQUEST_METHOD'] ?? '');
 $baseDebug = [
     'method' => $requestMethod,
@@ -403,7 +399,7 @@ $baseDebug = [
     'openssl_available' => extension_loaded('openssl'),
 ];
 
-if ($isDebugRequest && $requestMethod === 'GET') {
+if ($debugMode && $requestMethod === 'GET') {
     respond(200, true, 'Debug-Information', [
         'debug' => array_merge($baseDebug, [
             'php_version' => PHP_VERSION,
@@ -417,17 +413,8 @@ if ($requestMethod !== 'POST') {
     respond(405, false, 'Methode nicht erlaubt.', ['error_code' => 'METHOD_NOT_ALLOWED']);
 }
 
-if (!empty($missingEnvKeys)) {
-    error_log('[contact.php] Missing env configuration: ' . implode(', ', $missingEnvKeys));
-    $extra = ['error_code' => 'SERVER_CONFIG_INCOMPLETE'];
-    if ($isDebugRequest) {
-        $extra['debug'] = $baseDebug;
-    }
-    respond(500, false, 'Server-Konfiguration unvollständig.', $extra);
-}
-
-$rawBody = file_get_contents('php://input');
 $contentType = (string) ($_SERVER['CONTENT_TYPE'] ?? $_SERVER['HTTP_CONTENT_TYPE'] ?? '');
+$rawBody = '';
 $fieldsPresent = [
     'name' => false,
     'email' => false,
@@ -437,163 +424,112 @@ $fieldsPresent = [
     'message' => false,
     'consent' => false,
 ];
-if (!is_string($rawBody) || trim($rawBody) === '') {
-    $extra = ['error_code' => 'INVALID_REQUEST'];
-    if ($isDebugRequest) {
-        $extra['debug'] = array_merge($baseDebug, [
-            'request' => [
-                'content_type' => $contentType,
-                'raw_body_length' => 0,
-                'json_decoded' => false,
-                'fields_present' => $fieldsPresent,
-            ],
-            'smtp' => [
-                'attempted' => false,
-                'transport' => 'ssl://smtp.ionos.de:465',
-                'steps' => [],
-                'failed_step' => null,
-                'last_response' => null,
-            ],
-        ]);
-    }
-    respond(400, false, 'Leere Anfrage.', $extra);
-}
-
-$data = json_decode($rawBody, true);
-if (!is_array($data)) {
-    $extra = ['error_code' => 'INVALID_REQUEST'];
-    if ($isDebugRequest) {
-        $extra['debug'] = array_merge($baseDebug, [
-            'request' => [
-                'content_type' => $contentType,
-                'raw_body_length' => strlen($rawBody),
-                'json_decoded' => false,
-                'fields_present' => $fieldsPresent,
-            ],
-            'smtp' => [
-                'attempted' => false,
-                'transport' => 'ssl://smtp.ionos.de:465',
-                'steps' => [],
-                'failed_step' => null,
-                'last_response' => null,
-            ],
-        ]);
-    }
-    respond(400, false, 'Ungültige Anfrage.', $extra);
-}
-
-$fieldsPresent = [
-    'name' => array_key_exists('name', $data),
-    'email' => array_key_exists('email', $data),
-    'phone' => array_key_exists('phone', $data),
-    'company' => array_key_exists('company', $data),
-    'subject' => array_key_exists('subject', $data) || array_key_exists('topic', $data) || array_key_exists('service', $data) || array_key_exists('type', $data),
-    'message' => array_key_exists('message', $data),
-    'consent' => array_key_exists('consent', $data),
-];
-
-$honeypot = sanitize_text((string) ($data['_honey'] ?? $data['website'] ?? ''));
-if ($honeypot !== '') {
-    respond(200, true, 'Ihre Anfrage wurde angenommen.');
-}
-
-$name = sanitize_header_value((string) ($data['name'] ?? ''));
-$email = sanitize_header_value((string) ($data['email'] ?? ''));
-$phone = sanitize_text((string) ($data['phone'] ?? ''));
-$company = sanitize_text((string) ($data['company'] ?? ''));
-$topic = sanitize_header_value((string) ($data['topic'] ?? $data['service'] ?? $data['subject'] ?? $data['type'] ?? ''));
-$message = sanitize_text((string) ($data['message'] ?? ''));
-$consent = (bool) ($data['consent'] ?? false);
-
-$errors = [];
-if ($name === '' || mb_strlen($name) < 2) {
-    $errors['name'] = 'Bitte geben Sie einen gültigen Namen ein.';
-}
-if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-    $errors['email'] = 'Bitte geben Sie eine gültige E-Mail-Adresse ein.';
-}
-if ($topic === '') {
-    $errors['topic'] = 'Bitte wählen Sie ein Anliegen.';
-}
-if ($message === '' || mb_strlen($message) < 10) {
-    $errors['message'] = 'Bitte geben Sie eine Nachricht mit mindestens 10 Zeichen ein.';
-}
-if (!$consent) {
-    $errors['consent'] = 'Bitte bestätigen Sie die Datenschutzerklärung.';
-}
-if ($phone !== '' && preg_match('/^[\d\s+\-()]+$/', $phone) !== 1) {
-    $errors['phone'] = 'Telefonnummer enthält ungültige Zeichen.';
-}
-if (!empty($errors)) {
-    $extra = ['error_code' => 'VALIDATION_ERROR', 'errors' => $errors];
-    if ($isDebugRequest) {
-        $extra['debug'] = array_merge($baseDebug, [
-            'request' => [
-                'content_type' => $contentType,
-                'raw_body_length' => strlen($rawBody),
-                'json_decoded' => true,
-                'fields_present' => $fieldsPresent,
-            ],
-            'smtp' => [
-                'attempted' => false,
-                'transport' => 'ssl://smtp.ionos.de:465',
-                'steps' => [],
-                'failed_step' => null,
-                'last_response' => null,
-            ],
-        ]);
-    }
-    respond(422, false, 'Bitte prüfen Sie Ihre Eingaben.', $extra);
-}
-
-$ip = get_client_ip();
-if (!check_rate_limit($ip, 5, 600)) {
-    $extra = ['error_code' => 'RATE_LIMIT_EXCEEDED'];
-    if ($isDebugRequest) {
-        $extra['debug'] = array_merge($baseDebug, [
-            'request' => [
-                'content_type' => $contentType,
-                'raw_body_length' => strlen($rawBody),
-                'json_decoded' => true,
-                'fields_present' => $fieldsPresent,
-            ],
-            'smtp' => [
-                'attempted' => false,
-                'transport' => 'ssl://smtp.ionos.de:465',
-                'steps' => [],
-                'failed_step' => null,
-                'last_response' => null,
-            ],
-        ]);
-    }
-    respond(429, false, 'Zu viele Anfragen. Bitte versuchen Sie es in einigen Minuten erneut.', $extra);
-}
-
-$userAgent = sanitize_text((string) ($_SERVER['HTTP_USER_AGENT'] ?? 'unknown'));
-$smtpHost = sanitize_header_value((string) configValue('SMTP_HOST', 'smtp.ionos.de'));
-$smtpPort = (int) ((string) configValue('SMTP_PORT', '465'));
-$smtpUser = (string) configValue('SMTP_USER', '');
-$smtpPass = (string) configValue('SMTP_PASS', '');
-$mailFrom = sanitize_header_value((string) configValue('MAIL_FROM', $smtpUser));
-$mailTo = sanitize_header_value((string) configValue('MAIL_TO', $smtpUser));
-$mailSubject = sanitize_header_value((string) configValue('MAIL_SUBJECT', 'Neue Anfrage über die Website'));
-
-$subjectSuffix = $topic !== '' ? ' - ' . $topic : '';
-$finalSubject = sanitize_header_value($mailSubject . $subjectSuffix);
-$replyTo = sanitize_header_value($email);
-
-$mailBody = "Neue Anfrage über die Website\n\n"
-    . "Name: " . ($name !== '' ? $name : '-') . "\n"
-    . "E-Mail: " . ($email !== '' ? $email : '-') . "\n"
-    . "Telefon: " . ($phone !== '' ? $phone : '-') . "\n"
-    . "Firma: " . ($company !== '' ? $company : '-') . "\n"
-    . "Service: " . ($topic !== '' ? $topic : '-') . "\n\n"
-    . "Nachricht:\n" . $message . "\n\n"
-    . "Datum/Zeit: " . date('Y-m-d H:i:s T') . "\n"
-    . "IP-Adresse: " . $ip . "\n"
-    . "User-Agent: " . $userAgent . "\n";
+$smtpSteps = [];
+$smtpFailedStep = null;
+$smtpLastResponse = null;
+$runtimeConfigFound = $runtimeConfigPath !== null;
+$smtpHost = null;
+$smtpPort = null;
+$smtpUser = null;
+$smtpPass = null;
+$mailFrom = null;
+$mailTo = null;
+$mailSubject = null;
 
 try {
+    if (!empty($missingEnvKeys)) {
+        throw new RuntimeException('Server-Konfiguration unvollständig: ' . implode(', ', $missingEnvKeys));
+    }
+
+    $rawBody = (string) file_get_contents('php://input');
+    if (trim($rawBody) === '') {
+        respond(400, false, 'Leere Anfrage.', ['error_code' => 'INVALID_REQUEST']);
+    }
+
+    $data = json_decode($rawBody, true);
+    if (!is_array($data)) {
+        respond(400, false, 'Ungültige Anfrage.', ['error_code' => 'INVALID_REQUEST']);
+    }
+
+    if (($data['debug'] ?? false) === true) {
+        $debugMode = true;
+    }
+
+    $fieldsPresent = [
+        'name' => array_key_exists('name', $data),
+        'email' => array_key_exists('email', $data),
+        'phone' => array_key_exists('phone', $data),
+        'company' => array_key_exists('company', $data),
+        'subject' => array_key_exists('subject', $data) || array_key_exists('topic', $data) || array_key_exists('service', $data) || array_key_exists('type', $data),
+        'message' => array_key_exists('message', $data),
+        'consent' => array_key_exists('consent', $data),
+    ];
+
+    $honeypot = sanitize_text((string) ($data['_honey'] ?? $data['website'] ?? ''));
+    if ($honeypot !== '') {
+        respond(200, true, 'Ihre Anfrage wurde angenommen.');
+    }
+
+    $name = sanitize_header_value((string) ($data['name'] ?? ''));
+    $email = sanitize_header_value((string) ($data['email'] ?? ''));
+    $phone = sanitize_text((string) ($data['phone'] ?? ''));
+    $company = sanitize_text((string) ($data['company'] ?? ''));
+    $topic = sanitize_header_value((string) ($data['topic'] ?? $data['service'] ?? $data['subject'] ?? $data['type'] ?? ''));
+    $message = sanitize_text((string) ($data['message'] ?? ''));
+    $consent = (bool) ($data['consent'] ?? false);
+
+    $errors = [];
+    if ($name === '' || mb_strlen($name) < 2) {
+        $errors['name'] = 'Bitte geben Sie einen gültigen Namen ein.';
+    }
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $errors['email'] = 'Bitte geben Sie eine gültige E-Mail-Adresse ein.';
+    }
+    if ($topic === '') {
+        $errors['topic'] = 'Bitte wählen Sie ein Anliegen.';
+    }
+    if ($message === '' || mb_strlen($message) < 10) {
+        $errors['message'] = 'Bitte geben Sie eine Nachricht mit mindestens 10 Zeichen ein.';
+    }
+    if (!$consent) {
+        $errors['consent'] = 'Bitte bestätigen Sie die Datenschutzerklärung.';
+    }
+    if ($phone !== '' && preg_match('/^[\d\s+\-()]+$/', $phone) !== 1) {
+        $errors['phone'] = 'Telefonnummer enthält ungültige Zeichen.';
+    }
+    if (!empty($errors)) {
+        respond(422, false, 'Bitte prüfen Sie Ihre Eingaben.', ['error_code' => 'VALIDATION_ERROR', 'errors' => $errors]);
+    }
+
+    $ip = get_client_ip();
+    if (!check_rate_limit($ip, 5, 600)) {
+        respond(429, false, 'Zu viele Anfragen. Bitte versuchen Sie es in einigen Minuten erneut.', ['error_code' => 'RATE_LIMIT_EXCEEDED']);
+    }
+
+    $userAgent = sanitize_text((string) ($_SERVER['HTTP_USER_AGENT'] ?? 'unknown'));
+    $smtpHost = sanitize_header_value((string) configValue('SMTP_HOST', 'smtp.ionos.de'));
+    $smtpPort = (int) ((string) configValue('SMTP_PORT', '465'));
+    $smtpUser = (string) configValue('SMTP_USER', '');
+    $smtpPass = (string) configValue('SMTP_PASS', '');
+    $mailFrom = sanitize_header_value((string) configValue('MAIL_FROM', $smtpUser));
+    $mailTo = sanitize_header_value((string) configValue('MAIL_TO', $smtpUser));
+    $mailSubject = sanitize_header_value((string) configValue('MAIL_SUBJECT', 'Neue Anfrage über die Website'));
+
+    $subjectSuffix = $topic !== '' ? ' - ' . $topic : '';
+    $finalSubject = sanitize_header_value($mailSubject . $subjectSuffix);
+    $replyTo = sanitize_header_value($email);
+
+    $mailBody = "Neue Anfrage über die Website\n\n"
+        . "Name: " . ($name !== '' ? $name : '-') . "\n"
+        . "E-Mail: " . ($email !== '' ? $email : '-') . "\n"
+        . "Telefon: " . ($phone !== '' ? $phone : '-') . "\n"
+        . "Firma: " . ($company !== '' ? $company : '-') . "\n"
+        . "Service: " . ($topic !== '' ? $topic : '-') . "\n\n"
+        . "Nachricht:\n" . $message . "\n\n"
+        . "Datum/Zeit: " . date('Y-m-d H:i:s T') . "\n"
+        . "IP-Adresse: " . $ip . "\n"
+        . "User-Agent: " . $userAgent . "\n";
+
     $smtpDebug = smtp_send_mail(
         $smtpHost,
         $smtpPort,
@@ -604,11 +540,14 @@ try {
         $finalSubject,
         $mailBody,
         $replyTo,
-        $isDebugRequest
+        $debugMode
     );
+    $smtpSteps = $smtpDebug['steps'] ?? [];
+    $smtpFailedStep = $smtpDebug['failed_step'] ?? null;
+    $smtpLastResponse = $smtpDebug['last_response'] ?? null;
 
     $extra = [];
-    if ($isDebugRequest) {
+    if ($debugMode) {
         $extra['debug'] = array_merge($baseDebug, [
             'request' => [
                 'content_type' => $contentType,
@@ -619,48 +558,83 @@ try {
             'smtp' => $smtpDebug,
         ]);
     }
-
     respond(200, true, 'Vielen Dank! Ihre Anfrage wurde erfolgreich gesendet.', $extra);
 } catch (SmtpException $e) {
+    $smtpSteps = $e->steps;
+    $smtpFailedStep = $e->failedStep;
+    $smtpLastResponse = $e->lastResponse;
+
+    $response = [
+        'success' => false,
+        'message' => 'Beim Senden ist ein Serverfehler aufgetreten.',
+        'error_code' => $e->errorCode,
+    ];
+    if ($debugMode) {
+        $response['debug'] = [
+            'exception_class' => get_class($e),
+            'exception_message' => $e->getMessage(),
+            'exception_file' => $e->getFile(),
+            'exception_line' => $e->getLine(),
+            'smtp_steps' => $smtpSteps,
+            'smtp_failed_step' => $smtpFailedStep,
+            'smtp_last_response' => $smtpLastResponse,
+            'runtime_config_found' => $runtimeConfigFound,
+            'config_available' => [
+                'SMTP_HOST' => !empty($smtpHost),
+                'SMTP_PORT' => !empty($smtpPort),
+                'SMTP_USER' => !empty($smtpUser),
+                'SMTP_PASS' => !empty($smtpPass),
+                'MAIL_FROM' => !empty($mailFrom),
+                'MAIL_TO' => !empty($mailTo),
+                'MAIL_SUBJECT' => !empty($mailSubject),
+            ],
+            'request' => [
+                'content_type' => $contentType,
+                'raw_body_length' => strlen($rawBody),
+                'json_decoded' => true,
+                'fields_present' => $fieldsPresent,
+            ],
+        ];
+    }
     error_log('[contact.php] SMTP send failed [' . $e->errorCode . '][' . $e->failedStep . ']: ' . $e->lastResponse);
-    $extra = ['error_code' => $e->errorCode];
-    if ($isDebugRequest) {
-        $extra['debug'] = array_merge($baseDebug, [
-            'request' => [
-                'content_type' => $contentType,
-                'raw_body_length' => strlen($rawBody),
-                'json_decoded' => true,
-                'fields_present' => $fieldsPresent,
-            ],
-            'smtp' => [
-                'attempted' => true,
-                'transport' => 'ssl://' . $smtpHost . ':' . $smtpPort,
-                'steps' => $e->steps,
-                'failed_step' => $e->failedStep,
-                'last_response' => $e->lastResponse,
-            ],
-        ]);
-    }
-    respond(502, false, 'Beim Senden ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut.', $extra);
+    http_response_code(500);
+    echo json_encode($response, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    exit;
 } catch (Throwable $e) {
-    error_log('[contact.php] Unexpected send error: ' . $e->getMessage());
-    $extra = ['error_code' => 'SERVER_ERROR'];
-    if ($isDebugRequest) {
-        $extra['debug'] = array_merge($baseDebug, [
+    $response = [
+        'success' => false,
+        'message' => 'Beim Senden ist ein Serverfehler aufgetreten.',
+        'error_code' => 'SERVER_ERROR',
+    ];
+    if ($debugMode) {
+        $response['debug'] = [
+            'exception_class' => get_class($e),
+            'exception_message' => $e->getMessage(),
+            'exception_file' => $e->getFile(),
+            'exception_line' => $e->getLine(),
+            'smtp_steps' => $smtpSteps ?? [],
+            'smtp_failed_step' => $smtpFailedStep ?? null,
+            'smtp_last_response' => $smtpLastResponse ?? null,
+            'runtime_config_found' => $runtimeConfigFound ?? null,
+            'config_available' => [
+                'SMTP_HOST' => !empty($smtpHost ?? null),
+                'SMTP_PORT' => !empty($smtpPort ?? null),
+                'SMTP_USER' => !empty($smtpUser ?? null),
+                'SMTP_PASS' => !empty($smtpPass ?? null),
+                'MAIL_FROM' => !empty($mailFrom ?? null),
+                'MAIL_TO' => !empty($mailTo ?? null),
+                'MAIL_SUBJECT' => !empty($mailSubject ?? null),
+            ],
             'request' => [
                 'content_type' => $contentType,
                 'raw_body_length' => strlen($rawBody),
-                'json_decoded' => true,
+                'json_decoded' => is_array(json_decode($rawBody, true)),
                 'fields_present' => $fieldsPresent,
             ],
-            'smtp' => [
-                'attempted' => true,
-                'transport' => 'ssl://' . $smtpHost . ':' . $smtpPort,
-                'steps' => [],
-                'failed_step' => 'unknown',
-                'last_response' => 'unexpected_error',
-            ],
-        ]);
+        ];
     }
-    respond(500, false, 'Beim Senden ist ein Serverfehler aufgetreten.', $extra);
+    error_log('[contact.php] Unexpected send error: ' . $e->getMessage());
+    http_response_code(500);
+    echo json_encode($response, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    exit;
 }
