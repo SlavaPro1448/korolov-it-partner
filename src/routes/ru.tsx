@@ -43,6 +43,7 @@ import { ReferencesSection } from "@/components/sections/ReferencesSection";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumbSchema, faqPageSchema, localBusinessSchema, organizationSchema, webSiteSchema } from "@/lib/structured-data";
 import { buildHreflangLinks, buildSeoMeta } from "@/lib/seo";
+import { About } from "@/components/home/About";
 
 export const Route = createFileRoute("/ru")({
   head: () => ({
@@ -80,7 +81,7 @@ function RussianHomePage() {
         <Pricing />
         <Process />
         <References />
-        <About />
+        <About locale="ru" />
         <FAQ />
         <Contact />
       </main>
@@ -587,89 +588,6 @@ function Process() {
 
 function References() {
   return <ReferencesSection locale="ru" />;
-}
-
-function About() {
-  const trust = [
-    "Личное сопровождение",
-    "Понятная коммуникация",
-    "Практические решения для ежедневных задач бизнеса",
-    "Консультации возможны на немецком, русском и украинском",
-  ];
-  return (
-    <section
-      id="ueber-mich"
-      className="py-20 md:py-28 scroll-mt-20"
-      aria-labelledby="about-heading"
-    >
-      <div className="container-page grid lg:grid-cols-12 gap-12 items-start">
-        <div className="lg:col-span-7">
-          <div className="text-sm font-medium text-accent-blue uppercase tracking-wider">
-            Обо мне
-          </div>
-          <h2
-            id="about-heading"
-            className="mt-3 text-3xl md:text-4xl font-bold text-brand leading-tight"
-          >
-            О Korolov IT-Service
-          </h2>
-          <div className="mt-6 space-y-4 text-foreground/85 leading-relaxed">
-            <p>
-              Меня зовут <span className="font-medium text-brand">Viacheslav Korolov</span>. Я
-              помогаю малому бизнесу, самозанятым и локальным сервисам в Leverkusen, Köln и NRW с
-              сайтами, деловой почтой и IT-задачами.
-            </p>
-            <p>
-              Моя цель — сделать технические темы понятными и решить их практично. Вы получаете
-              надежного специалиста, который объясняет, внедряет и остается на связи.
-            </p>
-          </div>
-          <ul className="mt-8 grid sm:grid-cols-2 gap-3">
-            {trust.map((t) => (
-              <li key={t} className="flex items-start gap-2 text-sm text-foreground/85">
-                <CheckCircle2
-                  className="h-5 w-5 text-accent-teal shrink-0 mt-0.5"
-                  aria-hidden="true"
-                />
-                {t}
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div className="lg:col-span-5">
-          <div className="card-soft p-7 bg-gradient-to-br from-white to-section">
-            <div className="flex items-start justify-between gap-4">
-              <div className="min-w-0 pt-1">
-                <div className="font-semibold text-brand text-lg">Viacheslav Korolov</div>
-                <div className="text-sm text-muted-foreground">Основатель · Korolov IT-Service</div>
-              </div>
-              <div className="w-24 sm:w-28 aspect-[4/5] rounded-2xl overflow-hidden shadow-sm shrink-0">
-                <img
-                  src="/images/viacheslav-portrait-v4.jpeg"
-                  alt="Viacheslav Korolov – Inhaber Korolov IT-Service"
-                  loading="lazy"
-                  className="h-full w-full object-cover object-center"
-                />
-              </div>
-            </div>
-            <div className="mt-6 space-y-2.5 text-sm text-foreground/80">
-              <div className="flex items-center gap-2">
-                <MapPin className="h-4 w-4 text-accent-blue" aria-hidden="true" /> Leverkusen, NRW
-              </div>
-              <div className="flex items-center gap-2">
-                <Languages className="h-4 w-4 text-accent-blue" aria-hidden="true" /> Deutsch ·
-                Русский · Українська
-              </div>
-              <div className="flex items-center gap-2">
-                <MessageSquare className="h-4 w-4 text-accent-blue" aria-hidden="true" /> Личный
-                контакт без посредников
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
 }
 
 const faqs = [
