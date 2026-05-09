@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { Mail, MapPin, Phone, MessageCircle } from "lucide-react";
 import { COMPANY } from "@/config/legal";
 
-type Locale = "de" | "ru" | "ua";
+type Locale = "de" | "ru" | "uk";
 
 const aria = {
   de: {
@@ -27,7 +27,7 @@ const aria = {
     datenschutz: "Конфиденциальность",
     widerruf: "Отзыв (потребители)",
   },
-  ua: {
+  uk: {
     contactHeading: "Контакти",
     legalHeading: "Правова інформація",
     landmark: "Підвал сайту",

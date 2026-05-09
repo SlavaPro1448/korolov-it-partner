@@ -162,7 +162,8 @@ function sanitizeLine(s) {
 
 function pickLocale(input) {
   const v = String(input ?? "").toLowerCase();
-  if (v === "ru" || v === "ua" || v === "de") return v;
+  if (v === "ru" || v === "de") return v;
+  if (v === "uk" || v === "ua") return "ua";
   return "de";
 }
 

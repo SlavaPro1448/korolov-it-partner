@@ -1,4 +1,4 @@
-type SeoLocale = "de" | "ru" | "ua";
+type SeoLocale = "de" | "ru" | "uk";
 
 type SeoConfig = {
   title: string;
@@ -15,19 +15,25 @@ const SITE_URL = "https://korolov-it-service.de";
 const OG_IMAGE_BY_LOCALE: Record<SeoLocale, string> = {
   de: "/og/og-default-de.jpg",
   ru: "/og/og-default-ru.jpg",
-  ua: "/og/og-default-ua.jpg",
+  uk: "/og/og-default-ua.jpg",
 };
 
 const OG_LOCALE_BY_LOCALE: Record<SeoLocale, string> = {
   de: "de_DE",
   ru: "ru_RU",
-  ua: "uk_UA",
+  uk: "uk_UA",
 };
 
 const HREFLANG_BY_LOCALE: Record<SeoLocale, string> = {
   de: "de",
   ru: "ru",
-  ua: "uk",
+  uk: "uk",
+};
+
+const URL_PREFIX_BY_LOCALE: Record<SeoLocale, string> = {
+  de: "",
+  ru: "/ru",
+  uk: "/uk",
 };
 
 function toAbsoluteUrl(path: string): string {
@@ -38,7 +44,6 @@ export function buildSeoMeta(config: SeoConfig) {
   const canonicalUrl = toAbsoluteUrl(config.path);
   const ogImageUrl = toAbsoluteUrl(OG_IMAGE_BY_LOCALE[config.locale]);
   const ogLocale = OG_LOCALE_BY_LOCALE[config.locale];
-  const hreflang = HREFLANG_BY_LOCALE[config.locale];
 
   return [
     { title: config.title },
@@ -61,10 +66,21 @@ export function buildSeoMeta(config: SeoConfig) {
   ];
 }
 
-export function buildHreflangLinks(path: string) {
-  const locales: SeoLocale[] = ["de", "ru", "ua"];
-  return locales.map((locale) => {
-    const url = locale === "de" ? toAbsoluteUrl(path) : toAbsoluteUrl(`/${locale}${path}`);
-    return { rel: "alternate", hreflang: HREFLANG_BY_LOCALE[locale], href: url };
+/**
+ * @param subpath path within a locale, without locale prefix (e.g. "" for home, "/about")
+ */
+export function buildHreflangLinks(subpath: string = "") {
+  const locales: SeoLocale[] = ["de", "ru", "uk"];
+  const normalized = subpath === "/" ? "" : subpath;
+  const links = locales.map((locale) => ({
+    rel: "alternate",
+    hreflang: HREFLANG_BY_LOCALE[locale],
+    href: toAbsoluteUrl(`${URL_PREFIX_BY_LOCALE[locale]}${normalized}` || "/"),
+  }));
+  links.push({
+    rel: "alternate",
+    hreflang: "x-default",
+    href: toAbsoluteUrl(normalized || "/"),
   });
+  return links;
 }

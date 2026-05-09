@@ -12,7 +12,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 
-type Locale = "de" | "ru" | "ua";
+type Locale = "de" | "ru" | "uk";
 
 const copy: Record<
   Locale,
@@ -44,7 +44,7 @@ const copy: Record<
     testimonialsTitle: "Отзывы клиентов",
     testimonialsSubtitle: "Публикуются только после согласования.",
   },
-  ua: {
+  uk: {
     eyebrow: "Референси",
     title: "Вибрані проєкти",
     subtitle: "Приклади з попередньої співпраці.",

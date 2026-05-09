@@ -9,13 +9,24 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as WiderrufRouteImport } from './routes/widerruf'
+import { Route as UkRouteImport } from './routes/uk'
 import { Route as UaRouteImport } from './routes/ua'
 import { Route as RuRouteImport } from './routes/ru'
 import { Route as ImpressumRouteImport } from './routes/impressum'
 import { Route as DatenschutzRouteImport } from './routes/datenschutz'
-import { Route as WiderrufRouteImport } from './routes/widerruf'
 import { Route as IndexRouteImport } from './routes/index'
 
+const WiderrufRoute = WiderrufRouteImport.update({
+  id: '/widerruf',
+  path: '/widerruf',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UkRoute = UkRouteImport.update({
+  id: '/uk',
+  path: '/uk',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const UaRoute = UaRouteImport.update({
   id: '/ua',
   path: '/ua',
@@ -36,11 +47,6 @@ const DatenschutzRoute = DatenschutzRouteImport.update({
   path: '/datenschutz',
   getParentRoute: () => rootRouteImport,
 } as any)
-const WiderrufRoute = WiderrufRouteImport.update({
-  id: '/widerruf',
-  path: '/widerruf',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -53,6 +59,7 @@ export interface FileRoutesByFullPath {
   '/impressum': typeof ImpressumRoute
   '/ru': typeof RuRoute
   '/ua': typeof UaRoute
+  '/uk': typeof UkRoute
   '/widerruf': typeof WiderrufRoute
 }
 export interface FileRoutesByTo {
@@ -61,6 +68,7 @@ export interface FileRoutesByTo {
   '/impressum': typeof ImpressumRoute
   '/ru': typeof RuRoute
   '/ua': typeof UaRoute
+  '/uk': typeof UkRoute
   '/widerruf': typeof WiderrufRoute
 }
 export interface FileRoutesById {
@@ -70,14 +78,30 @@ export interface FileRoutesById {
   '/impressum': typeof ImpressumRoute
   '/ru': typeof RuRoute
   '/ua': typeof UaRoute
+  '/uk': typeof UkRoute
   '/widerruf': typeof WiderrufRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/datenschutz' | '/impressum' | '/ru' | '/ua' | '/widerruf'
+  fullPaths:
+    | '/'
+    | '/datenschutz'
+    | '/impressum'
+    | '/ru'
+    | '/ua'
+    | '/uk'
+    | '/widerruf'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/datenschutz' | '/impressum' | '/ru' | '/ua' | '/widerruf'
-  id: '__root__' | '/' | '/datenschutz' | '/impressum' | '/ru' | '/ua' | '/widerruf'
+  to: '/' | '/datenschutz' | '/impressum' | '/ru' | '/ua' | '/uk' | '/widerruf'
+  id:
+    | '__root__'
+    | '/'
+    | '/datenschutz'
+    | '/impressum'
+    | '/ru'
+    | '/ua'
+    | '/uk'
+    | '/widerruf'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -86,6 +110,7 @@ export interface RootRouteChildren {
   ImpressumRoute: typeof ImpressumRoute
   RuRoute: typeof RuRoute
   UaRoute: typeof UaRoute
+  UkRoute: typeof UkRoute
   WiderrufRoute: typeof WiderrufRoute
 }
 
@@ -96,6 +121,13 @@ declare module '@tanstack/react-router' {
       path: '/widerruf'
       fullPath: '/widerruf'
       preLoaderRoute: typeof WiderrufRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/uk': {
+      id: '/uk'
+      path: '/uk'
+      fullPath: '/uk'
+      preLoaderRoute: typeof UkRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/ua': {
@@ -142,6 +174,7 @@ const rootRouteChildren: RootRouteChildren = {
   ImpressumRoute: ImpressumRoute,
   RuRoute: RuRoute,
   UaRoute: UaRoute,
+  UkRoute: UkRoute,
   WiderrufRoute: WiderrufRoute,
 }
 export const routeTree = rootRouteImport

@@ -1,0 +1,2 @@
+/ua /uk 301
+/ua/* /uk/:splat 301

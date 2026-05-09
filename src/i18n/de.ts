@@ -1,6 +1,24 @@
 import type { Dict } from "./types";
 
 export const de: Dict = {
+  hero: {
+    badge: "IT-Partner für kleine Unternehmen in NRW",
+    heading: "Mehr Kundenanfragen mit Website und IT-Support aus Leverkusen",
+    description:
+      "Ich unterstütze kleine Unternehmen in Leverkusen mit Website, E-Mail, Hosting und IT-Support - persönlich und zuverlässig.",
+    ctaPrimary: "Kostenloses Erstgespräch anfragen",
+    ctaSecondary: "Leistungen ansehen",
+    highlights: ["Persönlicher Ansprechpartner", "Website + IT", "DE · RU · UA"],
+    card: {
+      site: { label: "Website online", value: "aktiv · SSL" },
+      mail: { label: "Geschäftliche E-Mail", value: "info@…de" },
+      security: { label: "Backups & Updates", value: "aktuell" },
+      support: { label: "Technischer Support", value: "erreichbar" },
+      consultLabel: "Beratung",
+      consultText: "Auf {de}, {ru} und {uk} möglich.",
+      consultLanguages: { de: "Deutsch", ru: "Russisch", uk: "Ukrainisch" },
+    },
+  },
   about: {
     eyebrow: "Über mich",
     heading: "Über Korolov IT-Service",
@@ -201,6 +219,100 @@ export const de: Dict = {
       {
         title: "Übergabe & Betreuung",
         text: "Nach dem Start erhalten Sie eine kurze Einweisung. Auf Wunsch übernehme ich die laufende Betreuung.",
+      },
+    ],
+  },
+  contact: {
+    eyebrow: "Kontakt",
+    heading: "Kostenloses Erstgespräch anfragen",
+    description:
+      "Schreiben Sie kurz, wobei Sie Unterstützung benötigen. Ich melde mich mit einer ersten Einschätzung zurück.",
+    rows: {
+      emailLabel: "E-Mail",
+      emailAria: "E-Mail an Korolov IT-Service senden",
+      phoneLabel: "Telefon",
+      phoneAria: "Korolov IT-Service anrufen",
+      whatsappLabel: "WhatsApp",
+      whatsappValue: "WhatsApp-Nachricht senden",
+      whatsappAria: "Über WhatsApp schreiben",
+      locationLabel: "Standort",
+      locationValue: "Leverkusen, NRW",
+      languagesLabel: "Sprachen",
+      languagesValue: "Deutsch · Russisch · Ukrainisch",
+    },
+    form: {
+      nameLabel: "Name",
+      namePlaceholder: "Ihr Name",
+      companyLabel: "Unternehmen",
+      companyPlaceholder: "Firmenname (optional)",
+      emailLabel: "E-Mail",
+      emailPlaceholder: "ihre@email.de",
+      phoneLabel: "Telefon",
+      phonePlaceholder: "optional",
+      topicLabel: "Anliegen",
+      topicPlaceholder: "Bitte wählen",
+      topicOptions: {
+        website: "Website erstellen",
+        wartung: "Website-Betreuung",
+        "email-domain": "E-Mail, Domain & Hosting",
+        "it-support": "IT-Support",
+        "digital-setup": "Digital Setup",
+        sonstiges: "Sonstiges",
+      },
+      messageLabel: "Nachricht",
+      messagePlaceholder: "Beschreiben Sie kurz Ihr Anliegen…",
+      requiredAria: "erforderlich",
+      consentTemplate:
+        "Ich habe die {privacy} zur Kenntnis genommen. Ich stimme zu, dass meine Angaben (Name, E-Mail-Adresse sowie ggf. Telefon und Firmenname) zur Bearbeitung meiner Anfrage erhoben und verarbeitet werden. Diese Einwilligung kann ich jederzeit für die Zukunft per E-Mail an {email} widerrufen.",
+      consentPrivacyLabel: "Datenschutzerklärung",
+      submit: "Anfrage senden",
+      submitting: "Wird gesendet...",
+      successTitle: "Vielen Dank!",
+      successBody:
+        "Ihre Anfrage wurde erfolgreich gesendet. Ich melde mich innerhalb von 24 Stunden bei Ihnen zurück.",
+      errorFallback:
+        "Beim Senden ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut oder schreiben Sie direkt an {email}.",
+    },
+    validation: {
+      nameRequired: "Bitte geben Sie Ihren Namen ein.",
+      nameMin: "Der Name muss mindestens 2 Zeichen haben.",
+      emailRequired: "Bitte geben Sie Ihre E-Mail-Adresse ein.",
+      emailInvalid: "Bitte geben Sie eine gültige E-Mail-Adresse ein.",
+      phoneInvalid: "Nur Ziffern, Leerzeichen und + - ( ) sind erlaubt.",
+      topicRequired: "Bitte wählen Sie ein Anliegen.",
+      messageRequired: "Bitte geben Sie eine Nachricht ein.",
+      messageMin: "Die Nachricht muss mindestens 10 Zeichen haben.",
+      messageMax: "Die Nachricht darf höchstens 2000 Zeichen haben.",
+    },
+  },
+  faq: {
+    eyebrow: "FAQ",
+    title: "Häufige Fragen",
+    subtitle: "Antworten auf die häufigsten Fragen vor dem Erstgespräch.",
+    items: [
+      {
+        q: "Wie lange dauert die Erstellung einer Website?",
+        a: "Eine einfache Website dauert je nach Inhalt und Abstimmung meist einige Tage bis wenige Wochen. Der genaue Zeitrahmen wird vor Projektstart besprochen.",
+      },
+      {
+        q: "Kann ich später Änderungen an meiner Website machen lassen?",
+        a: "Ja. Kleine Änderungen und laufende technische Betreuung können monatlich vereinbart werden.",
+      },
+      {
+        q: "Übernehmen Sie auch Domain und E-Mail?",
+        a: "Ja. Ich unterstütze bei Domain, Hosting, geschäftlicher E-Mail, DNS, SPF, DKIM, DMARC und Formularversand.",
+      },
+      {
+        q: "Ist die Website DSGVO-konform?",
+        a: "Ich unterstütze bei der technischen DSGVO-orientierten Umsetzung. Rechtliche Inhalte wie Datenschutztexte sollten über spezialisierte Generatoren oder juristische Beratung geprüft werden.",
+      },
+      {
+        q: "Arbeiten Sie auch vor Ort?",
+        a: "Je nach Projekt ist Unterstützung remote oder im Raum Leverkusen, Köln und Umgebung möglich.",
+      },
+      {
+        q: "Kann die Beratung auf Russisch oder Ukrainisch stattfinden?",
+        a: "Ja, Beratung ist auf Deutsch, Russisch und Ukrainisch möglich.",
       },
     ],
   },

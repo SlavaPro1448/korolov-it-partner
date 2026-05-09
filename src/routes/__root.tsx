@@ -35,7 +35,7 @@ export const Route = createRootRoute({
 
 function getSkipLinkLabel(pathname: string): string {
   if (pathname.startsWith("/ru")) return "Перейти к содержимому";
-  if (pathname.startsWith("/ua")) return "Перейти до вмісту";
+  if (pathname.startsWith("/uk") || pathname.startsWith("/ua")) return "Перейти до вмісту";
   return "Zum Inhalt springen";
 }
 

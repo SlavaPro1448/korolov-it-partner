@@ -3,7 +3,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { Menu, X, Languages } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-type Locale = "de" | "ru" | "ua";
+type Locale = "de" | "ru" | "uk";
 
 const navItemsByLocale: Record<Locale, Array<{ label: string; href: string }>> = {
   de: [
@@ -24,7 +24,7 @@ const navItemsByLocale: Record<Locale, Array<{ label: string; href: string }>> =
     { label: "Обо мне", href: "#ueber-mich" },
     { label: "Контакты", href: "#kontakt" },
   ],
-  ua: [
+  uk: [
     { label: "Послуги", href: "#leistungen" },
     { label: "Для кого", href: "#fuer-wen" },
     { label: "Ціни", href: "#preise" },
@@ -38,47 +38,47 @@ const navItemsByLocale: Record<Locale, Array<{ label: string; href: string }>> =
 const ctaByLocale: Record<Locale, string> = {
   de: "Kostenloses Erstgespräch",
   ru: "Бесплатная консультация",
-  ua: "Безкоштовна консультація",
+  uk: "Безкоштовна консультація",
 };
 
 const menuOpenLabelByLocale: Record<Locale, string> = {
   de: "Hauptmenü öffnen",
   ru: "Открыть главное меню",
-  ua: "Відкрити головне меню",
+  uk: "Відкрити головне меню",
 };
 
 const menuCloseLabelByLocale: Record<Locale, string> = {
   de: "Menü schließen",
   ru: "Закрыть меню",
-  ua: "Закрити меню",
+  uk: "Закрити меню",
 };
 
 const homeAriaLabelByLocale: Record<Locale, string> = {
   de: "Korolov IT-Service – zur Startseite",
   ru: "Korolov IT-Service – на главную",
-  ua: "Korolov IT-Service – на головну",
+  uk: "Korolov IT-Service – на головну",
 };
 
 const langSwitchAriaByLocale: Record<
   Locale,
-  { de: string; ru: string; ua: string; group: string }
+  { de: string; ru: string; uk: string; group: string }
 > = {
   de: {
     de: "Sprache auf Deutsch wechseln",
     ru: "Sprache auf Russisch wechseln",
-    ua: "Sprache auf Ukrainisch wechseln",
+    uk: "Sprache auf Ukrainisch wechseln",
     group: "Sprache wechseln",
   },
   ru: {
     de: "Переключить язык на немецкий",
     ru: "Переключить язык на русский",
-    ua: "Переключить язык на украинский",
+    uk: "Переключить язык на украинский",
     group: "Переключение языка",
   },
-  ua: {
+  uk: {
     de: "Перемкнути мову на німецьку",
     ru: "Перемкнути мову на російську",
-    ua: "Перемкнути мову на українську",
+    uk: "Перемкнути мову на українську",
     group: "Перемикання мови",
   },
 };
@@ -95,10 +95,10 @@ export function SiteHeader({
   const navigate = useNavigate();
   const navItems = navItemsByLocale[locale];
   const cta = ctaByLocale[locale];
-  const homePath = locale === "de" ? "/" : locale === "ru" ? "/ru" : "/ua";
+  const homePath = locale === "de" ? "/" : locale === "ru" ? "/ru" : "/uk";
   const langCopy = langSwitchAriaByLocale[locale];
 
-  const switchLang = (to: "/" | "/ru" | "/ua") => {
+  const switchLang = (to: "/" | "/ru" | "/uk") => {
     if (typeof window === "undefined") return;
     const y = window.scrollY;
     const hash = window.location.hash.replace(/^#/, "");
@@ -201,11 +201,11 @@ export function SiteHeader({
               RU
             </button>
             <button
-              onClick={() => switchLang("/ua")}
-              aria-label={langCopy.ua}
-              aria-current={locale === "ua" ? "true" : undefined}
+              onClick={() => switchLang("/uk")}
+              aria-label={langCopy.uk}
+              aria-current={locale === "uk" ? "true" : undefined}
               className={`rounded-md px-2 py-1 text-sm transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-blue ${
-                locale === "ua"
+                locale === "uk"
                   ? "bg-section text-brand font-medium"
                   : "text-muted-foreground hover:text-foreground"
               }`}
@@ -295,11 +295,11 @@ export function SiteHeader({
                 Русский
               </button>
               <button
-                onClick={() => switchLang("/ua")}
-                aria-label={langCopy.ua}
-                aria-current={locale === "ua" ? "true" : undefined}
+                onClick={() => switchLang("/uk")}
+                aria-label={langCopy.uk}
+                aria-current={locale === "uk" ? "true" : undefined}
                 className={`rounded-md px-3 py-2 text-sm border transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-blue ${
-                  locale === "ua"
+                  locale === "uk"
                     ? "border-accent-blue text-accent-blue bg-accent-blue/5 font-medium"
                     : "border-border text-foreground/80 hover:bg-section"
                 }`}
