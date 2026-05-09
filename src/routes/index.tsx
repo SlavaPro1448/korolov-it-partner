@@ -4,23 +4,14 @@ import {
   ArrowRight,
   CheckCircle2,
   Globe,
-  Wrench,
   Mail,
   LifeBuoy,
-  FileText,
   ShieldCheck,
-  UserCheck,
-  HardHat,
-  Building2,
-  Scale,
-  Users,
   Languages,
   Phone,
   MapPin,
   MessageSquare,
   Sparkles,
-  Check,
-  Star,
   ChevronDown,
   Loader2,
 } from "lucide-react";
@@ -44,6 +35,11 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumbSchema, faqPageSchema, localBusinessSchema, organizationSchema, webSiteSchema } from "@/lib/structured-data";
 import { buildHreflangLinks, buildSeoMeta } from "@/lib/seo";
 import { About } from "@/components/home/About";
+import { Problem } from "@/components/home/Problem";
+import { Services } from "@/components/home/Services";
+import { ForWhom } from "@/components/home/ForWhom";
+import { Pricing } from "@/components/home/Pricing";
+import { Process } from "@/components/home/Process";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -75,12 +71,12 @@ function HomePage() {
       <SiteHeader />
       <main id="main" tabIndex={-1} className="flex-1 focus:outline-none">
         <Hero />
-        <Problem />
-        <Services />
-        <ForWhom />
-        <Pricing />
-        <Process />
-        <References />
+        <Problem locale="de" />
+        <Services locale="de" />
+        <ForWhom locale="de" />
+        <Pricing locale="de" />
+        <Process locale="de" />
+        <ReferencesSection locale="de" />
         <About locale="de" />
         <FAQ />
         <Contact />
@@ -221,387 +217,6 @@ function MiniRow({
       <span className="text-xs font-medium text-foreground/70">{value}</span>
     </div>
   );
-}
-
-/* ---------------- PROBLEM ---------------- */
-function Problem() {
-  const items = [
-    {
-      title: "Verständlich erklärt",
-      text: "Keine Fachsprache ohne Erklärung. Sie wissen jederzeit, was umgesetzt wird und warum.",
-    },
-    {
-      title: "Sauber umgesetzt",
-      text: "Strukturierte Arbeit mit Fokus auf Zuverlässigkeit, Sicherheit und Nachvollziehbarkeit.",
-    },
-    {
-      title: "Auch nach dem Projekt erreichbar",
-      text: "Auf Wunsch laufende technische Betreuung — als fester Ansprechpartner für Ihre Technik.",
-    },
-  ];
-  return (
-    <section className="py-20 md:py-28" aria-labelledby="problem-heading">
-      <div className="container-page max-w-5xl">
-        <h2
-          id="problem-heading"
-          className="text-3xl md:text-4xl font-bold text-brand leading-tight"
-        >
-          Viele kleine Unternehmen brauchen keine große Agentur — sondern{" "}
-          <span className="text-accent-blue">zuverlässige technische Unterstützung</span>.
-        </h2>
-        <p className="mt-5 text-lg text-muted-foreground max-w-3xl">
-          Website veraltet, E-Mail-Probleme, Kontaktformulare funktionieren nicht, Updates bleiben
-          liegen oder niemand fühlt sich für die Technik verantwortlich. Genau hier unterstütze ich:
-          praktisch, verständlich und mit Blick auf den Alltag Ihres Unternehmens.
-        </p>
-        <div className="mt-10 grid md:grid-cols-3 gap-5">
-          {items.map((it) => (
-            <div key={it.title} className="card-soft p-6">
-              <div
-                className="h-10 w-10 rounded-lg bg-section flex items-center justify-center text-accent-blue"
-                aria-hidden="true"
-              >
-                <CheckCircle2 className="h-5 w-5" />
-              </div>
-              <h3 className="mt-4 font-semibold text-brand">{it.title}</h3>
-              <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{it.text}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ---------------- SERVICES ---------------- */
-const services = [
-  {
-    icon: Globe,
-    title: "Website-Erstellung",
-    text: "Moderne, schnelle und mobil optimierte Websites für Unternehmen, Selbstständige und Dienstleister. Klar strukturiert, seriös gestaltet und auf Ihre Leistungen abgestimmt.",
-    tags: ["Responsive Design", "SEO-Basis", "Kontaktformular", "SSL"],
-  },
-  {
-    icon: Wrench,
-    title: "Website-Pflege & Wartung",
-    text: "Auch nach dem Launch bleibe ich Ihr technischer Ansprechpartner. Ich unterstütze bei Updates, Backups, kleinen Änderungen, Formularprüfung und technischen Problemen.",
-    tags: ["Updates", "Backups", "technische Prüfung"],
-  },
-  {
-    icon: Mail,
-    title: "E-Mail, Domain & Hosting",
-    text: "Einrichtung von geschäftlichen E-Mail-Adressen, Domain, Hosting, DNS, SPF, DKIM, DMARC und Formularversand — damit Ihre digitale Kommunikation zuverlässig funktioniert.",
-    tags: ["Domain", "Business E-Mail", "DNS", "SMTP"],
-  },
-  {
-    icon: LifeBuoy,
-    title: "IT-Support für kleine Unternehmen",
-    text: "Hilfe bei Computern, Netzwerk, Druckern, Cloud, Datensicherung und alltäglichen technischen Fragen — verständlich, praktisch und lösungsorientiert.",
-    tags: ["Remote", "vor Ort", "Netzwerk", "Cloud"],
-  },
-  {
-    icon: FileText,
-    title: "Digitale Dokumente & Ordnung",
-    text: "Struktur für Rechnungen, Angebote, PDF-Vorlagen, QR-Codes und digitale Ablage — damit Ihre Unterlagen übersichtlich und professionell bleiben.",
-    tags: ["Rechnungen", "Angebote", "PDF", "QR-Codes"],
-  },
-  {
-    icon: ShieldCheck,
-    title: "Technische DSGVO-orientierte Umsetzung",
-    text: "Technische Einbindung von SSL, Cookie-Banner, Kontaktformularen, Impressum- und Datenschutzseiten. Rechtliche Inhalte können über spezialisierte Generatoren oder juristische Beratung ergänzt und geprüft werden.",
-    tags: ["SSL", "Cookie-Banner", "Datenschutz", "Impressum"],
-  },
-];
-
-function Services() {
-  return (
-    <section
-      id="leistungen"
-      className="py-20 md:py-28 bg-section scroll-mt-20"
-      aria-labelledby="services-heading"
-    >
-      <div className="container-page">
-        <SectionHeading
-          headingId="services-heading"
-          eyebrow="Leistungen"
-          title="Digitale Lösungen für den Geschäftsalltag"
-          subtitle="Von der Website bis zur laufenden technischen Betreuung — digitale Lösungen für den Geschäftsalltag kleiner Unternehmen."
-        />
-        <div className="mt-12 grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {services.map((s) => (
-            <article key={s.title} className="card-soft p-6 flex flex-col">
-              <div
-                className="h-11 w-11 rounded-xl bg-brand/5 text-accent-blue flex items-center justify-center"
-                aria-hidden="true"
-              >
-                <s.icon className="h-5 w-5" />
-              </div>
-              <h3 className="mt-4 font-semibold text-brand text-lg">{s.title}</h3>
-              <p className="mt-2 text-sm text-muted-foreground leading-relaxed flex-1">{s.text}</p>
-              <div className="mt-5 flex flex-wrap gap-1.5">
-                {s.tags.map((t) => (
-                  <span
-                    key={t}
-                    className="text-xs px-2.5 py-1 rounded-full bg-section text-foreground/70 border border-border"
-                  >
-                    {t}
-                  </span>
-                ))}
-              </div>
-            </article>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ---------------- FOR WHOM ---------------- */
-const audiences = [
-  {
-    icon: UserCheck,
-    title: "Selbstständige & Gründer",
-    text: "Sie benötigen einen seriösen ersten Webauftritt und eine zuverlässige technische Grundlage für den Start.",
-  },
-  {
-    icon: HardHat,
-    title: "Handwerker & lokale Dienstleister",
-    text: "Klare Website mit Leistungen, Kontaktmöglichkeit und lokalem Bezug — übersichtlich für Ihre Kundschaft.",
-  },
-  {
-    icon: Building2,
-    title: "Hausverwaltungen & Immobilienservice",
-    text: "Strukturierte Darstellung Ihrer Leistungen sowie technische Betreuung für den professionellen Alltag.",
-  },
-  {
-    icon: Scale,
-    title: "Kanzleien, Büros & Beratungsstellen",
-    text: "Seriöser Auftritt, sichere E-Mail und verlässlicher technischer Ansprechpartner für sensible Bereiche.",
-  },
-  {
-    icon: Users,
-    title: "Kleine Unternehmen ohne eigene IT",
-    text: "Ein fester Ansprechpartner für Website, E-Mail, Hosting und alltägliche technische Fragen.",
-  },
-  {
-    icon: Languages,
-    title: "Mehrsprachige Unternehmer in Deutschland",
-    text: "Beratung und Umsetzung auf Deutsch, Russisch und Ukrainisch — verständlich und ohne Sprachbarriere.",
-  },
-];
-
-function ForWhom() {
-  return (
-    <section
-      id="fuer-wen"
-      className="py-20 md:py-28 scroll-mt-20"
-      aria-labelledby="forwhom-heading"
-    >
-      <div className="container-page">
-        <SectionHeading
-          headingId="forwhom-heading"
-          eyebrow="Für wen"
-          title="Für wen ist Korolov IT-Service geeignet?"
-          subtitle="Wer typischerweise mit mir zusammenarbeitet."
-        />
-        <div className="mt-12 grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {audiences.map((a) => (
-            <div key={a.title} className="card-soft p-6">
-              <div
-                className="h-10 w-10 rounded-lg bg-section text-accent-teal flex items-center justify-center"
-                aria-hidden="true"
-              >
-                <a.icon className="h-5 w-5" />
-              </div>
-              <h3 className="mt-4 font-semibold text-brand">{a.title}</h3>
-              <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{a.text}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ---------------- PRICING ---------------- */
-const packages = [
-  {
-    name: "Start Website",
-    price: "ab 890 €",
-    suffix: "netto",
-    desc: "Für Selbstständige und kleine Betriebe, die einen professionellen Einstieg benötigen.",
-    features: [
-      "1–3 Seiten",
-      "Responsives Design",
-      "Kontaktformular",
-      "SSL & Domain-Anbindung",
-      "Impressum- und Datenschutzseiten technisch eingebunden",
-      "Basis-SEO",
-    ],
-    recommended: false,
-  },
-  {
-    name: "Business Website",
-    price: "ab 1.500 €",
-    suffix: "netto",
-    desc: "Für Unternehmen mit mehreren Leistungen, klarer Struktur und professionellem Außenauftritt.",
-    features: [
-      "4–7 Seiten",
-      "Individuelle Seitenstruktur",
-      "Leistungsseiten",
-      "Kontaktformular & E-Mail-Anbindung",
-      "Google Maps Link",
-      "SEO-Grundstruktur",
-      "Hilfe bei Texten nach Absprache",
-    ],
-    recommended: true,
-  },
-  {
-    name: "Digital Setup",
-    price: "ab 390 €",
-    suffix: "netto",
-    desc: "Für Unternehmen, die Domain, E-Mail und technische Grundlagen sauber eingerichtet haben möchten.",
-    features: [
-      "Domain & Hosting einrichten",
-      "Geschäftliche E-Mail-Adresse",
-      "SPF, DKIM, DMARC",
-      "E-Mail-Signatur",
-      "Formularversand",
-      "Google Business Profile Grundsetup",
-    ],
-    recommended: false,
-  },
-  {
-    name: "Monatliche Betreuung",
-    price: "ab 79 €",
-    suffix: "/ Monat",
-    desc: "Laufende technische Unterstützung nach dem Start.",
-    features: [
-      "Updates & Backups",
-      "Regelmäßige technische Prüfung",
-      "Kleine Änderungen nach Absprache",
-      "Formularprüfung",
-      "Technischer Ansprechpartner",
-    ],
-    note: "Umfang und Reaktionszeiten werden individuell vereinbart.",
-    recommended: false,
-  },
-];
-
-function Pricing() {
-  return (
-    <section
-      id="preise"
-      className="py-20 md:py-28 bg-section scroll-mt-20"
-      aria-labelledby="pricing-heading"
-    >
-      <div className="container-page">
-        <SectionHeading
-          headingId="pricing-heading"
-          eyebrow="Pakete & Preise"
-          title="Transparente Einstiegspakete"
-          subtitle="Jedes Projekt wird nach dem kostenlosen Erstgespräch konkret angeboten."
-        />
-        <div className="mt-12 grid md:grid-cols-2 xl:grid-cols-4 gap-5">
-          {packages.map((p) => (
-            <div
-              key={p.name}
-              className={`relative card-soft p-6 flex flex-col ${
-                p.recommended ? "ring-2 ring-accent-blue border-accent-blue" : ""
-              }`}
-            >
-              {p.recommended && (
-                <div className="absolute -top-3 left-6 inline-flex items-center gap-1 rounded-full bg-accent-blue text-white text-xs font-medium px-2.5 py-1">
-                  <Star className="h-3 w-3" aria-hidden="true" /> Empfohlen
-                </div>
-              )}
-              <div className="text-sm font-medium text-accent-blue uppercase tracking-wider">
-                {p.name}
-              </div>
-              <div className="mt-3 flex items-baseline gap-1.5">
-                <div className="text-3xl font-bold text-brand">{p.price}</div>
-                <div className="text-sm text-muted-foreground">{p.suffix}</div>
-              </div>
-              <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{p.desc}</p>
-              <ul className="mt-5 space-y-2.5 flex-1">
-                {p.features.map((f) => (
-                  <li key={f} className="flex items-start gap-2 text-sm text-foreground/85">
-                    <Check
-                      className="h-4 w-4 text-accent-teal shrink-0 mt-0.5"
-                      aria-hidden="true"
-                    />
-                    {f}
-                  </li>
-                ))}
-              </ul>
-              {p.note && <p className="mt-4 text-xs text-muted-foreground italic">{p.note}</p>}
-              <Button asChild variant={p.recommended ? "brand" : "outline"} className="mt-6">
-                <a href="#kontakt">Anfragen</a>
-              </Button>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ---------------- PROCESS ---------------- */
-const steps = [
-  {
-    title: "Kostenloses Erstgespräch",
-    text: "Wir besprechen Ihr Unternehmen, Ihre aktuelle Situation und Ihr Ziel.",
-  },
-  {
-    title: "Kurze Analyse & Empfehlung",
-    text: "Ich prüfe, welche Lösung sinnvoll ist — Website, E-Mail, Hosting, Support oder Kombination.",
-  },
-  {
-    title: "Transparentes Angebot",
-    text: "Sie erhalten ein klares Angebot mit Leistungsumfang, Preis und nächstem Schritt.",
-  },
-  {
-    title: "Umsetzung",
-    text: "Ich setze die vereinbarten Leistungen strukturiert und nachvollziehbar um.",
-  },
-  {
-    title: "Übergabe & Betreuung",
-    text: "Nach dem Start erhalten Sie eine kurze Einweisung. Auf Wunsch übernehme ich die laufende Betreuung.",
-  },
-];
-
-function Process() {
-  return (
-    <section id="ablauf" className="py-20 md:py-28 scroll-mt-20" aria-labelledby="process-heading">
-      <div className="container-page">
-        <SectionHeading
-          headingId="process-heading"
-          eyebrow="Ablauf"
-          title="So läuft die Zusammenarbeit ab"
-          subtitle="Klar, strukturiert und ohne Überraschungen."
-        />
-        <ol className="mt-12 grid gap-5 lg:grid-cols-5 md:grid-cols-2">
-          {steps.map((s, i) => (
-            <li key={s.title} className="card-soft p-6 relative">
-              <div className="text-xs uppercase tracking-wider text-muted-foreground">
-                Schritt {i + 1}
-              </div>
-              <div className="mt-2 h-9 w-9 rounded-lg bg-brand text-brand-foreground flex items-center justify-center font-semibold">
-                {i + 1}
-              </div>
-              <h3 className="mt-4 font-semibold text-brand">{s.title}</h3>
-              <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{s.text}</p>
-            </li>
-          ))}
-        </ol>
-      </div>
-    </section>
-  );
-}
-
-/* ---------------- REFERENCES ---------------- */
-function References() {
-  return <ReferencesSection locale="de" />;
 }
 
 /* ---------------- FAQ ---------------- */

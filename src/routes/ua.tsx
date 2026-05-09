@@ -4,23 +4,14 @@ import {
   ArrowRight,
   CheckCircle2,
   Globe,
-  Wrench,
   Mail,
   LifeBuoy,
-  FileText,
   ShieldCheck,
-  UserCheck,
-  HardHat,
-  Building2,
-  Scale,
-  Users,
   Languages,
   Phone,
   MapPin,
   MessageSquare,
   Sparkles,
-  Check,
-  Star,
   ChevronDown,
   Loader2,
 } from "lucide-react";
@@ -44,6 +35,11 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumbSchema, faqPageSchema, localBusinessSchema, organizationSchema, webSiteSchema } from "@/lib/structured-data";
 import { buildHreflangLinks, buildSeoMeta } from "@/lib/seo";
 import { About } from "@/components/home/About";
+import { Problem } from "@/components/home/Problem";
+import { Services } from "@/components/home/Services";
+import { ForWhom } from "@/components/home/ForWhom";
+import { Pricing } from "@/components/home/Pricing";
+import { Process } from "@/components/home/Process";
 
 export const Route = createFileRoute("/ua")({
   head: () => ({
@@ -75,12 +71,12 @@ function UkrainianHomePage() {
       <SiteHeader locale="ua" basePath="/ua" />
       <main id="main" tabIndex={-1} className="flex-1 focus:outline-none">
         <Hero />
-        <Problem />
-        <Services />
-        <ForWhom />
-        <Pricing />
-        <Process />
-        <References />
+        <Problem locale="uk" />
+        <Services locale="uk" />
+        <ForWhom locale="uk" />
+        <Pricing locale="uk" />
+        <Process locale="uk" />
+        <ReferencesSection locale="ua" />
         <About locale="uk" />
         <FAQ />
         <Contact />
@@ -201,367 +197,6 @@ function MiniRow({
       <span className="text-xs font-medium text-foreground/70">{value}</span>
     </div>
   );
-}
-
-function Problem() {
-  const items = [
-    {
-      title: "Пояснюю просто",
-      text: "Без складного технічного жаргону: зрозуміло, що і навіщо робиться.",
-    },
-    {
-      title: "Роблю системно",
-      text: "Охайна реалізація з фокусом на надійність, безпеку та стабільність.",
-    },
-    {
-      title: "Підтримую після запуску",
-      text: "За потреби беру на себе регулярний технічний супровід.",
-    },
-  ];
-
-  return (
-    <section className="py-20 md:py-28" aria-labelledby="problem-heading">
-      <div className="container-page max-w-5xl">
-        <h2
-          id="problem-heading"
-          className="text-3xl md:text-4xl font-bold text-brand leading-tight"
-        >
-          Невеликому бізнесу частіше потрібен не великий підрядник, а{" "}
-          <span className="text-accent-blue">надійний технічний партнер</span>.
-        </h2>
-        <p className="mt-5 text-lg text-muted-foreground max-w-3xl">
-          Застарілий сайт, проблеми з поштою, форми що не працюють, оновлення які постійно
-          відкладаються, або в команді немає відповідального за техніку. Саме тут я допомагаю:
-          практично, зрозуміло і з фокусом на потреби вашого бізнесу.
-        </p>
-        <div className="mt-10 grid md:grid-cols-3 gap-5">
-          {items.map((it) => (
-            <div key={it.title} className="card-soft p-6">
-              <CheckCircle2 className="h-5 w-5 text-accent-blue" aria-hidden="true" />
-              <h3 className="mt-4 font-semibold text-brand">{it.title}</h3>
-              <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{it.text}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-const services = [
-  {
-    icon: Globe,
-    title: "Створення сайтів",
-    text: "Сучасні, швидкі та адаптивні сайти для компаній, самозайнятих і локальних сервісів. Чітка структура та професійний вигляд під ваші послуги.",
-    tags: ["Responsive Design", "SEO-основа", "Форма зворотного зв'язку", "SSL"],
-  },
-  {
-    icon: Wrench,
-    title: "Підтримка та обслуговування сайту",
-    text: "Після запуску залишаюся вашим технічним контактним спеціалістом: оновлення, резервні копії, невеликі зміни та перевірка форм.",
-    tags: ["Оновлення", "Бекапи", "Технічний контроль"],
-  },
-  {
-    icon: Mail,
-    title: "Пошта, домен та хостинг",
-    text: "Налаштування ділової пошти, домену, хостингу, DNS, SPF, DKIM, DMARC і стабільної відправки форм.",
-    tags: ["Домен", "Business E-mail", "DNS", "SMTP"],
-  },
-  {
-    icon: LifeBuoy,
-    title: "IT-підтримка для малого бізнесу",
-    text: "Допомога з комп'ютерами, мережею, принтерами, хмарою, резервним копіюванням і щоденними технічними питаннями.",
-    tags: ["Віддалено", "On-site", "Мережа", "Хмара"],
-  },
-  {
-    icon: FileText,
-    title: "Цифрові документи та порядок",
-    text: "Структура для рахунків, комерційних пропозицій, PDF-шаблонів, QR-кодів і цифрового архіву документів.",
-    tags: ["Рахунки", "Пропозиції", "PDF", "QR-коди"],
-  },
-  {
-    icon: ShieldCheck,
-    title: "Технічна реалізація DSGVO",
-    text: "Технічне впровадження SSL, cookie-банера, форм, сторінок Impressum і Datenschutz. Юридичні тексти бажано додатково перевірити в профільному сервісі або у юриста.",
-    tags: ["SSL", "Cookie-банер", "Datenschutz", "Impressum"],
-  },
-];
-
-function Services() {
-  return (
-    <section
-      id="leistungen"
-      className="py-20 md:py-28 bg-section scroll-mt-20"
-      aria-labelledby="services-heading"
-    >
-      <div className="container-page">
-        <SectionHeading
-          headingId="services-heading"
-          eyebrow="Послуги"
-          title="Цифрові рішення для щоденних бізнес-завдань"
-        />
-        <div className="mt-12 grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {services.map((s) => (
-            <article key={s.title} className="card-soft p-6 flex flex-col">
-              <div
-                className="h-11 w-11 rounded-xl bg-brand/5 text-accent-blue flex items-center justify-center"
-                aria-hidden="true"
-              >
-                <s.icon className="h-5 w-5" />
-              </div>
-              <h3 className="mt-4 font-semibold text-brand text-lg">{s.title}</h3>
-              <p className="mt-2 text-sm text-muted-foreground leading-relaxed flex-1">{s.text}</p>
-              <div className="mt-5 flex flex-wrap gap-1.5">
-                {s.tags.map((t) => (
-                  <span
-                    key={t}
-                    className="text-xs px-2.5 py-1 rounded-full bg-section text-foreground/70 border border-border"
-                  >
-                    {t}
-                  </span>
-                ))}
-              </div>
-            </article>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-const audiences = [
-  {
-    icon: UserCheck,
-    title: "Підприємці та самозайняті",
-    text: "Професійний старт із надійною технічною основою.",
-  },
-  {
-    icon: HardHat,
-    title: "Локальні сервіси та майстри",
-    text: "Зрозумілий сайт з послугами та контактами.",
-  },
-  {
-    icon: Building2,
-    title: "Керуючі компанії та сервіси нерухомості",
-    text: "Структурована подача послуг і технічна підтримка в щоденній роботі.",
-  },
-  {
-    icon: Scale,
-    title: "Офіси, практики та консультаційні служби",
-    text: "Професійний онлайн-образ, безпечна пошта й надійний технічний контакт.",
-  },
-  {
-    icon: Users,
-    title: "Невеликі компанії без власного IT-відділу",
-    text: "Один відповідальний спеціаліст із сайту, пошти, хостингу й щоденних IT-питань.",
-  },
-  {
-    icon: Languages,
-    title: "Багатомовні підприємці в Німеччині",
-    text: "Консультації та реалізація німецькою, російською та українською.",
-  },
-];
-
-function ForWhom() {
-  return (
-    <section
-      id="fuer-wen"
-      className="py-20 md:py-28 scroll-mt-20"
-      aria-labelledby="forwhom-heading"
-    >
-      <div className="container-page">
-        <SectionHeading
-          headingId="forwhom-heading"
-          eyebrow="Для кого"
-          title="Кому підходить Korolov IT-Service"
-        />
-        <div className="mt-12 grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {audiences.map((a) => (
-            <div key={a.title} className="card-soft p-6">
-              <a.icon className="h-5 w-5 text-accent-teal" aria-hidden="true" />
-              <h3 className="mt-4 font-semibold text-brand">{a.title}</h3>
-              <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{a.text}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-const packages = [
-  {
-    name: "Start Website",
-    price: "від 890 €",
-    suffix: "netto",
-    desc: "Для самозайнятих і невеликих компаній, яким потрібен професійний старт.",
-    features: [
-      "1-3 сторінки",
-      "Адаптивний дизайн",
-      "Контактна форма",
-      "SSL та підключення домену",
-      "Базове SEO",
-    ],
-    recommended: false,
-  },
-  {
-    name: "Business Website",
-    price: "від 1.500 €",
-    suffix: "netto",
-    desc: "Для компаній із кількома напрямами послуг і більш складною структурою.",
-    features: [
-      "4-7 сторінок",
-      "Індивідуальна структура",
-      "Сторінки послуг",
-      "Контактна форма та e-mail інтеграція",
-      "SEO-основа",
-      "Допомога з текстами за домовленістю",
-    ],
-    recommended: true,
-  },
-  {
-    name: "Digital Setup",
-    price: "від 390 €",
-    suffix: "netto",
-    desc: "Для чистого налаштування домену, пошти та технічної бази компанії.",
-    features: [
-      "Налаштування домену та хостингу",
-      "Ділова e-mail адреса",
-      "SPF, DKIM, DMARC",
-      "Підпис e-mail",
-      "Відправка форм",
-      "Базове налаштування Google Business Profile",
-    ],
-    recommended: false,
-  },
-  {
-    name: "Щомісячний супровід",
-    price: "від 79 €",
-    suffix: "/ місяць",
-    desc: "Регулярна технічна підтримка після запуску.",
-    features: [
-      "Оновлення та резервні копії",
-      "Регулярна технічна перевірка",
-      "Невеликі зміни за домовленістю",
-      "Перевірка форм",
-      "Постійний технічний контакт",
-    ],
-    note: "Обсяг робіт і час реакції узгоджуються індивідуально.",
-    recommended: false,
-  },
-];
-
-function Pricing() {
-  return (
-    <section
-      id="preise"
-      className="py-20 md:py-28 bg-section scroll-mt-20"
-      aria-labelledby="pricing-heading"
-    >
-      <div className="container-page">
-        <SectionHeading
-          headingId="pricing-heading"
-          eyebrow="Пакети та ціни"
-          title="Прозорі стартові пропозиції"
-        />
-        <div className="mt-12 grid md:grid-cols-2 xl:grid-cols-4 gap-5">
-          {packages.map((p) => (
-            <div
-              key={p.name}
-              className={`relative card-soft p-6 flex flex-col ${p.recommended ? "ring-2 ring-accent-blue border-accent-blue" : ""}`}
-            >
-              {p.recommended && (
-                <div className="absolute -top-3 left-6 inline-flex items-center gap-1 rounded-full bg-accent-blue text-white text-xs font-medium px-2.5 py-1">
-                  <Star className="h-3 w-3" aria-hidden="true" /> Рекомендовано
-                </div>
-              )}
-              <div className="text-sm font-medium text-accent-blue uppercase tracking-wider">
-                {p.name}
-              </div>
-              <div className="mt-3 flex items-baseline gap-1.5">
-                <div className="text-3xl font-bold text-brand">{p.price}</div>
-                <div className="text-sm text-muted-foreground">{p.suffix}</div>
-              </div>
-              <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{p.desc}</p>
-              <ul className="mt-5 space-y-2.5 flex-1">
-                {p.features.map((f) => (
-                  <li key={f} className="flex items-start gap-2 text-sm text-foreground/85">
-                    <Check
-                      className="h-4 w-4 text-accent-teal shrink-0 mt-0.5"
-                      aria-hidden="true"
-                    />
-                    {f}
-                  </li>
-                ))}
-              </ul>
-              {"note" in p && p.note && (
-                <p className="mt-4 text-xs text-muted-foreground italic">{p.note}</p>
-              )}
-              <Button asChild variant={p.recommended ? "brand" : "outline"} className="mt-6">
-                <a href="#kontakt">Залишити заявку</a>
-              </Button>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function Process() {
-  const steps = [
-    {
-      title: "Безкоштовна первинна консультація",
-      text: "Обговорюємо ваш бізнес, поточну ситуацію та цілі.",
-    },
-    {
-      title: "Короткий аналіз і рекомендації",
-      text: "Визначаю оптимальне рішення: сайт, пошта, хостинг, підтримка або комбінація.",
-    },
-    {
-      title: "Прозора комерційна пропозиція",
-      text: "Ви отримуєте чіткий обсяг робіт, вартість і наступні кроки.",
-    },
-    {
-      title: "Реалізація",
-      text: "Виконую узгоджені завдання структуровано та зрозуміло.",
-    },
-    {
-      title: "Передача та супровід",
-      text: "Після запуску пояснюю, як усе працює. За потреби беру на себе подальшу підтримку.",
-    },
-  ];
-
-  return (
-    <section id="ablauf" className="py-20 md:py-28 scroll-mt-20" aria-labelledby="process-heading">
-      <div className="container-page">
-        <SectionHeading
-          headingId="process-heading"
-          eyebrow="Етапи"
-          title="Як проходить співпраця"
-          subtitle="Чітко, структуровано й без сюрпризів."
-        />
-        <ol className="mt-12 grid gap-5 lg:grid-cols-5 md:grid-cols-2">
-          {steps.map((step, i) => (
-            <li key={step.title} className="card-soft p-6 relative">
-              <div className="text-xs uppercase tracking-wider text-muted-foreground">
-                Крок {i + 1}
-              </div>
-              <div className="mt-2 h-9 w-9 rounded-lg bg-brand text-brand-foreground flex items-center justify-center font-semibold">
-                {i + 1}
-              </div>
-              <h3 className="mt-4 font-semibold text-brand">{step.title}</h3>
-              <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{step.text}</p>
-            </li>
-          ))}
-        </ol>
-      </div>
-    </section>
-  );
-}
-
-function References() {
-  return <ReferencesSection locale="ua" />;
 }
 
 const faqs = [
