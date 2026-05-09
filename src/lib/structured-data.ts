@@ -83,6 +83,7 @@ export function organizationSchema(locale: SupportedLocale = "de") {
   return {
     "@context": "https://schema.org",
     "@type": "Organization",
+    "@id": `${SITE_URL}/#organization`,
     name: "Korolov IT-Service",
     description: descriptionByLocale[locale],
     url: SITE_URL,
@@ -101,6 +102,11 @@ export function organizationSchema(locale: SupportedLocale = "de") {
       addressCountry: "DE",
     },
     areaServed: areaServedByLocale[locale],
+    sameAs: [
+      // Добавьте ссылки на социальные сети, если есть, например:
+      // "https://www.facebook.com/korolovitservice",
+      // "https://www.linkedin.com/company/korolov-it-service"
+    ],
   };
 }
 
@@ -116,6 +122,24 @@ export function faqPageSchema(items: FaqItem[]) {
         text: item.answer,
       },
     })),
+  };
+}
+
+export function webSiteSchema(locale: SupportedLocale = "de") {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "Korolov IT-Service",
+    description: descriptionByLocale[locale],
+    url: SITE_URL,
+    potentialAction: {
+      "@type": "SearchAction",
+      target: `${SITE_URL}/search?q={search_term_string}`,
+      "query-input": "required name=search_term_string",
+    },
+    publisher: {
+      "@id": `${SITE_URL}/#organization`,
+    },
   };
 }
 

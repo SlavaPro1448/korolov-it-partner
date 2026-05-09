@@ -41,8 +41,8 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { COMPANY } from "@/config/legal";
 import { ReferencesSection } from "@/components/sections/ReferencesSection";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { breadcrumbSchema, faqPageSchema, localBusinessSchema } from "@/lib/structured-data";
-import { buildSeoMeta } from "@/lib/seo";
+import { breadcrumbSchema, faqPageSchema, localBusinessSchema, organizationSchema, webSiteSchema } from "@/lib/structured-data";
+import { buildHreflangLinks, buildSeoMeta } from "@/lib/seo";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -52,7 +52,9 @@ export const Route = createFileRoute("/")({
         "Korolov IT-Service unterstützt kleine Unternehmen in Leverkusen, Köln und NRW bei Websites, E-Mail, Hosting, IT-Support und digitaler Organisation.",
       path: "/",
       locale: "de",
+      keywords: "IT-Service Leverkusen, Website erstellen, IT-Support NRW, E-Mail Hosting, digitale Organisation",
     }),
+    links: buildHreflangLinks("/"),
   }),
   component: HomePage,
 });
@@ -63,6 +65,8 @@ function HomePage() {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <JsonLd data={localBusinessSchema("de")} />
+      <JsonLd data={organizationSchema("de")} />
+      <JsonLd data={webSiteSchema("de")} />
       <JsonLd data={faqPageSchema(faqItems)} />
       <JsonLd
         data={breadcrumbSchema([{ name: "Startseite", item: "https://korolov-it-service.de/" }])}

@@ -7,6 +7,7 @@ type SeoConfig = {
   locale: SeoLocale;
   type?: "website";
   noindex?: boolean;
+  keywords?: string;
 };
 
 const SITE_URL = "https://korolov-it-service.de";
@@ -23,6 +24,12 @@ const OG_LOCALE_BY_LOCALE: Record<SeoLocale, string> = {
   ua: "uk_UA",
 };
 
+const HREFLANG_BY_LOCALE: Record<SeoLocale, string> = {
+  de: "de",
+  ru: "ru",
+  ua: "uk",
+};
+
 function toAbsoluteUrl(path: string): string {
   return new URL(path, SITE_URL).toString();
 }
@@ -31,10 +38,13 @@ export function buildSeoMeta(config: SeoConfig) {
   const canonicalUrl = toAbsoluteUrl(config.path);
   const ogImageUrl = toAbsoluteUrl(OG_IMAGE_BY_LOCALE[config.locale]);
   const ogLocale = OG_LOCALE_BY_LOCALE[config.locale];
+  const hreflang = HREFLANG_BY_LOCALE[config.locale];
 
   return [
     { title: config.title },
     { name: "description", content: config.description },
+    ...(config.keywords ? [{ name: "keywords", content: config.keywords }] : []),
+    { rel: "canonical", href: canonicalUrl },
     { property: "og:title", content: config.title },
     { property: "og:description", content: config.description },
     { property: "og:url", content: canonicalUrl },
@@ -49,4 +59,12 @@ export function buildSeoMeta(config: SeoConfig) {
     { name: "twitter:image", content: ogImageUrl },
     ...(config.noindex ? [{ name: "robots", content: "noindex" }] : []),
   ];
+}
+
+export function buildHreflangLinks(path: string) {
+  const locales: SeoLocale[] = ["de", "ru", "ua"];
+  return locales.map((locale) => {
+    const url = locale === "de" ? toAbsoluteUrl(path) : toAbsoluteUrl(`/${locale}${path}`);
+    return { rel: "alternate", hreflang: HREFLANG_BY_LOCALE[locale], href: url };
+  });
 }

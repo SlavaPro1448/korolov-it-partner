@@ -41,8 +41,8 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { COMPANY } from "@/config/legal";
 import { ReferencesSection } from "@/components/sections/ReferencesSection";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { breadcrumbSchema, faqPageSchema, localBusinessSchema } from "@/lib/structured-data";
-import { buildSeoMeta } from "@/lib/seo";
+import { breadcrumbSchema, faqPageSchema, localBusinessSchema, organizationSchema, webSiteSchema } from "@/lib/structured-data";
+import { buildHreflangLinks, buildSeoMeta } from "@/lib/seo";
 
 export const Route = createFileRoute("/ua")({
   head: () => ({
@@ -52,7 +52,9 @@ export const Route = createFileRoute("/ua")({
         "Korolov IT-Service допомагає малому бізнесу в Leverkusen, Köln і NRW із сайтами, поштою, хостингом та IT-підтримкою.",
       path: "/ua",
       locale: "ua",
+      keywords: "IT-сервіс Леверкузен, створення сайтів, IT-підтримка NRW, хостинг пошти, цифрова організація",
     }),
+    links: buildHreflangLinks("/ua"),
   }),
   component: UkrainianHomePage,
 });
@@ -63,6 +65,8 @@ function UkrainianHomePage() {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <JsonLd data={localBusinessSchema("uk")} />
+      <JsonLd data={organizationSchema("uk")} />
+      <JsonLd data={webSiteSchema("uk")} />
       <JsonLd data={faqPageSchema(faqItems)} />
       <JsonLd
         data={breadcrumbSchema([{ name: "Головна", item: "https://korolov-it-service.de/ua" }])}

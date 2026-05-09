@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://korolov-it-service.de/sitemap.xml
