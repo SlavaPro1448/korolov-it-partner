@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
-import { COMPANY, formatLegalDate } from "@/config/legal";
+import { COMPANY, formatTodayLegalStand } from "@/config/legal";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumbSchema } from "@/lib/structured-data";
 import { buildSeoMeta } from "@/lib/seo";
@@ -351,7 +351,7 @@ function DatenschutzPage() {
               </h2>
               <p>
                 Diese Datenschutzerklärung ist aktuell gültig und hat den Stand vom{" "}
-                <strong>{formatLegalDate(COMPANY.lastUpdated)}</strong>.
+                <strong>{formatTodayLegalStand()}</strong>.
               </p>
               <p className="mt-3">
                 Durch die Weiterentwicklung der Website oder aufgrund geänderter gesetzlicher bzw.
@@ -362,7 +362,7 @@ function DatenschutzPage() {
             </section>
 
             <p className="pt-8 text-sm text-muted-foreground border-t border-border">
-              Stand: {formatLegalDate(COMPANY.lastUpdated)}
+              Stand: {formatTodayLegalStand()}
             </p>
           </div>
         </article>

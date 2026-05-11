@@ -59,13 +59,12 @@ export const COMPANY = {
     privacyUrl: "https://bunny.net/privacy",
   },
 
-  // Дата последней редакции легальных текстов (обновлять при изменениях)
+  // Резерв: ручная дата для formatLegalDate(); «Stand» на Impressum/Datenschutz/Widerruf — formatTodayLegalStand().
   lastUpdated: "2025-01-15",
 } as const;
 
 // Удобный геттер полного адреса
 export const FULL_ADDRESS = `${COMPANY.street}, ${COMPANY.zip} ${COMPANY.city}, ${COMPANY.country}`;
-
 // Форматированная дата для отображения на странице
 export const formatLegalDate = (iso: string, locale = "de-DE") => {
   return new Date(iso).toLocaleDateString(locale, {
@@ -73,4 +72,14 @@ export const formatLegalDate = (iso: string, locale = "de-DE") => {
     month: "long",
     day: "numeric",
   });
+};
+
+/** Kalenderdatum für «Stand»-Angaben (täglich aktuell, Zeitzone Deutschland). */
+export const formatTodayLegalStand = (locale = "de-DE", timeZone = "Europe/Berlin") => {
+  return new Intl.DateTimeFormat(locale, {
+    timeZone,
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  }).format(new Date());
 };
