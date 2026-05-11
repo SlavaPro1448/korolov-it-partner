@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
+import { BackLink } from "@/components/BackLink";
 import { COMPANY, formatTodayLegalStand } from "@/config/legal";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumbSchema, organizationSchema } from "@/lib/structured-data";
@@ -31,6 +32,7 @@ function ImpressumPage() {
       <SiteHeader />
       <main id="main" tabIndex={-1} className="flex-1 flex flex-col focus:outline-none">
         <article className="container-page py-16 md:py-24 max-w-3xl">
+          <BackLink className="mb-8" />
           <header className="mb-12">
             <p className="text-sm font-medium text-accent-blue uppercase tracking-wider">
               Rechtliches
