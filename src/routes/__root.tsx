@@ -58,7 +58,15 @@ function RootComponent() {
     if (typeof window === "undefined") return;
     const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
 
-    const targets = document.querySelectorAll<HTMLElement>("main section, section, [data-reveal]");
+    const selector = [
+      "main section",
+      "main article header",
+      "main article > a:first-of-type",
+      "main article .space-y-10 > p:last-child",
+      "main [data-reveal]",
+    ].join(", ");
+
+    const targets = document.querySelectorAll<HTMLElement>(selector);
 
     targets.forEach((el) => {
       if (!el.classList.contains("reveal")) {
@@ -93,7 +101,7 @@ function RootComponent() {
     });
 
     return () => io.disconnect();
-  }, []);
+  }, [pathname]);
 
   return (
     <>
