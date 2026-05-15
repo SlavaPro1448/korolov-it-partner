@@ -68,39 +68,44 @@ function RootComponent() {
 
     const targets = document.querySelectorAll<HTMLElement>(selector);
 
+    // Phase 1: batch reads (no DOM writes yet → no forced reflow)
+    const innerHeight = window.innerHeight;
+    const aboveFold = new WeakSet<HTMLElement>();
+    if (!reduce) {
+      targets.forEach((el) => {
+        if (el.getBoundingClientRect().top < innerHeight * 0.9) {
+          aboveFold.add(el);
+        }
+      });
+    }
+
+    // Phase 2: batch writes (and observe what's left)
+    const io = reduce
+      ? null
+      : new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                entry.target.classList.add("reveal-visible");
+                io?.unobserve(entry.target);
+              }
+            });
+          },
+          { threshold: 0.08, rootMargin: "0px 0px -80px 0px" },
+        );
+
     targets.forEach((el) => {
       if (!el.classList.contains("reveal")) {
         el.classList.add("reveal", "reveal-up");
       }
-    });
-
-    if (reduce) {
-      targets.forEach((el) => el.classList.add("reveal-visible"));
-      return;
-    }
-
-    const io = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("reveal-visible");
-            io.unobserve(entry.target);
-          }
-        });
-      },
-      { threshold: 0.08, rootMargin: "0px 0px -80px 0px" },
-    );
-
-    targets.forEach((el) => {
-      const rect = el.getBoundingClientRect();
-      if (rect.top < window.innerHeight * 0.9) {
+      if (reduce || aboveFold.has(el)) {
         el.classList.add("reveal-visible");
       } else {
-        io.observe(el);
+        io?.observe(el);
       }
     });
 
-    return () => io.disconnect();
+    return () => io?.disconnect();
   }, [pathname]);
 
   return (

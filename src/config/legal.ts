@@ -52,13 +52,6 @@ export const COMPANY = {
     privacyUrl: "https://www.ionos.de/terms-gtc/datenschutzerklaerung",
   },
 
-  // Шрифты
-  fontProvider: {
-    provider: "Bunny Fonts (BunnyWay d.o.o.)",
-    country: "Slowenien",
-    privacyUrl: "https://bunny.net/privacy",
-  },
-
   // Резерв: ручная дата для formatLegalDate(); «Stand» на Impressum/Datenschutz/Widerruf — formatTodayLegalStand().
   lastUpdated: "2025-01-15",
 } as const;
