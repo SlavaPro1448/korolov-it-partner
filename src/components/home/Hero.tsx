@@ -119,11 +119,11 @@ export function Hero({ locale }: { locale: Locale }) {
           </div>
           <h1
             id="hero-heading"
-            className="mt-6 text-4xl md:text-5xl lg:text-6xl font-bold text-brand leading-[1.05]"
+            className="mt-6 text-4xl md:text-5xl lg:text-6xl font-bold text-brand leading-[1.05] hyphens-auto [overflow-wrap:anywhere]"
           >
             {t.heading}
           </h1>
-          <p className="mt-6 text-lg text-muted-foreground max-w-2xl leading-relaxed">
+          <p className="mt-6 text-lg text-muted-foreground max-w-2xl leading-relaxed hyphens-auto [overflow-wrap:anywhere]">
             {t.description}
           </p>
           <div className="mt-8 flex flex-col sm:flex-row gap-3">

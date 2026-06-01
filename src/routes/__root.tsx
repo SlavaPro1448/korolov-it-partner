@@ -39,8 +39,19 @@ function getSkipLinkLabel(pathname: string): string {
   return "Zum Inhalt springen";
 }
 
+function getLangAttr(pathname: string): string {
+  if (pathname.startsWith("/ru")) return "ru";
+  if (pathname.startsWith("/uk") || pathname.startsWith("/ua")) return "uk";
+  return "de";
+}
+
 function RootComponent() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    document.documentElement.lang = getLangAttr(pathname);
+  }, [pathname]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
