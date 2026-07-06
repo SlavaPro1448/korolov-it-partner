@@ -19,6 +19,22 @@ export type Case = {
 
 export const cases: Case[] = [
   {
+    id: "erbrecht-leverkusen",
+    slug: "erbrecht-leverkusen",
+    client: "Rechtsanwaltskanzlei Dr. Plutte & Mettlach-Plutte",
+    industry: "Rechtsberatung",
+    servicesProvided: ["Website-Redesign", "Kontaktformular", "Terminanfrage"],
+    summary: {
+      de: "Komplettes Redesign-Konzept für eine Anwaltskanzlei: moderner Webauftritt mit Online-Terminanfrage, Rückruf-Service und funktionierendem Kontaktformular.",
+      ru: "Полный редизайн сайта адвокатской канцелярии: современный дизайн, онлайн-запись на приём, заказ обратного звонка и рабочая контактная форма.",
+      uk: "Повний редизайн сайту адвокатської канцелярії: сучасний дизайн, онлайн-запис на прийом, замовлення зворотного дзвінка та робоча контактна форма.",
+    },
+    thumbnail: "/cases/erbrecht-leverkusen-thumb.jpg",
+    thumbnailStyle: "screenshot",
+    liveUrl: "/projects/erbrecht-leverkusen/",
+    featured: true,
+  },
+  {
     id: "hausverwaltung-frank",
     slug: "hausverwaltung-frank",
     client: "Hausverwaltung Natalie Frank",

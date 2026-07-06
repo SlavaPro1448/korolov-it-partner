@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Kontakt &amp; Terminvereinbarung | Dr. Plutte &amp; Mettlach-Plutte, Leverkusen</title>
+  <meta name="description" content="Kontaktieren Sie die Rechtsanwaltskanzlei Dr. Plutte & Mettlach-Plutte in Leverkusen-Pattscheid. Rückruf-Service, Terminvereinbarung und Anfahrt." />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Zum Inhalt springen</a>
+  <div class="demo-note">Redesign-Konzept · umgesetzt von <a href="https://www.korolov-it-partner.de" target="_blank" rel="noopener">Korolov IT-Partner</a></div>
+
+  <header class="site-header">
+    <div class="container nav-bar">
+      <a class="brand" href="index.html" aria-label="Startseite – Kanzlei Dr. Plutte & Mettlach-Plutte">
+        <span class="brand-name">Dr. Plutte &amp; Mettlach-Plutte</span>
+        <span class="brand-sub">Rechtsanwälte · Leverkusen</span>
+      </a>
+      <nav aria-label="Hauptnavigation">
+        <ul class="nav-links">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="rechtsgebiete.html">Rechtsgebiete</a></li>
+          <li><a href="kanzlei.html">Die Kanzlei</a></li>
+          <li><a href="informationen.html">Informationen</a></li>
+          <li><a href="seminare.html">Seminare</a></li>
+          <li><a href="kontakt.html" aria-current="page">Kontakt</a></li>
+        </ul>
+      </nav>
+      <a class="btn btn-primary nav-cta" href="#formular">Termin vereinbaren</a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" aria-label="Menü öffnen">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="mobile-menu" id="mobile-menu">
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="rechtsgebiete.html">Rechtsgebiete</a></li>
+        <li><a href="kanzlei.html">Die Kanzlei</a></li>
+        <li><a href="informationen.html">Informationen</a></li>
+        <li><a href="seminare.html">Seminare</a></li>
+        <li><a href="kontakt.html" aria-current="page">Kontakt</a></li>
+        <li><a class="btn btn-primary" style="margin-top:.5rem" href="#formular">Termin vereinbaren</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="page-hero">
+      <div class="container">
+        <span class="eyebrow">Kontakt</span>
+        <h1>Wir rufen Sie gerne zurück!</h1>
+        <p>Vereinbaren Sie einen Termin, fordern Sie einen Rückruf an oder schreiben Sie uns – wir melden uns zeitnah bei Ihnen.</p>
+      </div>
+    </section>
+
+    <section class="section" id="formular">
+      <div class="container">
+        <div class="grid grid-2" style="align-items:start">
+          <!-- Formular -->
+          <div class="form-card reveal">
+            <h2 style="font-size:1.5rem">Terminanfrage &amp; Rückruf-Service</h2>
+            <p style="color:var(--color-muted-text);font-size:.95rem">Felder mit <span class="req">*</span> sind Pflichtfelder.</p>
+            <form id="contact-form" novalidate>
+              <div class="form-grid form-grid-2">
+                <div class="field" data-field="name">
+                  <label for="f-name">Vor- und Nachname <span class="req" aria-hidden="true">*</span></label>
+                  <input id="f-name" name="name" type="text" autocomplete="name" required />
+                  <p class="error-msg" role="alert">Bitte geben Sie Ihren Namen ein.</p>
+                </div>
+                <div class="field" data-field="email">
+                  <label for="f-email">E-Mail <span class="req" aria-hidden="true">*</span></label>
+                  <input id="f-email" name="email" type="email" autocomplete="email" required />
+                  <p class="error-msg" role="alert">Bitte geben Sie eine gültige E-Mail-Adresse ein.</p>
+                </div>
+                <div class="field" data-field="phone">
+                  <label for="f-phone">Telefon (für Rückruf)</label>
+                  <input id="f-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" />
+                  <p class="error-msg" role="alert">Telefonnummer enthält ungültige Zeichen.</p>
+                </div>
+                <div class="field" data-field="topic">
+                  <label for="f-topic">Thema Ihrer Anfrage <span class="req" aria-hidden="true">*</span></label>
+                  <select id="f-topic" name="topic" required>
+                    <option value="">– bitte auswählen –</option>
+                    <option value="Erbrecht">Erbrecht</option>
+                    <option value="Arbeitsrecht">Arbeitsrecht</option>
+                    <option value="Zivilrecht">Zivilrecht</option>
+                    <option value="Seminare">Seminare</option>
+                    <option value="Sonstiges">Sonstiges</option>
+                  </select>
+                  <p class="error-msg" role="alert">Bitte wählen Sie ein Anliegen.</p>
+                </div>
+                <div class="field" data-field="callback_date">
+                  <label for="f-date">Ihr Wunschdatum (für Rückruf)</label>
+                  <input id="f-date" name="callback_date" type="date" />
+                </div>
+                <div class="field" style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem">
+                  <div>
+                    <label for="f-from">Uhrzeit von</label>
+                    <input id="f-from" name="callback_from" type="time" step="900" />
+                  </div>
+                  <div>
+                    <label for="f-to">Uhrzeit bis</label>
+                    <input id="f-to" name="callback_to" type="time" step="900" />
+                  </div>
+                </div>
+                <div class="field full" data-field="message">
+                  <label for="f-message">Nachricht <span class="req" aria-hidden="true">*</span></label>
+                  <textarea id="f-message" name="message" required minlength="10" placeholder="Beschreiben Sie kurz Ihr Anliegen …"></textarea>
+                  <p class="hint">Bitte übermitteln Sie keine vertraulichen Falldetails über das Formular.</p>
+                  <p class="error-msg" role="alert">Bitte geben Sie eine Nachricht mit mindestens 10 Zeichen ein.</p>
+                </div>
+                <!-- Honeypot -->
+                <div class="hp-field" aria-hidden="true">
+                  <label for="f-website">Website</label>
+                  <input id="f-website" name="website" type="text" tabindex="-1" autocomplete="off" />
+                </div>
+                <div class="field full" data-field="consent">
+                  <label class="consent-row" for="f-consent">
+                    <input id="f-consent" name="consent" type="checkbox" required />
+                    <span>Ich erkläre mich mit der Verarbeitung der eingegebenen Daten gemäß der <a href="datenschutz.html">Datenschutzerklärung</a> einverstanden. <span class="req" aria-hidden="true">*</span></span>
+                  </label>
+                  <p class="error-msg" role="alert">Bitte bestätigen Sie die Datenschutzerklärung.</p>
+                </div>
+                <div class="full">
+                  <div id="form-status" class="form-status" aria-live="polite"></div>
+                </div>
+                <div class="full">
+                  <button class="btn btn-primary" type="submit" style="width:100%">
+                    <span class="spinner" aria-hidden="true"></span>
+                    Anfrage senden
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+
+          <!-- Kontaktinfo -->
+          <div style="display:grid;gap:1.5rem">
+            <div class="card reveal">
+              <h3>Direkter Kontakt</h3>
+              <ul class="checklist" style="margin-top:1rem">
+                <li>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                  <span>Telefon: <a href="tel:0217131932">02171 31932</a> · Fax: 02171 31023</span>
+                </li>
+                <li>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>
+                  <span>WhatsApp: <a href="https://wa.me/491773287774" target="_blank" rel="noopener noreferrer">0177 3287774</a></span>
+                </li>
+                <li>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                  <span>E-Mail: <a href="mailto:rain.mettlach-plutte@t-online.de">rain.mettlach-plutte@t-online.de</a></span>
+                </li>
+                <li>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>
+                  <span>Romberg 9, 51381 Leverkusen-Pattscheid</span>
+                </li>
+              </ul>
+              <p class="hint" style="font-size:.85rem;color:var(--color-muted-text);margin-top:1rem">Notfallrufnummer außerhalb der Bürozeiten: <a href="tel:01773287774">0177 3287774</a></p>
+            </div>
+
+            <div class="card reveal">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:1rem">
+                <h3 style="margin:0">Bürozeiten</h3>
+                <span class="open-badge" data-open-badge>
+                  <span class="dot" aria-hidden="true"></span>
+                  <span data-open-label>Jetzt geöffnet</span>
+                </span>
+              </div>
+              <table class="hours-table">
+                <tbody>
+                  <tr><td>Montag – Freitag</td><td>8:00 – 18:00</td></tr>
+                  <tr><td>Sa / So</td><td>nach Vereinbarung</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="card reveal">
+              <h3>Anfahrt</h3>
+              <p style="margin-top:.75rem"><strong>Mit dem PKW:</strong> Ehemalige B232 im Ortsteil Pattscheid – von Burscheid kommend hinter dem Ortsschild die erste Straße links, von Opladen kommend hinter dem alten Pattscheider Bahnhof erste Straße rechts. Über die kleine Brücke, rechts halten und auf der rechten Seite parken. Erster begehbarer Weg links zur Hausnummer 9, hinterer Eingang.</p>
+              <p><strong>Öffentliche Verkehrsmittel:</strong> Buslinie 239/240 Opladen–Pattscheid, Haltestelle Romberg.</p>
+              <p style="margin-bottom:0"><strong>Hausbesuche:</strong> Falls Sie gesundheitlich nicht in der Lage sind, uns zu besuchen, können auch Hausbesuche vereinbart werden.</p>
+            </div>
+
+            <div class="card reveal">
+              <h3>Sie finden uns auch auf anwalt.de</h3>
+              <p style="margin:.75rem 0 0"><a href="https://www.anwalt.de/axel-plutte" target="_blank" rel="noopener noreferrer">Profil von Dr. Axel Plutte auf anwalt.de ansehen →</a></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <h3>Rechtsanwälte Dr. Plutte &amp; Mettlach-Plutte</h3>
+          <p>Romberg 9<br />51381 Leverkusen-Pattscheid</p>
+          <p>Tel: <a href="tel:0217131932">02171 31932</a><br />Fax: 02171 31023<br />
+            <a href="mailto:rain.mettlach-plutte@t-online.de">rain.mettlach-plutte@t-online.de</a></p>
+        </div>
+        <div>
+          <h3>Navigation</h3>
+          <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="rechtsgebiete.html">Rechtsgebiete</a></li>
+            <li><a href="kanzlei.html">Die Kanzlei</a></li>
+            <li><a href="informationen.html">Informationen</a></li>
+            <li><a href="seminare.html">Seminare</a></li>
+            <li><a href="kontakt.html">Kontakt</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3>Rechtliches</h3>
+          <ul>
+            <li><a href="impressum.html">Impressum</a></li>
+            <li><a href="datenschutz.html">Datenschutz</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 Rechtsanwälte Dr. Plutte &amp; Mettlach-Plutte</span>
+        <span>Redesign-Konzept: <a href="https://www.korolov-it-partner.de" target="_blank" rel="noopener">Korolov IT-Partner</a></span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/main.js" defer></script>
+</body>
+</html>
