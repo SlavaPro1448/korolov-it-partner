@@ -213,6 +213,160 @@
 
   document.querySelectorAll("select[data-custom]").forEach(enhanceSelect);
 
+  /* Datepicker (styled calendar, de-DE, Mo–Fr, keine vergangenen Tage) ------ */
+  document.querySelectorAll("[data-datepicker]").forEach(function (wrap) {
+    var input = wrap.querySelector('input[type="hidden"]');
+    var btn = wrap.querySelector(".dropdown-toggle");
+    var panel = wrap.querySelector(".datepicker-panel");
+    var labelSpan = btn.querySelector("span");
+
+    var MONTHS = ["Januar", "Februar", "März", "April", "Mai", "Juni",
+      "Juli", "August", "September", "Oktober", "November", "Dezember"];
+    var WEEKDAYS = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"];
+
+    var today = new Date();
+    today.setHours(0, 0, 0, 0);
+    var view = new Date(today.getFullYear(), today.getMonth(), 1);
+    var selected = null;
+
+    function pad(n) { return String(n).padStart(2, "0"); }
+
+    function fmt(d) {
+      return pad(d.getDate()) + "." + pad(d.getMonth() + 1) + "." + d.getFullYear();
+    }
+
+    function sameDay(a, b) {
+      return a && b && a.getTime() === b.getTime();
+    }
+
+    function render() {
+      panel.innerHTML = "";
+
+      var head = document.createElement("div");
+      head.className = "datepicker-head";
+
+      var prev = document.createElement("button");
+      prev.type = "button";
+      prev.className = "datepicker-nav";
+      prev.setAttribute("aria-label", "Vorheriger Monat");
+      prev.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>';
+      prev.disabled =
+        view.getFullYear() === today.getFullYear() && view.getMonth() === today.getMonth();
+      prev.addEventListener("click", function () {
+        view = new Date(view.getFullYear(), view.getMonth() - 1, 1);
+        render();
+      });
+
+      var title = document.createElement("span");
+      title.className = "datepicker-title";
+      title.textContent = MONTHS[view.getMonth()] + " " + view.getFullYear();
+
+      var next = document.createElement("button");
+      next.type = "button";
+      next.className = "datepicker-nav";
+      next.setAttribute("aria-label", "Nächster Monat");
+      next.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>';
+      next.addEventListener("click", function () {
+        view = new Date(view.getFullYear(), view.getMonth() + 1, 1);
+        render();
+      });
+
+      head.appendChild(prev);
+      head.appendChild(title);
+      head.appendChild(next);
+      panel.appendChild(head);
+
+      var grid = document.createElement("div");
+      grid.className = "datepicker-grid";
+
+      WEEKDAYS.forEach(function (wd) {
+        var el = document.createElement("span");
+        el.className = "datepicker-weekday";
+        el.textContent = wd;
+        grid.appendChild(el);
+      });
+
+      var firstDay = new Date(view.getFullYear(), view.getMonth(), 1);
+      var offset = (firstDay.getDay() + 6) % 7; // Montag = 0
+      var daysInMonth = new Date(view.getFullYear(), view.getMonth() + 1, 0).getDate();
+
+      for (var i = 0; i < offset; i++) {
+        var padCell = document.createElement("button");
+        padCell.type = "button";
+        padCell.className = "datepicker-day other-month";
+        padCell.tabIndex = -1;
+        grid.appendChild(padCell);
+      }
+
+      for (var d = 1; d <= daysInMonth; d++) {
+        (function (d) {
+          var date = new Date(view.getFullYear(), view.getMonth(), d);
+          var cell = document.createElement("button");
+          cell.type = "button";
+          cell.className = "datepicker-day";
+          cell.textContent = d;
+          var isWeekend = date.getDay() === 0 || date.getDay() === 6;
+          if (date < today || isWeekend) cell.disabled = true;
+          if (sameDay(date, today)) cell.classList.add("today");
+          if (selected && sameDay(date, selected)) cell.classList.add("selected");
+          cell.addEventListener("click", function () {
+            selected = date;
+            input.value = fmt(date);
+            labelSpan.textContent = fmt(date);
+            labelSpan.className = "";
+            close();
+            btn.focus();
+          });
+          grid.appendChild(cell);
+        })(d);
+      }
+
+      panel.appendChild(grid);
+
+      var hint = document.createElement("p");
+      hint.className = "datepicker-hint";
+      hint.textContent = "Rückrufe erfolgen Mo–Fr innerhalb der Bürozeiten.";
+      panel.appendChild(hint);
+    }
+
+    function openPanel() {
+      render();
+      wrap.classList.add("open");
+      btn.setAttribute("aria-expanded", "true");
+    }
+
+    function close() {
+      wrap.classList.remove("open");
+      btn.setAttribute("aria-expanded", "false");
+    }
+
+    btn.addEventListener("click", function () {
+      if (wrap.classList.contains("open")) close();
+      else openPanel();
+    });
+
+    btn.addEventListener("keydown", function (ev) {
+      if (ev.key === "Escape") close();
+    });
+
+    document.addEventListener("click", function (ev) {
+      if (!wrap.contains(ev.target)) close();
+    });
+
+    // Reset support (form.reset() clears the hidden input asynchronously)
+    var form = wrap.closest("form");
+    if (form) {
+      form.addEventListener("reset", function () {
+        setTimeout(function () {
+          selected = null;
+          view = new Date(today.getFullYear(), today.getMonth(), 1);
+          labelSpan.textContent = "Datum wählen";
+          labelSpan.className = "placeholder";
+        }, 0);
+      });
+    }
+  });
+
   /* Testimonials carousel --------------------------------------------------- */
   document.querySelectorAll("[data-carousel]").forEach(function (root) {
     var track = root.querySelector(".testimonials-track");

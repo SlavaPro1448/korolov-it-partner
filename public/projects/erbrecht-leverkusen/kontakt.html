@@ -92,8 +92,15 @@
                   <p class="error-msg" role="alert">Bitte wählen Sie ein Anliegen.</p>
                 </div>
                 <div class="field" data-field="callback_date">
-                  <label for="f-date">Ihr Wunschdatum (für Rückruf)</label>
-                  <input id="f-date" name="callback_date" type="date" />
+                  <label id="f-date-label">Ihr Wunschdatum (für Rückruf)</label>
+                  <div class="dropdown datepicker" data-datepicker>
+                    <input type="hidden" name="callback_date" id="f-date" />
+                    <button type="button" class="dropdown-toggle" aria-haspopup="dialog" aria-expanded="false" aria-labelledby="f-date-label">
+                      <span class="placeholder">Datum wählen</span>
+                      <svg class="chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg>
+                    </button>
+                    <div class="dropdown-menu datepicker-panel" role="dialog" aria-label="Kalender"></div>
+                  </div>
                 </div>
                 <div class="field" style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem">
                   <div>
