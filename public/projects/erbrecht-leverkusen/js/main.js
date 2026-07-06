@@ -12,14 +12,17 @@
     });
   }
 
-  /* Scroll reveal ---------------------------------------------------------- */
+  /* Scroll reveal with soft stagger ---------------------------------------- */
   var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var items = document.querySelectorAll(".reveal");
   if (!reduced && "IntersectionObserver" in window) {
     var io = new IntersectionObserver(
       function (entries) {
+        var delay = 0;
         entries.forEach(function (e) {
           if (e.isIntersecting) {
+            e.target.style.setProperty("--reveal-delay", delay + "ms");
+            delay += 80;
             e.target.classList.add("visible");
             io.unobserve(e.target);
           }
@@ -54,6 +57,234 @@
       badge.classList.add("closed");
       if (label) label.textContent = "Derzeit geschlossen";
     }
+  });
+
+  /* Time slot options (08:00–18:00, alle 15 Minuten) ------------------------ */
+  document.querySelectorAll("select[data-timeslots]").forEach(function (sel) {
+    for (var h = 8; h <= 18; h++) {
+      for (var m = 0; m < 60; m += 15) {
+        if (h === 18 && m > 0) break;
+        var val =
+          String(h).padStart(2, "0") + ":" + String(m).padStart(2, "0");
+        var opt = document.createElement("option");
+        opt.value = val;
+        opt.textContent = val + " Uhr";
+        sel.appendChild(opt);
+      }
+    }
+  });
+
+  /* Custom dropdowns (styled select replacement) ---------------------------
+     Progressive enhancement: the native <select> stays in the form (hidden)
+     and keeps the value for FormData; the visible UI is a button + listbox. */
+  function enhanceSelect(select) {
+    var wrap = document.createElement("div");
+    wrap.className = "dropdown";
+    select.parentNode.insertBefore(wrap, select);
+    wrap.appendChild(select);
+
+    var btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "dropdown-toggle";
+    btn.setAttribute("aria-haspopup", "listbox");
+    btn.setAttribute("aria-expanded", "false");
+    if (select.id) btn.setAttribute("aria-labelledby", select.id + "-label");
+
+    var labelSpan = document.createElement("span");
+    var chevron = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    chevron.setAttribute("class", "chevron");
+    chevron.setAttribute("width", "18");
+    chevron.setAttribute("height", "18");
+    chevron.setAttribute("viewBox", "0 0 24 24");
+    chevron.setAttribute("fill", "none");
+    chevron.setAttribute("stroke", "currentColor");
+    chevron.setAttribute("stroke-width", "2");
+    chevron.setAttribute("stroke-linecap", "round");
+    chevron.setAttribute("stroke-linejoin", "round");
+    chevron.setAttribute("aria-hidden", "true");
+    chevron.innerHTML = '<path d="m6 9 6 6 6-6"/>';
+    btn.appendChild(labelSpan);
+    btn.appendChild(chevron);
+
+    var list = document.createElement("ul");
+    list.className = "dropdown-menu";
+    list.setAttribute("role", "listbox");
+    list.tabIndex = -1;
+
+    var options = Array.prototype.slice.call(select.options);
+    var focusIdx = Math.max(select.selectedIndex, 0);
+
+    options.forEach(function (opt, i) {
+      var li = document.createElement("li");
+      li.setAttribute("role", "option");
+      li.dataset.value = opt.value;
+      li.textContent = opt.textContent;
+      if (opt.value === "") li.classList.add("placeholder-option");
+      if (i === select.selectedIndex) li.setAttribute("aria-selected", "true");
+      li.addEventListener("click", function () {
+        choose(i);
+        close();
+        btn.focus();
+      });
+      list.appendChild(li);
+    });
+
+    function syncLabel() {
+      var sel = options[select.selectedIndex];
+      if (!sel || sel.value === "") {
+        labelSpan.textContent = options[0] ? options[0].textContent : "";
+        labelSpan.className = "placeholder";
+      } else {
+        labelSpan.textContent = sel.textContent;
+        labelSpan.className = "";
+      }
+    }
+
+    function choose(i) {
+      select.selectedIndex = i;
+      focusIdx = i;
+      Array.prototype.forEach.call(list.children, function (li, j) {
+        if (j === i) li.setAttribute("aria-selected", "true");
+        else li.removeAttribute("aria-selected");
+      });
+      syncLabel();
+      select.dispatchEvent(new Event("change", { bubbles: true }));
+    }
+
+    function setFocused(i) {
+      focusIdx = Math.max(0, Math.min(options.length - 1, i));
+      Array.prototype.forEach.call(list.children, function (li, j) {
+        li.classList.toggle("focused", j === focusIdx);
+      });
+      var el = list.children[focusIdx];
+      if (el) el.scrollIntoView({ block: "nearest" });
+    }
+
+    function openMenu() {
+      wrap.classList.add("open");
+      btn.setAttribute("aria-expanded", "true");
+      setFocused(Math.max(select.selectedIndex, 0));
+    }
+
+    function close() {
+      wrap.classList.remove("open");
+      btn.setAttribute("aria-expanded", "false");
+    }
+
+    btn.addEventListener("click", function () {
+      if (wrap.classList.contains("open")) close();
+      else openMenu();
+    });
+
+    btn.addEventListener("keydown", function (ev) {
+      var open = wrap.classList.contains("open");
+      if (ev.key === "ArrowDown" || ev.key === "ArrowUp") {
+        ev.preventDefault();
+        if (!open) { openMenu(); return; }
+        setFocused(focusIdx + (ev.key === "ArrowDown" ? 1 : -1));
+      } else if ((ev.key === "Enter" || ev.key === " ") && open) {
+        ev.preventDefault();
+        choose(focusIdx);
+        close();
+      } else if (ev.key === "Escape" && open) {
+        close();
+      }
+    });
+
+    document.addEventListener("click", function (ev) {
+      if (!wrap.contains(ev.target)) close();
+    });
+
+    // Keep UI in sync when the select changes externally (e.g. form.reset()).
+    select.addEventListener("change", function () {
+      var i = Math.max(select.selectedIndex, 0);
+      focusIdx = i;
+      Array.prototype.forEach.call(list.children, function (li, j) {
+        if (j === i) li.setAttribute("aria-selected", "true");
+        else li.removeAttribute("aria-selected");
+      });
+      syncLabel();
+    });
+
+    syncLabel();
+    wrap.appendChild(btn);
+    wrap.appendChild(list);
+  }
+
+  document.querySelectorAll("select[data-custom]").forEach(enhanceSelect);
+
+  /* Testimonials carousel --------------------------------------------------- */
+  document.querySelectorAll("[data-carousel]").forEach(function (root) {
+    var track = root.querySelector(".testimonials-track");
+    var prev = root.querySelector("[data-carousel-prev]");
+    var next = root.querySelector("[data-carousel-next]");
+    var dotsWrap = root.querySelector(".carousel-dots");
+    var cards = track ? track.querySelectorAll(".testimonial-card") : [];
+    if (!track || !cards.length) return;
+
+    function perView() {
+      var w = track.clientWidth;
+      if (w >= 1024) return 3;
+      if (w >= 640) return 2;
+      return 1;
+    }
+
+    function pageCount() {
+      return Math.max(1, Math.ceil(cards.length / perView()));
+    }
+
+    function currentPage() {
+      var step = track.scrollWidth / pageCount();
+      return Math.round(track.scrollLeft / step);
+    }
+
+    function buildDots() {
+      if (!dotsWrap) return;
+      dotsWrap.innerHTML = "";
+      for (var i = 0; i < pageCount(); i++) {
+        (function (idx) {
+          var dot = document.createElement("button");
+          dot.type = "button";
+          dot.className = "carousel-dot";
+          dot.setAttribute("aria-label", "Zu Seite " + (idx + 1));
+          dot.addEventListener("click", function () {
+            var step = track.scrollWidth / pageCount();
+            track.scrollTo({ left: step * idx, behavior: "smooth" });
+          });
+          dotsWrap.appendChild(dot);
+        })(i);
+      }
+      update();
+    }
+
+    function update() {
+      var page = currentPage();
+      var last = pageCount() - 1;
+      if (prev) prev.disabled = page <= 0;
+      if (next) next.disabled = page >= last;
+      if (dotsWrap) {
+        Array.prototype.forEach.call(dotsWrap.children, function (d, i) {
+          d.classList.toggle("active", i === page);
+        });
+      }
+    }
+
+    function go(dir) {
+      var step = track.scrollWidth / pageCount();
+      var target = (currentPage() + dir) * step;
+      track.scrollTo({ left: target, behavior: "smooth" });
+    }
+
+    if (prev) prev.addEventListener("click", function () { go(-1); });
+    if (next) next.addEventListener("click", function () { go(1); });
+
+    var raf;
+    track.addEventListener("scroll", function () {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(update);
+    });
+    window.addEventListener("resize", buildDots);
+    buildDots();
   });
 
   /* Contact form ----------------------------------------------------------- */
@@ -123,7 +354,7 @@
       hasError = true;
     }
     if (hasError) {
-      var firstInvalid = form.querySelector(".field.invalid input, .field.invalid select, .field.invalid textarea");
+      var firstInvalid = form.querySelector(".field.invalid input, .field.invalid select, .field.invalid textarea, .field.invalid .dropdown-toggle");
       if (firstInvalid) firstInvalid.focus();
       return;
     }
@@ -163,6 +394,9 @@
       .then(function (result) {
         if (result.ok && result.body && result.body.success !== false) {
           form.reset();
+          form.querySelectorAll("select[data-custom]").forEach(function (sel) {
+            sel.dispatchEvent(new Event("change", { bubbles: true }));
+          });
           if (statusBox) {
             statusBox.className = "form-status success";
             statusBox.textContent =

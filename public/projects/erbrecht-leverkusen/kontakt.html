@@ -80,8 +80,8 @@
                   <p class="error-msg" role="alert">Telefonnummer enthält ungültige Zeichen.</p>
                 </div>
                 <div class="field" data-field="topic">
-                  <label for="f-topic">Thema Ihrer Anfrage <span class="req" aria-hidden="true">*</span></label>
-                  <select id="f-topic" name="topic" required>
+                  <label for="f-topic" id="f-topic-label">Thema Ihrer Anfrage <span class="req" aria-hidden="true">*</span></label>
+                  <select id="f-topic" name="topic" required data-custom>
                     <option value="">– bitte auswählen –</option>
                     <option value="Erbrecht">Erbrecht</option>
                     <option value="Arbeitsrecht">Arbeitsrecht</option>
@@ -97,12 +97,16 @@
                 </div>
                 <div class="field" style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem">
                   <div>
-                    <label for="f-from">Uhrzeit von</label>
-                    <input id="f-from" name="callback_from" type="time" step="900" />
+                    <label for="f-from" id="f-from-label">Uhrzeit von</label>
+                    <select id="f-from" name="callback_from" data-custom data-timeslots>
+                      <option value="">Uhrzeit</option>
+                    </select>
                   </div>
                   <div>
-                    <label for="f-to">Uhrzeit bis</label>
-                    <input id="f-to" name="callback_to" type="time" step="900" />
+                    <label for="f-to" id="f-to-label">Uhrzeit bis</label>
+                    <select id="f-to" name="callback_to" data-custom data-timeslots>
+                      <option value="">Uhrzeit</option>
+                    </select>
                   </div>
                 </div>
                 <div class="field full" data-field="message">
