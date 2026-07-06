@@ -252,7 +252,8 @@
       prev.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>';
       prev.disabled =
         view.getFullYear() === today.getFullYear() && view.getMonth() === today.getMonth();
-      prev.addEventListener("click", function () {
+      prev.addEventListener("click", function (ev) {
+        ev.stopPropagation();
         view = new Date(view.getFullYear(), view.getMonth() - 1, 1);
         render();
       });
@@ -266,7 +267,8 @@
       next.className = "datepicker-nav";
       next.setAttribute("aria-label", "Nächster Monat");
       next.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>';
-      next.addEventListener("click", function () {
+      next.addEventListener("click", function (ev) {
+        ev.stopPropagation();
         view = new Date(view.getFullYear(), view.getMonth() + 1, 1);
         render();
       });
@@ -350,7 +352,10 @@
     });
 
     document.addEventListener("click", function (ev) {
-      if (!wrap.contains(ev.target)) close();
+      // Use composedPath so re-rendered (detached) calendar buttons still
+      // count as "inside": the path is captured at dispatch time.
+      var path = ev.composedPath ? ev.composedPath() : [];
+      if (path.indexOf(wrap) === -1 && !wrap.contains(ev.target)) close();
     });
 
     // Reset support (form.reset() clears the hidden input asynchronously)
