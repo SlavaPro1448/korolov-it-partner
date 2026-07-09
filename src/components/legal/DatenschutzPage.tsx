@@ -196,8 +196,147 @@ export default function DatenschutzPage() {
               </p>
             </section>
 
+            <section id="demo-bot" className="scroll-mt-20">
+              <h2 className="text-lg font-semibold text-brand mb-3">
+                6. Chatbots zur Bestellung einer kostenlosen Website-Demo (Telegram und WhatsApp)
+              </h2>
+              <p>
+                Ich biete die Möglichkeit, über Chatbots in den Messenger-Diensten{" "}
+                <strong>Telegram</strong> (@KorolovDemoBot) und <strong>WhatsApp</strong> kostenlos
+                und unverbindlich eine Demo-Version einer Website anzufordern (Fertigstellung
+                innerhalb von 48 Stunden). Die Nutzung der Chatbots ist freiwillig und erfolgt
+                ausschließlich auf Ihre eigene Initiative, indem Sie den jeweiligen Bot zuerst
+                kontaktieren. Verantwortlicher für die damit verbundene Datenverarbeitung ist der
+                unter Ziffer 1 genannte Verantwortliche.
+              </p>
+
+              <h3 className="font-semibold text-brand mt-5 mb-2">Verarbeitete Daten</h3>
+              <p>Im Rahmen der Nutzung der Chatbots werden folgende Daten verarbeitet:</p>
+              <ul className="mt-3 space-y-1 list-disc pl-6">
+                <li>
+                  Vor- und Nachname sowie Telefonnummer (bei WhatsApp ist Ihre Telefonnummer
+                  automatisch aus dem Chat ersichtlich)
+                </li>
+                <li>
+                  Ihre Antworten im Rahmen der Bot-Abfrage: ob bereits eine Website vorhanden ist,
+                  ggf. die URL der bestehenden Website, Ihre Wünsche zur Website sowie die von Ihnen
+                  gewählte Sprache
+                </li>
+                <li>Telegram-User-ID bzw. WhatsApp-Nummer als technische Chat-Kennung</li>
+                <li>
+                  Herkunftskennzeichnung (über welchen QR-Code bzw. Link Sie den Bot aufgerufen
+                  haben)
+                </li>
+                <li>
+                  Nachweis Ihrer Einwilligung: Datum und Uhrzeit (UTC) sowie die Version des
+                  Einwilligungstextes — zur Nachweisbarkeit der Einwilligung gemäß Art. 7 Abs. 1
+                  DSGVO
+                </li>
+              </ul>
+              <p className="mt-4">
+                <strong>Zahlungsdaten werden nicht abgefragt und nicht verarbeitet.</strong>
+              </p>
+
+              <h3 className="font-semibold text-brand mt-5 mb-2">Zwecke und Rechtsgrundlagen</h3>
+              <p>
+                Die Verarbeitung erfolgt zur Erstellung der kostenlosen Website-Demo sowie zur
+                Kommunikation im Zusammenhang mit Ihrer Anfrage. Rechtsgrundlage ist Art. 6 Abs. 1
+                lit. b DSGVO (Durchführung vorvertraglicher Maßnahmen, die auf Anfrage der
+                betroffenen Person erfolgen). Darüber hinaus holt der Bot <strong>vor</strong> der
+                Erhebung Ihrer Daten Ihre ausdrückliche Einwilligung ein; insoweit ist Art. 6
+                Abs. 1 lit. a DSGVO Rechtsgrundlage.
+              </p>
+              <p className="mt-3">
+                Es erfolgt keine werbliche Ansprache und keine Weitergabe Ihrer Daten an Dritte zu
+                deren eigenen Zwecken.
+              </p>
+
+              <h3 className="font-semibold text-brand mt-5 mb-2">Speicherdauer und Widerruf</h3>
+              <p>
+                Ihre Daten werden bis zur Bearbeitung Ihrer Anfrage gespeichert, längstens jedoch{" "}
+                <strong>180 Tage</strong>; danach werden sie automatisch gelöscht. Sie können Ihre
+                Einwilligung jederzeit mit Wirkung für die Zukunft direkt im Bot widerrufen — in
+                Telegram über den Befehl <em>/datenschutz</em>, in WhatsApp durch eine Nachricht
+                mit dem Wort <em>&quot;datenschutz&quot;</em>. In diesem Fall werden sämtliche zu
+                Ihnen gespeicherten Daten vollständig und unwiderruflich gelöscht (Art. 17 DSGVO).
+              </p>
+
+              <h3 className="font-semibold text-brand mt-5 mb-2">
+                Auftragsverarbeiter und Empfänger
+              </h3>
+              <p>
+                Bei der Bereitstellung der Chatbots setze ich folgende Dienstleister ein bzw. es
+                kommt zu folgenden Datenübermittlungen:
+              </p>
+              <ul className="mt-3 space-y-2 list-disc pl-6">
+                <li>
+                  <strong>Railway Corp., USA</strong> (Hosting des Bots, Auftragsverarbeiter gemäß
+                  Art. 28 DSGVO). Die Server befinden sich in der EU-Region (Amsterdam,
+                  Niederlande). Eine Übermittlung in die USA ist im Rahmen der technischen Wartung
+                  möglich; sie erfolgt auf Grundlage der Zertifizierung von Railway unter dem
+                  EU-US Data Privacy Framework (Angemessenheitsbeschluss der EU-Kommission gemäß
+                  Art. 45 DSGVO) sowie ergänzend auf Grundlage der Standardvertragsklauseln der
+                  EU-Kommission (Art. 46 Abs. 2 lit. c DSGVO).
+                </li>
+                <li>
+                  <strong>Resend, USA</strong> (technischer Versand von E-Mail-Benachrichtigungen
+                  über eingegangene Anfragen, Auftragsverarbeiter gemäß Art. 28 DSGVO). Der Versand
+                  erfolgt über die EU-Region (Irland). Soweit dabei Daten in die USA übermittelt
+                  werden, erfolgt dies auf Grundlage der Standardvertragsklauseln der EU-Kommission
+                  (Art. 46 Abs. 2 lit. c DSGVO) bzw. des EU-US Data Privacy Framework.
+                </li>
+                <li>
+                  <strong>Telegram Messenger Inc.</strong> — bei Nutzung des Telegram-Bots erfolgt
+                  die Übermittlung Ihrer Nachrichten über die Server von Telegram; dabei können
+                  Daten auch außerhalb der EU verarbeitet werden. Es gilt ergänzend die
+                  Datenschutzerklärung von Telegram:{" "}
+                  <a
+                    href="https://telegram.org/privacy"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-accent-blue hover:underline break-all"
+                  >
+                    https://telegram.org/privacy
+                  </a>
+                </li>
+                <li>
+                  <strong>WhatsApp Ireland Limited / Meta Platforms</strong> — bei Nutzung des
+                  WhatsApp-Bots werden Ihre Nachrichten über die WhatsApp Business Platform (Cloud
+                  API) verarbeitet. Für Nutzer im Europäischen Wirtschaftsraum ist die WhatsApp
+                  Ireland Limited verantwortliche Vertragspartnerin. Es gilt ergänzend die
+                  Datenschutzerklärung von WhatsApp:{" "}
+                  <a
+                    href="https://www.whatsapp.com/legal/privacy-policy-eea"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-accent-blue hover:underline break-all"
+                  >
+                    https://www.whatsapp.com/legal/privacy-policy-eea
+                  </a>
+                </li>
+              </ul>
+
+              <h3 className="font-semibold text-brand mt-5 mb-2">
+                Ihre Rechte und Freiwilligkeit der Bereitstellung
+              </h3>
+              <p>
+                Ihnen stehen die unter Ziffer 9 dieser Datenschutzerklärung aufgeführten
+                Betroffenenrechte zu (Auskunft, Berichtigung, Löschung, Einschränkung der
+                Verarbeitung, Datenübertragbarkeit und Widerspruch, Art. 15–21 DSGVO). Eine
+                erteilte Einwilligung können Sie jederzeit mit Wirkung für die Zukunft widerrufen
+                (Art. 7 Abs. 3 DSGVO). Ferner haben Sie das Recht auf Beschwerde bei einer
+                Aufsichtsbehörde (Art. 77 DSGVO); die zuständige Aufsichtsbehörde finden Sie unter
+                Ziffer 10.
+              </p>
+              <p className="mt-3">
+                Die Bereitstellung Ihrer Daten ist weder gesetzlich noch vertraglich
+                vorgeschrieben; Sie sind nicht verpflichtet, die Daten bereitzustellen. Ohne diese
+                Angaben kann ich die Demo-Version jedoch nicht erstellen.
+              </p>
+            </section>
+
             <section>
-              <h2 className="text-lg font-semibold text-brand mb-3">6. E-Mail-Verarbeitung</h2>
+              <h2 className="text-lg font-semibold text-brand mb-3">7. E-Mail-Verarbeitung</h2>
               <p>
                 Für die geschäftliche E-Mail-Adresse <em>{COMPANY.email}</em> nutze ich die
                 Mail-Dienste von <strong>{COMPANY.mailProvider.provider}</strong>. Beim Versand und
@@ -208,7 +347,7 @@ export default function DatenschutzPage() {
             </section>
 
             <section>
-              <h2 className="text-lg font-semibold text-brand mb-3">7. Schriftarten</h2>
+              <h2 className="text-lg font-semibold text-brand mb-3">8. Schriftarten</h2>
               <p>
                 Diese Website verwendet lokal eingebundene Schriftarten (Inter). Die Schriftdateien
                 werden direkt vom Webserver dieser Website ausgeliefert. Es findet{" "}
@@ -220,7 +359,7 @@ export default function DatenschutzPage() {
 
             <section>
               <h2 className="text-lg font-semibold text-brand mb-3">
-                8. Ihre Rechte als betroffene Person
+                9. Ihre Rechte als betroffene Person
               </h2>
               <p>
                 Sie haben gegenüber dem Verantwortlichen folgende Rechte hinsichtlich der Sie
@@ -262,7 +401,7 @@ export default function DatenschutzPage() {
 
             <section>
               <h2 className="text-lg font-semibold text-brand mb-3">
-                9. Beschwerderecht bei einer Aufsichtsbehörde
+                10. Beschwerderecht bei einer Aufsichtsbehörde
               </h2>
               <p>
                 Sie haben das Recht, sich über die Verarbeitung Ihrer personenbezogenen Daten bei
@@ -303,7 +442,7 @@ export default function DatenschutzPage() {
 
             <section>
               <h2 className="text-lg font-semibold text-brand mb-3">
-                10. SSL- bzw. TLS-Verschlüsselung
+                11. SSL- bzw. TLS-Verschlüsselung
               </h2>
               <p>
                 Diese Website nutzt aus Sicherheitsgründen und zum Schutz der Übertragung
@@ -315,7 +454,7 @@ export default function DatenschutzPage() {
 
             <section>
               <h2 className="text-lg font-semibold text-brand mb-3">
-                11. Aktualität und Änderung dieser Datenschutzerklärung
+                12. Aktualität und Änderung dieser Datenschutzerklärung
               </h2>
               <p>
                 Diese Datenschutzerklärung ist aktuell gültig und hat den Stand vom{" "}
