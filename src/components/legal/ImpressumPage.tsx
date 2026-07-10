@@ -24,7 +24,7 @@ export default function ImpressumPage() {
               Rechtliches
             </p>
             <h1 className="mt-3 text-3xl md:text-4xl font-bold text-brand">Impressum</h1>
-            <p className="mt-3 text-sm text-muted-foreground">Angaben gemäß § 5 TMG</p>
+            <p className="mt-3 text-sm text-muted-foreground">Angaben gemäß § 5 DDG</p>
           </header>
 
           <div className="space-y-10 text-foreground/90 leading-relaxed">
@@ -139,11 +139,11 @@ export default function ImpressumPage() {
             <section>
               <h2 className="text-lg font-semibold text-brand mb-3">Haftung für Inhalte</h2>
               <p>
-                Als Diensteanbieter sind wir gemäß § 7 Abs. 1 TMG für eigene Inhalte auf diesen
-                Seiten nach den allgemeinen Gesetzen verantwortlich. Nach §§ 8 bis 10 TMG sind wir
-                als Diensteanbieter jedoch nicht verpflichtet, übermittelte oder gespeicherte fremde
-                Informationen zu überwachen oder nach Umständen zu forschen, die auf eine
-                rechtswidrige Tätigkeit hinweisen.
+                Als Diensteanbieter sind wir für eigene Inhalte auf diesen Seiten nach den
+                allgemeinen Gesetzen verantwortlich. Nach Art. 4 bis 8 der Verordnung (EU)
+                2022/2065 (Digital Services Act) sind wir als Diensteanbieter jedoch nicht
+                verpflichtet, übermittelte oder gespeicherte fremde Informationen zu überwachen
+                oder nach Umständen zu forschen, die auf eine rechtswidrige Tätigkeit hinweisen.
               </p>
               <p className="mt-3">
                 Verpflichtungen zur Entfernung oder Sperrung der Nutzung von Informationen nach den

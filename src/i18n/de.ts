@@ -61,7 +61,7 @@ export const de: Dict = {
   },
   services: {
     eyebrow: "Leistungen",
-    title: "Digitale Lösungen für den Geschäftsalltag",
+    title: "Website, IT-Support & digitale Lösungen für den Geschäftsalltag",
     subtitle:
       "Von der Website bis zur laufenden technischen Betreuung — digitale Lösungen für den Geschäftsalltag kleiner Unternehmen.",
     items: [
@@ -130,7 +130,7 @@ export const de: Dict = {
   },
   pricing: {
     eyebrow: "Pakete & Preise",
-    title: "Transparente Einstiegspakete",
+    title: "Transparente Einstiegspakete für Website & IT-Service",
     subtitle: "Jedes Projekt wird nach dem kostenlosen Erstgespräch konkret angeboten.",
     recommendedBadge: "Empfohlen",
     ctaLabel: "Anfragen",
@@ -224,7 +224,7 @@ export const de: Dict = {
   },
   contact: {
     eyebrow: "Kontakt",
-    heading: "Kostenloses Erstgespräch anfragen",
+    heading: "Kostenloses Erstgespräch in Leverkusen anfragen",
     description:
       "Schreiben Sie kurz, wobei Sie Unterstützung benötigen. Ich melde mich mit einer ersten Einschätzung zurück.",
     rows: {
@@ -287,7 +287,7 @@ export const de: Dict = {
   },
   faq: {
     eyebrow: "FAQ",
-    title: "Häufige Fragen",
+    title: "Häufige Fragen zu Website, Hosting & IT-Support",
     subtitle: "Antworten auf die häufigsten Fragen vor dem Erstgespräch.",
     items: [
       {

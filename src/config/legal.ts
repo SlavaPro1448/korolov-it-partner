@@ -10,7 +10,7 @@
 // Impressum или Datenschutz (новые инструменты, смена адреса и т.д.).
 
 export const COMPANY = {
-  // Анбитер по § 5 TMG
+  // Анбитер по § 5 DDG
   legalName: "Viacheslav Korolov",
   tradeName: "Korolov IT-Service",
   legalForm: "Einzelunternehmen",
