@@ -110,6 +110,25 @@ export function organizationSchema(locale: SupportedLocale = "de") {
   };
 }
 
+export function serviceSchema(input: {
+  name: string;
+  description: string;
+  path: string;
+  serviceType: string;
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    name: input.name,
+    description: input.description,
+    url: `${SITE_URL}${input.path}`,
+    serviceType: input.serviceType,
+    provider: { "@id": `${SITE_URL}/#business` },
+    areaServed: areaServedByLocale.de,
+    availableLanguage: ["de", "ru", "uk"],
+  };
+}
+
 export function faqPageSchema(items: FaqItem[]) {
   return {
     "@context": "https://schema.org",

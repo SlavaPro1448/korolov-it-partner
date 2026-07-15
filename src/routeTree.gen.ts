@@ -10,9 +10,12 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WiderrufRouteImport } from './routes/widerruf'
+import { Route as WebsiteWartungLeverkusenRouteImport } from './routes/website-wartung-leverkusen'
+import { Route as WebdesignLeverkusenRouteImport } from './routes/webdesign-leverkusen'
 import { Route as UkRouteImport } from './routes/uk'
 import { Route as UaRouteImport } from './routes/ua'
 import { Route as RuRouteImport } from './routes/ru'
+import { Route as ItSupportLeverkusenRouteImport } from './routes/it-support-leverkusen'
 import { Route as ImpressumRouteImport } from './routes/impressum'
 import { Route as DatenschutzRouteImport } from './routes/datenschutz'
 import { Route as IndexRouteImport } from './routes/index'
@@ -20,6 +23,17 @@ import { Route as IndexRouteImport } from './routes/index'
 const WiderrufRoute = WiderrufRouteImport.update({
   id: '/widerruf',
   path: '/widerruf',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WebsiteWartungLeverkusenRoute =
+  WebsiteWartungLeverkusenRouteImport.update({
+    id: '/website-wartung-leverkusen',
+    path: '/website-wartung-leverkusen',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const WebdesignLeverkusenRoute = WebdesignLeverkusenRouteImport.update({
+  id: '/webdesign-leverkusen',
+  path: '/webdesign-leverkusen',
   getParentRoute: () => rootRouteImport,
 } as any)
 const UkRoute = UkRouteImport.update({
@@ -35,6 +49,11 @@ const UaRoute = UaRouteImport.update({
 const RuRoute = RuRouteImport.update({
   id: '/ru',
   path: '/ru',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ItSupportLeverkusenRoute = ItSupportLeverkusenRouteImport.update({
+  id: '/it-support-leverkusen',
+  path: '/it-support-leverkusen',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ImpressumRoute = ImpressumRouteImport.update({
@@ -57,18 +76,24 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/datenschutz': typeof DatenschutzRoute
   '/impressum': typeof ImpressumRoute
+  '/it-support-leverkusen': typeof ItSupportLeverkusenRoute
   '/ru': typeof RuRoute
   '/ua': typeof UaRoute
   '/uk': typeof UkRoute
+  '/webdesign-leverkusen': typeof WebdesignLeverkusenRoute
+  '/website-wartung-leverkusen': typeof WebsiteWartungLeverkusenRoute
   '/widerruf': typeof WiderrufRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/datenschutz': typeof DatenschutzRoute
   '/impressum': typeof ImpressumRoute
+  '/it-support-leverkusen': typeof ItSupportLeverkusenRoute
   '/ru': typeof RuRoute
   '/ua': typeof UaRoute
   '/uk': typeof UkRoute
+  '/webdesign-leverkusen': typeof WebdesignLeverkusenRoute
+  '/website-wartung-leverkusen': typeof WebsiteWartungLeverkusenRoute
   '/widerruf': typeof WiderrufRoute
 }
 export interface FileRoutesById {
@@ -76,9 +101,12 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/datenschutz': typeof DatenschutzRoute
   '/impressum': typeof ImpressumRoute
+  '/it-support-leverkusen': typeof ItSupportLeverkusenRoute
   '/ru': typeof RuRoute
   '/ua': typeof UaRoute
   '/uk': typeof UkRoute
+  '/webdesign-leverkusen': typeof WebdesignLeverkusenRoute
+  '/website-wartung-leverkusen': typeof WebsiteWartungLeverkusenRoute
   '/widerruf': typeof WiderrufRoute
 }
 export interface FileRouteTypes {
@@ -87,20 +115,36 @@ export interface FileRouteTypes {
     | '/'
     | '/datenschutz'
     | '/impressum'
+    | '/it-support-leverkusen'
     | '/ru'
     | '/ua'
     | '/uk'
+    | '/webdesign-leverkusen'
+    | '/website-wartung-leverkusen'
     | '/widerruf'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/datenschutz' | '/impressum' | '/ru' | '/ua' | '/uk' | '/widerruf'
+  to:
+    | '/'
+    | '/datenschutz'
+    | '/impressum'
+    | '/it-support-leverkusen'
+    | '/ru'
+    | '/ua'
+    | '/uk'
+    | '/webdesign-leverkusen'
+    | '/website-wartung-leverkusen'
+    | '/widerruf'
   id:
     | '__root__'
     | '/'
     | '/datenschutz'
     | '/impressum'
+    | '/it-support-leverkusen'
     | '/ru'
     | '/ua'
     | '/uk'
+    | '/webdesign-leverkusen'
+    | '/website-wartung-leverkusen'
     | '/widerruf'
   fileRoutesById: FileRoutesById
 }
@@ -108,9 +152,12 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DatenschutzRoute: typeof DatenschutzRoute
   ImpressumRoute: typeof ImpressumRoute
+  ItSupportLeverkusenRoute: typeof ItSupportLeverkusenRoute
   RuRoute: typeof RuRoute
   UaRoute: typeof UaRoute
   UkRoute: typeof UkRoute
+  WebdesignLeverkusenRoute: typeof WebdesignLeverkusenRoute
+  WebsiteWartungLeverkusenRoute: typeof WebsiteWartungLeverkusenRoute
   WiderrufRoute: typeof WiderrufRoute
 }
 
@@ -121,6 +168,20 @@ declare module '@tanstack/react-router' {
       path: '/widerruf'
       fullPath: '/widerruf'
       preLoaderRoute: typeof WiderrufRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/website-wartung-leverkusen': {
+      id: '/website-wartung-leverkusen'
+      path: '/website-wartung-leverkusen'
+      fullPath: '/website-wartung-leverkusen'
+      preLoaderRoute: typeof WebsiteWartungLeverkusenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/webdesign-leverkusen': {
+      id: '/webdesign-leverkusen'
+      path: '/webdesign-leverkusen'
+      fullPath: '/webdesign-leverkusen'
+      preLoaderRoute: typeof WebdesignLeverkusenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/uk': {
@@ -142,6 +203,13 @@ declare module '@tanstack/react-router' {
       path: '/ru'
       fullPath: '/ru'
       preLoaderRoute: typeof RuRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/it-support-leverkusen': {
+      id: '/it-support-leverkusen'
+      path: '/it-support-leverkusen'
+      fullPath: '/it-support-leverkusen'
+      preLoaderRoute: typeof ItSupportLeverkusenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/impressum': {
@@ -172,9 +240,12 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DatenschutzRoute: DatenschutzRoute,
   ImpressumRoute: ImpressumRoute,
+  ItSupportLeverkusenRoute: ItSupportLeverkusenRoute,
   RuRoute: RuRoute,
   UaRoute: UaRoute,
   UkRoute: UkRoute,
+  WebdesignLeverkusenRoute: WebdesignLeverkusenRoute,
+  WebsiteWartungLeverkusenRoute: WebsiteWartungLeverkusenRoute,
   WiderrufRoute: WiderrufRoute,
 }
 export const routeTree = rootRouteImport

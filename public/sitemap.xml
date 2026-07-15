@@ -30,6 +30,26 @@
     <priority>0.3</priority>
   </url>
 
+  <!-- Service landing pages -->
+  <url>
+    <loc>https://korolov-it-service.de/webdesign-leverkusen</loc>
+    <lastmod>2026-07-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://korolov-it-service.de/it-support-leverkusen</loc>
+    <lastmod>2026-07-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://korolov-it-service.de/website-wartung-leverkusen</loc>
+    <lastmod>2026-07-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
   <!-- Russian pages -->
   <url>
     <loc>https://korolov-it-service.de/ru</loc>

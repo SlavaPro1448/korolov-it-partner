@@ -40,6 +40,18 @@ const aria = {
   },
 } satisfies Record<Locale, Record<string, string>>;
 
+const serviceLinks: Array<{ label: string; to: string }> = [
+  { label: "Webdesign Leverkusen", to: "/webdesign-leverkusen" },
+  { label: "IT-Support Leverkusen", to: "/it-support-leverkusen" },
+  { label: "Website-Wartung & Pflege", to: "/website-wartung-leverkusen" },
+];
+
+const servicesHeadingByLocale: Record<Locale, string> = {
+  de: "Leistungen",
+  ru: "Услуги (DE)",
+  uk: "Послуги (DE)",
+};
+
 export function SiteFooter({ locale = "de" }: { locale?: Locale }) {
   const year = new Date().getFullYear();
   const t = aria[locale];
@@ -112,7 +124,21 @@ export function SiteFooter({ locale = "de" }: { locale?: Locale }) {
         </div>
 
         <div>
-          <h2 className="text-sm font-semibold mb-3">{t.legalHeading}</h2>
+          <h2 className="text-sm font-semibold mb-3">{servicesHeadingByLocale[locale]}</h2>
+          <ul className="space-y-2 text-sm text-white/85">
+            {serviceLinks.map((s) => (
+              <li key={s.to}>
+                <Link
+                  to={s.to}
+                  className="hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-blue rounded-sm"
+                >
+                  {s.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+
+          <h2 className="text-sm font-semibold mb-3 mt-8">{t.legalHeading}</h2>
           <ul className="space-y-2 text-sm text-white/85">
             <li>
               <Link
