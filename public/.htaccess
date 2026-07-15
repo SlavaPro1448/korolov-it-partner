@@ -74,7 +74,12 @@ Options -MultiViews
   RewriteCond %{REQUEST_FILENAME} -d
   RewriteRule ^ - [L]
 
-  # Skip API
+  # API: echte Dateien durchlassen, alles andere hart auf 404
+  # (verhindert auch "300 Multiple Choices" durch MultiViews — IONOS
+  # ignoriert "Options -MultiViews" aus .htaccess)
+  RewriteCond %{REQUEST_URI} ^/api/
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteRule ^ - [R=404,L]
   RewriteRule ^api/ - [L]
 
   # Everything else → index.html
