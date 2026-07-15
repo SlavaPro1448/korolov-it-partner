@@ -82,6 +82,12 @@ Options -MultiViews
   RewriteRule ^ - [R=404,L]
   RewriteRule ^api/ - [L]
 
+  # Prerender-Snapshots: /ru → /ru.html usw. (vom Build erzeugt)
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI}.html -f
+  RewriteRule ^(.+)$ $1.html [L]
+
   # Everything else → index.html
   RewriteRule ^ index.html [L]
 </IfModule>

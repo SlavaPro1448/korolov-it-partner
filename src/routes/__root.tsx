@@ -54,10 +54,10 @@ function RootComponent() {
   }, [pathname]);
 
   useEffect(() => {
-    // Statische Fallback-Metas aus index.html entfernen, sobald die Router-Metas
-    // aktiv sind — sonst sehen Crawler doppelte (deutsche) og:/description-Tags.
+    // Statische Fallback-Tags (index.html) und Prerender-Snapshots entfernen,
+    // sobald die Router-Metas aktiv sind — sonst sehen Crawler doppelte Tags.
     if (typeof document === "undefined") return;
-    document.querySelectorAll("meta[data-static-head]").forEach((el) => el.remove());
+    document.querySelectorAll("[data-static-head]").forEach((el) => el.remove());
   }, []);
 
   useEffect(() => {
