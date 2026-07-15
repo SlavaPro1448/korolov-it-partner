@@ -1,6 +1,6 @@
 import { createFileRoute, lazyRouteComponent } from "@tanstack/react-router";
 
-import { buildSeoMeta } from "@/lib/seo";
+import { buildCanonicalLink, buildSeoMeta } from "@/lib/seo";
 
 export const Route = createFileRoute("/datenschutz")({
   head: () => ({
@@ -10,6 +10,7 @@ export const Route = createFileRoute("/datenschutz")({
       path: "/datenschutz",
       locale: "de",
     }),
+    links: [buildCanonicalLink("/datenschutz")],
   }),
   component: lazyRouteComponent(() => import("@/components/legal/DatenschutzPage")),
 });

@@ -1,4 +1,4 @@
-import { Outlet, Link, createRootRoute, useRouterState } from "@tanstack/react-router";
+import { HeadContent, Outlet, Link, createRootRoute, useRouterState } from "@tanstack/react-router";
 import { useEffect } from "react";
 
 import appCss from "../styles.css?url";
@@ -52,6 +52,13 @@ function RootComponent() {
     if (typeof document === "undefined") return;
     document.documentElement.lang = getLangAttr(pathname);
   }, [pathname]);
+
+  useEffect(() => {
+    // Statische Fallback-Metas aus index.html entfernen, sobald die Router-Metas
+    // aktiv sind — sonst sehen Crawler doppelte (deutsche) og:/description-Tags.
+    if (typeof document === "undefined") return;
+    document.querySelectorAll("meta[data-static-head]").forEach((el) => el.remove());
+  }, []);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -121,6 +128,7 @@ function RootComponent() {
 
   return (
     <>
+      <HeadContent />
       <a href="#main" className="skip-link">
         {getSkipLinkLabel(pathname)}
       </a>

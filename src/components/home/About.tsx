@@ -64,9 +64,11 @@ export function About({ locale }: { locale: Locale }) {
               </div>
               <div className="w-24 sm:w-28 aspect-[4/5] rounded-2xl overflow-hidden shadow-sm shrink-0">
                 <img
-                  src="/images/viacheslav-portrait-v4.jpeg"
+                  src="/images/viacheslav-portrait-v4.webp"
                   alt="Viacheslav Korolov – Inhaber Korolov IT-Service"
                   loading="lazy"
+                  width={448}
+                  height={559}
                   className="h-full w-full object-cover object-center"
                 />
               </div>

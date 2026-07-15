@@ -1,6 +1,6 @@
 import { createFileRoute, lazyRouteComponent } from "@tanstack/react-router";
 
-import { buildSeoMeta } from "@/lib/seo";
+import { buildCanonicalLink, buildSeoMeta } from "@/lib/seo";
 
 export const Route = createFileRoute("/widerruf")({
   head: () => ({
@@ -10,6 +10,7 @@ export const Route = createFileRoute("/widerruf")({
       path: "/widerruf",
       locale: "de",
     }),
+    links: [buildCanonicalLink("/widerruf")],
   }),
   component: lazyRouteComponent(() => import("@/components/legal/WiderrufPage")),
 });

@@ -1,6 +1,6 @@
 import { createFileRoute, lazyRouteComponent } from "@tanstack/react-router";
 
-import { buildSeoMeta } from "@/lib/seo";
+import { buildCanonicalLink, buildSeoMeta } from "@/lib/seo";
 
 export const Route = createFileRoute("/impressum")({
   head: () => ({
@@ -10,6 +10,7 @@ export const Route = createFileRoute("/impressum")({
       path: "/impressum",
       locale: "de",
     }),
+    links: [buildCanonicalLink("/impressum")],
   }),
   component: lazyRouteComponent(() => import("@/components/legal/ImpressumPage")),
 });

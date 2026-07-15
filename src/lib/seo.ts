@@ -49,7 +49,6 @@ export function buildSeoMeta(config: SeoConfig) {
     { title: config.title },
     { name: "description", content: config.description },
     ...(config.keywords ? [{ name: "keywords", content: config.keywords }] : []),
-    { rel: "canonical", href: canonicalUrl },
     { property: "og:title", content: config.title },
     { property: "og:description", content: config.description },
     { property: "og:url", content: canonicalUrl },
@@ -64,6 +63,14 @@ export function buildSeoMeta(config: SeoConfig) {
     { name: "twitter:image", content: ogImageUrl },
     ...(config.noindex ? [{ name: "robots", content: "noindex" }] : []),
   ];
+}
+
+/**
+ * Canonical gehört in `links`, nicht in `meta` — sonst rendert
+ * TanStack Router keinen <link>-Tag.
+ */
+export function buildCanonicalLink(path: string) {
+  return { rel: "canonical", href: toAbsoluteUrl(path) };
 }
 
 /**

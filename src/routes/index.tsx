@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import { HomePage } from "@/components/home/HomePage";
-import { buildHreflangLinks, buildSeoMeta } from "@/lib/seo";
+import { buildCanonicalLink, buildHreflangLinks, buildSeoMeta } from "@/lib/seo";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -14,7 +14,7 @@ export const Route = createFileRoute("/")({
       keywords:
         "IT-Service Leverkusen, Website erstellen, IT-Support NRW, E-Mail Hosting, digitale Organisation",
     }),
-    links: buildHreflangLinks(),
+    links: [buildCanonicalLink("/"), ...buildHreflangLinks()],
   }),
   component: () => <HomePage locale="de" />,
 });

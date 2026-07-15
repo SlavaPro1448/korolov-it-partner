@@ -417,7 +417,12 @@ foreach ($requiredEnvKeys as $key) {
     }
 }
 
-$debugMode = isset($_GET['debug']) && $_GET['debug'] === '1';
+// Debug nur mit geheimem Token (DEBUG_TOKEN in runtime-config.php/.env setzen).
+// Ohne konfiguriertes Token ist der Debug-Modus vollständig deaktiviert.
+$debugToken = configValue('DEBUG_TOKEN');
+$debugMode = $debugToken !== null
+    && isset($_GET['debug'])
+    && hash_equals($debugToken, (string) $_GET['debug']);
 $requestMethod = (string) ($_SERVER['REQUEST_METHOD'] ?? '');
 $baseDebug = [
     'method' => $requestMethod,
@@ -483,7 +488,11 @@ try {
         respond(400, false, 'Ungültige Anfrage.', ['error_code' => 'INVALID_REQUEST']);
     }
 
-    if (($data['debug'] ?? false) === true) {
+    if (
+        $debugToken !== null
+        && is_string($data['debug'] ?? null)
+        && hash_equals($debugToken, (string) $data['debug'])
+    ) {
         $debugMode = true;
     }
 
