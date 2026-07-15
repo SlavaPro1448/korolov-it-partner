@@ -82,10 +82,12 @@ Options -MultiViews
   RewriteRule ^ - [R=404,L]
   RewriteRule ^api/ - [L]
 
-  # Prerender-Snapshots: /ru → /ru.html usw. (vom Build erzeugt)
+  # Prerender-Snapshots: /ru → /ru.html usw. (vom Build erzeugt).
+  # REQUEST_FILENAME statt DOCUMENT_ROOT: IONOS mappt das Webroot über
+  # einen /kunden/-Symlink, wodurch DOCUMENT_ROOT-basierte -f-Tests fehlschlagen.
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
-  RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI}.html -f
+  RewriteCond %{REQUEST_FILENAME}.html -f
   RewriteRule ^(.+)$ $1.html [L]
 
   # Everything else → index.html
