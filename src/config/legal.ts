@@ -24,9 +24,9 @@ export const COMPANY = {
   countryCode: "DE",
 
   email: "info@korolov-it-service.de",
-  phoneDisplay: "+49 1516 3825 1736",
-  phoneHref: "tel:+4915163251736",
-  whatsappHref: "https://wa.me/4915163251736",
+  phoneDisplay: "+49 163 825 1736",
+  phoneHref: "tel:+491638251736",
+  whatsappHref: "https://wa.me/491638251736",
 
   // Налоговые данные (Kleinunternehmer — без USt-IdNr.)
   ustId: null as string | null,
