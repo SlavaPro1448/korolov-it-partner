@@ -8,6 +8,8 @@ type SeoConfig = {
   type?: "website";
   noindex?: boolean;
   keywords?: string;
+  /** Nur für Seiten mit Sprachvarianten (Startseiten): og:locale:alternate für die anderen Sprachen. */
+  localeAlternates?: boolean;
 };
 
 const SITE_URL = "https://korolov-it-service.de";
@@ -57,6 +59,11 @@ export function buildSeoMeta(config: SeoConfig) {
     { property: "og:image:width", content: "1200" },
     { property: "og:image:height", content: "630" },
     { property: "og:locale", content: ogLocale },
+    ...(config.localeAlternates
+      ? (Object.keys(OG_LOCALE_BY_LOCALE) as SeoLocale[])
+          .filter((l) => l !== config.locale)
+          .map((l) => ({ property: "og:locale:alternate", content: OG_LOCALE_BY_LOCALE[l] }))
+      : []),
     { name: "twitter:card", content: "summary_large_image" },
     { name: "twitter:title", content: config.title },
     { name: "twitter:description", content: config.description },

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, type MouseEvent } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { Menu, X, Languages } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -159,6 +159,13 @@ export function SiteHeader({
     });
   };
 
+  // Echte <a>-Links (crawlbar für hreflang-Discovery); Klick läuft trotzdem
+  // über switchLang, damit die Scroll-Position erhalten bleibt.
+  const langClick = (to: "/" | "/ru" | "/uk") => (e: MouseEvent) => {
+    e.preventDefault();
+    switchLang(to);
+  };
+
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
     onScroll();
@@ -254,8 +261,11 @@ export function SiteHeader({
             aria-label={langCopy.group}
           >
             <Languages className="h-3.5 w-3.5" aria-hidden="true" />
-            <button
-              onClick={() => switchLang("/")}
+            <a
+              href="/"
+              hrefLang="de"
+              lang="de"
+              onClick={langClick("/")}
               aria-label={langCopy.de}
               aria-current={locale === "de" ? "true" : undefined}
               className={`rounded-md px-2 py-1 text-sm transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-blue ${
@@ -265,9 +275,12 @@ export function SiteHeader({
               }`}
             >
               DE
-            </button>
-            <button
-              onClick={() => switchLang("/ru")}
+            </a>
+            <a
+              href="/ru"
+              hrefLang="ru"
+              lang="ru"
+              onClick={langClick("/ru")}
               aria-label={langCopy.ru}
               aria-current={locale === "ru" ? "true" : undefined}
               className={`rounded-md px-2 py-1 text-sm transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-blue ${
@@ -277,9 +290,12 @@ export function SiteHeader({
               }`}
             >
               RU
-            </button>
-            <button
-              onClick={() => switchLang("/uk")}
+            </a>
+            <a
+              href="/uk"
+              hrefLang="uk"
+              lang="uk"
+              onClick={langClick("/uk")}
               aria-label={langCopy.uk}
               aria-current={locale === "uk" ? "true" : undefined}
               className={`rounded-md px-2 py-1 text-sm transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-blue ${
@@ -289,7 +305,7 @@ export function SiteHeader({
               }`}
             >
               UA
-            </button>
+            </a>
           </div>
           <Button asChild variant="brand" size="sm">
             <a href={`${basePath}#kontakt`}>{cta}</a>
@@ -366,8 +382,11 @@ export function SiteHeader({
               role="group"
               aria-label={langCopy.group}
             >
-              <button
-                onClick={() => switchLang("/")}
+              <a
+                href="/"
+                hrefLang="de"
+                lang="de"
+                onClick={langClick("/")}
                 aria-label={langCopy.de}
                 aria-current={locale === "de" ? "true" : undefined}
                 className={`rounded-md px-3 py-2 text-sm border transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-blue ${
@@ -377,9 +396,12 @@ export function SiteHeader({
                 }`}
               >
                 Deutsch
-              </button>
-              <button
-                onClick={() => switchLang("/ru")}
+              </a>
+              <a
+                href="/ru"
+                hrefLang="ru"
+                lang="ru"
+                onClick={langClick("/ru")}
                 aria-label={langCopy.ru}
                 aria-current={locale === "ru" ? "true" : undefined}
                 className={`rounded-md px-3 py-2 text-sm border transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-blue ${
@@ -389,9 +411,12 @@ export function SiteHeader({
                 }`}
               >
                 Русский
-              </button>
-              <button
-                onClick={() => switchLang("/uk")}
+              </a>
+              <a
+                href="/uk"
+                hrefLang="uk"
+                lang="uk"
+                onClick={langClick("/uk")}
                 aria-label={langCopy.uk}
                 aria-current={locale === "uk" ? "true" : undefined}
                 className={`rounded-md px-3 py-2 text-sm border transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-blue ${
@@ -401,7 +426,7 @@ export function SiteHeader({
                 }`}
               >
                 Українська
-              </button>
+              </a>
             </div>
             <Button asChild variant="brand" className="mt-3">
               <a href={`${basePath}#kontakt`} onClick={() => setOpen(false)}>

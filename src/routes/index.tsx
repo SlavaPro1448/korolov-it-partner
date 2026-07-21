@@ -11,6 +11,7 @@ export const Route = createFileRoute("/")({
         "IT-Service in Leverkusen: IT-Betreuung, Support, Beratung und Websites für kleine Unternehmen. Persönlicher Ansprechpartner, faire Preise, vor Ort & remote.",
       path: "/",
       locale: "de",
+      localeAlternates: true,
       keywords:
         "IT-Service Leverkusen, IT-Betreuung kleine Unternehmen, IT-Support Leverkusen, IT-Beratung Leverkusen, Webdesign Leverkusen",
     }),

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
         http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
@@ -10,6 +11,10 @@
     <lastmod>2026-07-21</lastmod>
     <changefreq>monthly</changefreq>
     <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="de" href="https://korolov-it-service.de/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://korolov-it-service.de/ru"/>
+    <xhtml:link rel="alternate" hreflang="uk" href="https://korolov-it-service.de/uk"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://korolov-it-service.de/"/>
   </url>
   <url>
     <loc>https://korolov-it-service.de/impressum</loc>
@@ -83,17 +88,25 @@
   <!-- Russian pages -->
   <url>
     <loc>https://korolov-it-service.de/ru</loc>
-    <lastmod>2026-07-15</lastmod>
+    <lastmod>2026-07-21</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="de" href="https://korolov-it-service.de/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://korolov-it-service.de/ru"/>
+    <xhtml:link rel="alternate" hreflang="uk" href="https://korolov-it-service.de/uk"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://korolov-it-service.de/"/>
   </url>
 
   <!-- Ukrainian pages -->
   <url>
     <loc>https://korolov-it-service.de/uk</loc>
-    <lastmod>2026-07-15</lastmod>
+    <lastmod>2026-07-21</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="de" href="https://korolov-it-service.de/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://korolov-it-service.de/ru"/>
+    <xhtml:link rel="alternate" hreflang="uk" href="https://korolov-it-service.de/uk"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://korolov-it-service.de/"/>
   </url>
 
 </urlset>

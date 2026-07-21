@@ -11,6 +11,7 @@ export const Route = createFileRoute("/ru")({
         "Korolov IT-Service помогает малому бизнесу в Leverkusen, Köln и NRW с сайтами, почтой, хостингом, IT-поддержкой и цифровой организацией.",
       path: "/ru",
       locale: "ru",
+      localeAlternates: true,
       keywords:
         "IT-сервис Леверкузен, создание сайтов, IT-поддержка NRW, хостинг почты, цифровая организация",
     }),
