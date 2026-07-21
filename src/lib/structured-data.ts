@@ -17,23 +17,41 @@ const SITE_URL = "https://korolov-it-service.de";
 const areaServedByLocale: Record<SupportedLocale, Array<{ "@type": string; name: string }>> = {
   de: [
     { "@type": "City", name: "Leverkusen" },
-    { "@type": "City", name: "Koeln" },
+    { "@type": "City", name: "Köln" },
+    { "@type": "City", name: "Leichlingen" },
+    { "@type": "City", name: "Burscheid" },
+    { "@type": "City", name: "Bergisch Gladbach" },
+    { "@type": "City", name: "Monheim am Rhein" },
+    { "@type": "City", name: "Langenfeld" },
     { "@type": "AdministrativeArea", name: "Nordrhein-Westfalen" },
   ],
   ru: [
     { "@type": "City", name: "Леверкузен" },
-    { "@type": "City", name: "Кельн" },
+    { "@type": "City", name: "Кёльн" },
+    { "@type": "City", name: "Лайхлинген" },
+    { "@type": "City", name: "Буршайд" },
+    { "@type": "City", name: "Бергиш-Гладбах" },
+    { "@type": "City", name: "Монхайм-на-Рейне" },
+    { "@type": "City", name: "Лангенфельд" },
     { "@type": "AdministrativeArea", name: "Северный Рейн-Вестфалия" },
   ],
   uk: [
     { "@type": "City", name: "Леверкузен" },
     { "@type": "City", name: "Кельн" },
+    { "@type": "City", name: "Ляйхлінген" },
+    { "@type": "City", name: "Буршайд" },
+    { "@type": "City", name: "Бергіш-Гладбах" },
+    { "@type": "City", name: "Монгайм-на-Рейні" },
+    { "@type": "City", name: "Лангенфельд" },
     { "@type": "AdministrativeArea", name: "Північний Рейн-Вестфалія" },
   ],
 };
 
+// Google Business Profile (Knowledge-Graph-ID, стабильная форма без сессионных параметров).
+const SAME_AS = ["https://www.google.com/search?kgmid=/g/11zbfj169z&q=Korolov+IT+Service"];
+
 const descriptionByLocale: Record<SupportedLocale, string> = {
-  de: "Korolov IT-Service unterstuetzt kleine Unternehmen bei Websites, E-Mail, Hosting und IT-Support in NRW.",
+  de: "Korolov IT-Service unterstützt kleine Unternehmen bei Websites, E-Mail, Hosting und IT-Support in NRW.",
   ru: "Korolov IT-Service помогает малому бизнесу с сайтами, почтой, хостингом и IT-поддержкой в NRW.",
   uk: "Korolov IT-Service допомагає малому бізнесу із сайтами, поштою, хостингом та IT-підтримкою в NRW.",
 };
@@ -63,6 +81,7 @@ export function localBusinessSchema(locale: SupportedLocale = "de") {
       longitude: 7.0192,
     },
     areaServed: areaServedByLocale[locale],
+    sameAs: SAME_AS,
     founder: {
       "@type": "Person",
       name: "Viacheslav Korolov",
@@ -102,11 +121,7 @@ export function organizationSchema(locale: SupportedLocale = "de") {
       addressCountry: "DE",
     },
     areaServed: areaServedByLocale[locale],
-    sameAs: [
-      // Добавьте ссылки на социальные сети, если есть, например:
-      // "https://www.facebook.com/korolovitservice",
-      // "https://www.linkedin.com/company/korolov-it-service"
-    ],
+    sameAs: SAME_AS,
   };
 }
 
@@ -159,6 +174,20 @@ export function webSiteSchema(locale: SupportedLocale = "de") {
     publisher: {
       "@id": `${SITE_URL}/#organization`,
     },
+  };
+}
+
+export function itemListSchema(items: Array<{ name: string; description?: string; url?: string }>) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    itemListElement: items.map((item, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: item.name,
+      ...(item.description ? { description: item.description } : {}),
+      ...(item.url ? { url: item.url } : {}),
+    })),
   };
 }
 

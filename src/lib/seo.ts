@@ -79,14 +79,15 @@ export function buildCanonicalLink(path: string) {
 export function buildHreflangLinks(subpath: string = "") {
   const locales: SeoLocale[] = ["de", "ru", "uk"];
   const normalized = subpath === "/" ? "" : subpath;
+  // React-DOM-Property heißt hrefLang; im HTML wird daraus das Attribut hreflang.
   const links = locales.map((locale) => ({
     rel: "alternate",
-    hreflang: HREFLANG_BY_LOCALE[locale],
+    hrefLang: HREFLANG_BY_LOCALE[locale],
     href: toAbsoluteUrl(`${URL_PREFIX_BY_LOCALE[locale]}${normalized}` || "/"),
   }));
   links.push({
     rel: "alternate",
-    hreflang: "x-default",
+    hrefLang: "x-default",
     href: toAbsoluteUrl(normalized || "/"),
   });
   return links;

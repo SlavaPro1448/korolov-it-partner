@@ -12,10 +12,15 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as WiderrufRouteImport } from './routes/widerruf'
 import { Route as WebsiteWartungLeverkusenRouteImport } from './routes/website-wartung-leverkusen'
 import { Route as WebdesignLeverkusenRouteImport } from './routes/webdesign-leverkusen'
+import { Route as WartungsvertragItRouteImport } from './routes/wartungsvertrag-it'
 import { Route as UkRouteImport } from './routes/uk'
 import { Route as UaRouteImport } from './routes/ua'
 import { Route as RuRouteImport } from './routes/ru'
+import { Route as ReferenzenRouteImport } from './routes/referenzen'
 import { Route as ItSupportLeverkusenRouteImport } from './routes/it-support-leverkusen'
+import { Route as ItServiceLeverkusenRouteImport } from './routes/it-service-leverkusen'
+import { Route as ItBetreuungKleineUnternehmenRouteImport } from './routes/it-betreuung-kleine-unternehmen'
+import { Route as ItBeratungLeverkusenRouteImport } from './routes/it-beratung-leverkusen'
 import { Route as ImpressumRouteImport } from './routes/impressum'
 import { Route as DatenschutzRouteImport } from './routes/datenschutz'
 import { Route as IndexRouteImport } from './routes/index'
@@ -36,6 +41,11 @@ const WebdesignLeverkusenRoute = WebdesignLeverkusenRouteImport.update({
   path: '/webdesign-leverkusen',
   getParentRoute: () => rootRouteImport,
 } as any)
+const WartungsvertragItRoute = WartungsvertragItRouteImport.update({
+  id: '/wartungsvertrag-it',
+  path: '/wartungsvertrag-it',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const UkRoute = UkRouteImport.update({
   id: '/uk',
   path: '/uk',
@@ -51,9 +61,30 @@ const RuRoute = RuRouteImport.update({
   path: '/ru',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ReferenzenRoute = ReferenzenRouteImport.update({
+  id: '/referenzen',
+  path: '/referenzen',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ItSupportLeverkusenRoute = ItSupportLeverkusenRouteImport.update({
   id: '/it-support-leverkusen',
   path: '/it-support-leverkusen',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ItServiceLeverkusenRoute = ItServiceLeverkusenRouteImport.update({
+  id: '/it-service-leverkusen',
+  path: '/it-service-leverkusen',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ItBetreuungKleineUnternehmenRoute =
+  ItBetreuungKleineUnternehmenRouteImport.update({
+    id: '/it-betreuung-kleine-unternehmen',
+    path: '/it-betreuung-kleine-unternehmen',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ItBeratungLeverkusenRoute = ItBeratungLeverkusenRouteImport.update({
+  id: '/it-beratung-leverkusen',
+  path: '/it-beratung-leverkusen',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ImpressumRoute = ImpressumRouteImport.update({
@@ -76,10 +107,15 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/datenschutz': typeof DatenschutzRoute
   '/impressum': typeof ImpressumRoute
+  '/it-beratung-leverkusen': typeof ItBeratungLeverkusenRoute
+  '/it-betreuung-kleine-unternehmen': typeof ItBetreuungKleineUnternehmenRoute
+  '/it-service-leverkusen': typeof ItServiceLeverkusenRoute
   '/it-support-leverkusen': typeof ItSupportLeverkusenRoute
+  '/referenzen': typeof ReferenzenRoute
   '/ru': typeof RuRoute
   '/ua': typeof UaRoute
   '/uk': typeof UkRoute
+  '/wartungsvertrag-it': typeof WartungsvertragItRoute
   '/webdesign-leverkusen': typeof WebdesignLeverkusenRoute
   '/website-wartung-leverkusen': typeof WebsiteWartungLeverkusenRoute
   '/widerruf': typeof WiderrufRoute
@@ -88,10 +124,15 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/datenschutz': typeof DatenschutzRoute
   '/impressum': typeof ImpressumRoute
+  '/it-beratung-leverkusen': typeof ItBeratungLeverkusenRoute
+  '/it-betreuung-kleine-unternehmen': typeof ItBetreuungKleineUnternehmenRoute
+  '/it-service-leverkusen': typeof ItServiceLeverkusenRoute
   '/it-support-leverkusen': typeof ItSupportLeverkusenRoute
+  '/referenzen': typeof ReferenzenRoute
   '/ru': typeof RuRoute
   '/ua': typeof UaRoute
   '/uk': typeof UkRoute
+  '/wartungsvertrag-it': typeof WartungsvertragItRoute
   '/webdesign-leverkusen': typeof WebdesignLeverkusenRoute
   '/website-wartung-leverkusen': typeof WebsiteWartungLeverkusenRoute
   '/widerruf': typeof WiderrufRoute
@@ -101,10 +142,15 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/datenschutz': typeof DatenschutzRoute
   '/impressum': typeof ImpressumRoute
+  '/it-beratung-leverkusen': typeof ItBeratungLeverkusenRoute
+  '/it-betreuung-kleine-unternehmen': typeof ItBetreuungKleineUnternehmenRoute
+  '/it-service-leverkusen': typeof ItServiceLeverkusenRoute
   '/it-support-leverkusen': typeof ItSupportLeverkusenRoute
+  '/referenzen': typeof ReferenzenRoute
   '/ru': typeof RuRoute
   '/ua': typeof UaRoute
   '/uk': typeof UkRoute
+  '/wartungsvertrag-it': typeof WartungsvertragItRoute
   '/webdesign-leverkusen': typeof WebdesignLeverkusenRoute
   '/website-wartung-leverkusen': typeof WebsiteWartungLeverkusenRoute
   '/widerruf': typeof WiderrufRoute
@@ -115,10 +161,15 @@ export interface FileRouteTypes {
     | '/'
     | '/datenschutz'
     | '/impressum'
+    | '/it-beratung-leverkusen'
+    | '/it-betreuung-kleine-unternehmen'
+    | '/it-service-leverkusen'
     | '/it-support-leverkusen'
+    | '/referenzen'
     | '/ru'
     | '/ua'
     | '/uk'
+    | '/wartungsvertrag-it'
     | '/webdesign-leverkusen'
     | '/website-wartung-leverkusen'
     | '/widerruf'
@@ -127,10 +178,15 @@ export interface FileRouteTypes {
     | '/'
     | '/datenschutz'
     | '/impressum'
+    | '/it-beratung-leverkusen'
+    | '/it-betreuung-kleine-unternehmen'
+    | '/it-service-leverkusen'
     | '/it-support-leverkusen'
+    | '/referenzen'
     | '/ru'
     | '/ua'
     | '/uk'
+    | '/wartungsvertrag-it'
     | '/webdesign-leverkusen'
     | '/website-wartung-leverkusen'
     | '/widerruf'
@@ -139,10 +195,15 @@ export interface FileRouteTypes {
     | '/'
     | '/datenschutz'
     | '/impressum'
+    | '/it-beratung-leverkusen'
+    | '/it-betreuung-kleine-unternehmen'
+    | '/it-service-leverkusen'
     | '/it-support-leverkusen'
+    | '/referenzen'
     | '/ru'
     | '/ua'
     | '/uk'
+    | '/wartungsvertrag-it'
     | '/webdesign-leverkusen'
     | '/website-wartung-leverkusen'
     | '/widerruf'
@@ -152,10 +213,15 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DatenschutzRoute: typeof DatenschutzRoute
   ImpressumRoute: typeof ImpressumRoute
+  ItBeratungLeverkusenRoute: typeof ItBeratungLeverkusenRoute
+  ItBetreuungKleineUnternehmenRoute: typeof ItBetreuungKleineUnternehmenRoute
+  ItServiceLeverkusenRoute: typeof ItServiceLeverkusenRoute
   ItSupportLeverkusenRoute: typeof ItSupportLeverkusenRoute
+  ReferenzenRoute: typeof ReferenzenRoute
   RuRoute: typeof RuRoute
   UaRoute: typeof UaRoute
   UkRoute: typeof UkRoute
+  WartungsvertragItRoute: typeof WartungsvertragItRoute
   WebdesignLeverkusenRoute: typeof WebdesignLeverkusenRoute
   WebsiteWartungLeverkusenRoute: typeof WebsiteWartungLeverkusenRoute
   WiderrufRoute: typeof WiderrufRoute
@@ -184,6 +250,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WebdesignLeverkusenRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/wartungsvertrag-it': {
+      id: '/wartungsvertrag-it'
+      path: '/wartungsvertrag-it'
+      fullPath: '/wartungsvertrag-it'
+      preLoaderRoute: typeof WartungsvertragItRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/uk': {
       id: '/uk'
       path: '/uk'
@@ -205,11 +278,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RuRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/referenzen': {
+      id: '/referenzen'
+      path: '/referenzen'
+      fullPath: '/referenzen'
+      preLoaderRoute: typeof ReferenzenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/it-support-leverkusen': {
       id: '/it-support-leverkusen'
       path: '/it-support-leverkusen'
       fullPath: '/it-support-leverkusen'
       preLoaderRoute: typeof ItSupportLeverkusenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/it-service-leverkusen': {
+      id: '/it-service-leverkusen'
+      path: '/it-service-leverkusen'
+      fullPath: '/it-service-leverkusen'
+      preLoaderRoute: typeof ItServiceLeverkusenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/it-betreuung-kleine-unternehmen': {
+      id: '/it-betreuung-kleine-unternehmen'
+      path: '/it-betreuung-kleine-unternehmen'
+      fullPath: '/it-betreuung-kleine-unternehmen'
+      preLoaderRoute: typeof ItBetreuungKleineUnternehmenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/it-beratung-leverkusen': {
+      id: '/it-beratung-leverkusen'
+      path: '/it-beratung-leverkusen'
+      fullPath: '/it-beratung-leverkusen'
+      preLoaderRoute: typeof ItBeratungLeverkusenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/impressum': {
@@ -240,10 +341,15 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DatenschutzRoute: DatenschutzRoute,
   ImpressumRoute: ImpressumRoute,
+  ItBeratungLeverkusenRoute: ItBeratungLeverkusenRoute,
+  ItBetreuungKleineUnternehmenRoute: ItBetreuungKleineUnternehmenRoute,
+  ItServiceLeverkusenRoute: ItServiceLeverkusenRoute,
   ItSupportLeverkusenRoute: ItSupportLeverkusenRoute,
+  ReferenzenRoute: ReferenzenRoute,
   RuRoute: RuRoute,
   UaRoute: UaRoute,
   UkRoute: UkRoute,
+  WartungsvertragItRoute: WartungsvertragItRoute,
   WebdesignLeverkusenRoute: WebdesignLeverkusenRoute,
   WebsiteWartungLeverkusenRoute: WebsiteWartungLeverkusenRoute,
   WiderrufRoute: WiderrufRoute,

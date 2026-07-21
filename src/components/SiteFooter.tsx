@@ -41,9 +41,14 @@ const aria = {
 } satisfies Record<Locale, Record<string, string>>;
 
 const serviceLinks: Array<{ label: string; to: string }> = [
-  { label: "Webdesign Leverkusen", to: "/webdesign-leverkusen" },
+  { label: "IT-Service Leverkusen", to: "/it-service-leverkusen" },
+  { label: "IT-Betreuung für kleine Unternehmen", to: "/it-betreuung-kleine-unternehmen" },
   { label: "IT-Support Leverkusen", to: "/it-support-leverkusen" },
+  { label: "IT-Beratung Leverkusen", to: "/it-beratung-leverkusen" },
+  { label: "IT-Wartungsvertrag", to: "/wartungsvertrag-it" },
+  { label: "Webdesign Leverkusen", to: "/webdesign-leverkusen" },
   { label: "Website-Wartung & Pflege", to: "/website-wartung-leverkusen" },
+  { label: "Referenzen", to: "/referenzen" },
 ];
 
 const servicesHeadingByLocale: Record<Locale, string> = {
@@ -116,9 +121,15 @@ export function SiteFooter({ locale = "de" }: { locale?: Locale }) {
                 WhatsApp
               </a>
             </li>
-            <li className="flex items-center gap-2">
-              <MapPin className="h-4 w-4" aria-hidden="true" />
-              <span>Leverkusen, NRW</span>
+            <li className="flex items-start gap-2">
+              <MapPin className="h-4 w-4 mt-0.5 shrink-0" aria-hidden="true" />
+              <span>
+                {COMPANY.tradeName}
+                <br />
+                {COMPANY.street}
+                <br />
+                {COMPANY.zip} {COMPANY.city}
+              </span>
             </li>
           </ul>
         </div>

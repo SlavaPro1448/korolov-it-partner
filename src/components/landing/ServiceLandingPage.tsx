@@ -1,9 +1,11 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, Check, ChevronRight } from "lucide-react";
+import { ArrowRight, Check, ChevronRight, Mail, Phone } from "lucide-react";
 
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { LandingContactForm } from "@/components/landing/LandingContactForm";
+import { COMPANY } from "@/config/legal";
 import { Button } from "@/components/ui/button";
 import {
   Accordion,
@@ -96,6 +98,17 @@ export function ServiceLandingPage({ content }: { content: LandingContent }) {
                 <a href="/#preise">Pakete & Preise ansehen</a>
               </Button>
             </div>
+            <p className="mt-5 text-sm text-muted-foreground">
+              Oder rufen Sie direkt an:{" "}
+              <a
+                href={COMPANY.phoneHref}
+                className="inline-flex items-center gap-1.5 font-medium text-foreground hover:text-accent-blue transition-colors"
+                aria-label="Korolov IT-Service anrufen"
+              >
+                <Phone className="h-4 w-4" aria-hidden="true" />
+                {COMPANY.phoneDisplay}
+              </a>
+            </p>
           </div>
         </section>
 
@@ -155,12 +168,15 @@ export function ServiceLandingPage({ content }: { content: LandingContent }) {
         </section>
 
         {/* Price anchor */}
-        <section className="py-14 md:py-20 bg-section" aria-labelledby="landing-price">
+        <section className="py-14 md:py-20 bg-section" aria-labelledby="landing-price-heading">
           <div className="container-page max-w-3xl">
             <div className="card-soft p-8 text-center">
-              <p className="text-sm font-medium text-accent-blue uppercase tracking-wider">
+              <h2
+                id="landing-price-heading"
+                className="text-sm font-medium text-accent-blue uppercase tracking-wider"
+              >
                 {content.price.label}
-              </p>
+              </h2>
               <p id="landing-price" className="mt-3 text-4xl font-bold text-brand">
                 {content.price.value}
                 <span className="ml-2 text-base font-normal text-muted-foreground">
@@ -221,7 +237,9 @@ export function ServiceLandingPage({ content }: { content: LandingContent }) {
                   <AccordionTrigger className="text-left font-medium text-brand hover:no-underline">
                     {f.question}
                   </AccordionTrigger>
-                  <AccordionContent className="text-muted-foreground leading-relaxed">
+                  {/* forceMount: Antworten bleiben im DOM (SEO/FAQPage-Konsistenz); Radix
+                      blendet geschlossene Panels über das hidden-Attribut aus. */}
+                  <AccordionContent forceMount className="text-muted-foreground leading-relaxed">
                     {f.answer}
                   </AccordionContent>
                 </AccordionItem>
@@ -239,18 +257,26 @@ export function ServiceLandingPage({ content }: { content: LandingContent }) {
             <p className="mt-4 text-muted-foreground leading-relaxed max-w-xl mx-auto">
               {content.ctaText}
             </p>
-            <div className="mt-8">
-              <Button
-                asChild
-                variant="brand"
-                size="lg"
-                className="h-13 px-8 text-base bg-accent-blue hover:bg-accent-blue/90 shadow-lg shadow-accent-blue/30"
+            <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-4 text-sm">
+              <a
+                href={COMPANY.phoneHref}
+                className="inline-flex items-center gap-2 font-medium text-foreground hover:text-accent-blue transition-colors"
+                aria-label="Korolov IT-Service anrufen"
               >
-                <a href="/#kontakt">
-                  Jetzt Anfrage senden
-                  <ArrowRight className="ml-1 h-4 w-4" aria-hidden="true" />
-                </a>
-              </Button>
+                <Phone className="h-4 w-4 text-accent-blue" aria-hidden="true" />
+                {COMPANY.phoneDisplay}
+              </a>
+              <a
+                href={`mailto:${COMPANY.email}`}
+                className="inline-flex items-center gap-2 font-medium text-foreground hover:text-accent-blue transition-colors"
+                aria-label="E-Mail an Korolov IT-Service senden"
+              >
+                <Mail className="h-4 w-4 text-accent-blue" aria-hidden="true" />
+                {COMPANY.email}
+              </a>
+            </div>
+            <div className="mt-8 max-w-xl mx-auto">
+              <LandingContactForm topic={content.formTopic} />
             </div>
             <div className="mt-12 pt-8 border-t border-border">
               <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">

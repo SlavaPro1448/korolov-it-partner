@@ -29,6 +29,11 @@ const ROUTES = [
   "/webdesign-leverkusen",
   "/it-support-leverkusen",
   "/website-wartung-leverkusen",
+  "/it-service-leverkusen",
+  "/it-betreuung-kleine-unternehmen",
+  "/it-beratung-leverkusen",
+  "/wartungsvertrag-it",
+  "/referenzen",
 ];
 
 const MIME = {

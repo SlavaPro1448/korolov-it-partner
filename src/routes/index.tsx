@@ -6,13 +6,13 @@ import { buildCanonicalLink, buildHreflangLinks, buildSeoMeta } from "@/lib/seo"
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: buildSeoMeta({
-      title: "Korolov IT-Service | Websites & IT-Support in Leverkusen",
+      title: "IT-Service Leverkusen | IT-Betreuung für kleine Unternehmen",
       description:
-        "Korolov IT-Service unterstützt kleine Unternehmen in Leverkusen, Köln und NRW bei Websites, E-Mail, Hosting, IT-Support und digitaler Organisation.",
+        "IT-Service in Leverkusen: IT-Betreuung, Support, Beratung und Websites für kleine Unternehmen. Persönlicher Ansprechpartner, faire Preise, vor Ort & remote.",
       path: "/",
       locale: "de",
       keywords:
-        "IT-Service Leverkusen, Website erstellen, IT-Support NRW, E-Mail Hosting, digitale Organisation",
+        "IT-Service Leverkusen, IT-Betreuung kleine Unternehmen, IT-Support Leverkusen, IT-Beratung Leverkusen, Webdesign Leverkusen",
     }),
     links: [buildCanonicalLink("/"), ...buildHreflangLinks()],
   }),

@@ -1,17 +1,63 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { Menu, X, Languages } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+} from "@/components/ui/navigation-menu";
 
 type Locale = "de" | "ru" | "uk";
 
+// Leistungs-Seiten für das "Leistungen"-Dropdown (nur DE — die Landing-Pages sind deutschsprachig).
+const serviceMenuItems: Array<{ label: string; to: string; description: string }> = [
+  {
+    label: "IT-Service in Leverkusen",
+    to: "/it-service-leverkusen",
+    description: "Alle Leistungen im Überblick",
+  },
+  {
+    label: "IT-Betreuung für kleine Unternehmen",
+    to: "/it-betreuung-kleine-unternehmen",
+    description: "Laufende Betreuung ab 79 €/Monat",
+  },
+  {
+    label: "IT-Support Leverkusen",
+    to: "/it-support-leverkusen",
+    description: "Schnelle Hilfe bei Störungen",
+  },
+  {
+    label: "IT-Beratung Leverkusen",
+    to: "/it-beratung-leverkusen",
+    description: "Unabhängige Entscheidungshilfe",
+  },
+  {
+    label: "IT-Wartungsvertrag",
+    to: "/wartungsvertrag-it",
+    description: "Feste Reaktionszeiten, planbare Kosten",
+  },
+  {
+    label: "Webdesign Leverkusen",
+    to: "/webdesign-leverkusen",
+    description: "Websites ab 890 € Festpreis",
+  },
+  {
+    label: "Website-Wartung & Pflege",
+    to: "/website-wartung-leverkusen",
+    description: "Updates, Backups & Monitoring",
+  },
+];
+
 const navItemsByLocale: Record<Locale, Array<{ label: string; href: string }>> = {
   de: [
-    { label: "Leistungen", href: "#leistungen" },
     { label: "Für wen", href: "#fuer-wen" },
     { label: "Preise", href: "#preise" },
     { label: "Ablauf", href: "#ablauf" },
-    { label: "Referenzen", href: "#referenzen" },
+    { label: "Referenzen", href: "/referenzen" },
     { label: "Über mich", href: "#ueber-mich" },
     { label: "Kontakt", href: "#kontakt" },
   ],
@@ -158,10 +204,42 @@ export function SiteHeader({
                 : "Головна навігація"
           }
         >
+          {locale === "de" && (
+            <NavigationMenu>
+              <NavigationMenuList>
+                <NavigationMenuItem>
+                  <NavigationMenuTrigger className="h-auto bg-transparent px-1 py-0 text-sm font-normal text-foreground/80 hover:bg-transparent hover:text-accent-blue focus:bg-transparent focus:text-accent-blue data-[state=open]:bg-transparent data-[state=open]:hover:bg-transparent data-[state=open]:focus:bg-transparent data-[state=open]:text-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-blue rounded-sm">
+                    Leistungen
+                  </NavigationMenuTrigger>
+                  <NavigationMenuContent>
+                    <ul className="grid w-[340px] gap-1 p-3">
+                      {serviceMenuItems.map((s) => (
+                        <li key={s.to}>
+                          <NavigationMenuLink asChild>
+                            <Link
+                              to={s.to}
+                              className="block rounded-md px-3 py-2.5 hover:bg-section transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-blue"
+                            >
+                              <span className="block text-sm font-medium text-brand">
+                                {s.label}
+                              </span>
+                              <span className="mt-0.5 block text-xs text-muted-foreground">
+                                {s.description}
+                              </span>
+                            </Link>
+                          </NavigationMenuLink>
+                        </li>
+                      ))}
+                    </ul>
+                  </NavigationMenuContent>
+                </NavigationMenuItem>
+              </NavigationMenuList>
+            </NavigationMenu>
+          )}
           {navItems.map((it) => (
             <a
               key={it.href}
-              href={`${basePath}${it.href}`}
+              href={it.href.startsWith("#") ? `${basePath}${it.href}` : it.href}
               className="text-sm text-foreground/80 hover:text-accent-blue transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-blue rounded-sm px-1"
             >
               {it.label}
@@ -247,10 +325,28 @@ export function SiteHeader({
           }
         >
           <div className="container-page py-4 flex flex-col gap-1">
+            {locale === "de" && (
+              <>
+                <div className="px-2 pt-1 pb-0.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  Leistungen
+                </div>
+                {serviceMenuItems.map((s) => (
+                  <Link
+                    key={s.to}
+                    to={s.to}
+                    onClick={() => setOpen(false)}
+                    className="px-4 py-2.5 rounded-md text-sm hover:bg-section focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-blue"
+                  >
+                    {s.label}
+                  </Link>
+                ))}
+                <div className="my-1 border-t border-border" aria-hidden="true" />
+              </>
+            )}
             {navItems.map((it) => (
               <a
                 key={it.href}
-                href={`${basePath}${it.href}`}
+                href={it.href.startsWith("#") ? `${basePath}${it.href}` : it.href}
                 onClick={() => setOpen(false)}
                 className="px-2 py-2.5 rounded-md text-sm hover:bg-section focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-blue"
               >

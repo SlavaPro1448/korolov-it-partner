@@ -84,6 +84,8 @@ function CaseCard({ item, locale, openLabel }: CaseCardProps) {
               <img
                 src={item.thumbnail}
                 loading="lazy"
+                width={item.thumbnailWidth}
+                height={item.thumbnailHeight}
                 alt={`${item.client} – ${item.industry}`}
                 className="block h-auto max-h-full w-auto max-w-full object-contain object-center"
                 onError={() => setHasImageError(true)}
@@ -93,6 +95,8 @@ function CaseCard({ item, locale, openLabel }: CaseCardProps) {
             <img
               src={item.thumbnail}
               loading="lazy"
+              width={item.thumbnailWidth}
+              height={item.thumbnailHeight}
               alt={`${item.client} – ${item.industry}`}
               className="absolute inset-0 h-full w-full object-cover"
               onError={() => setHasImageError(true)}
