@@ -87,12 +87,25 @@ export function localBusinessSchema(locale: SupportedLocale = "de") {
       name: "Viacheslav Korolov",
     },
     knowsLanguage: ["de", "ru", "uk"],
+    // Muss mit dem Google-Business-Profil übereinstimmen (NAP-Konsistenz).
     openingHoursSpecification: [
       {
         "@type": "OpeningHoursSpecification",
-        dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-        opens: "09:00",
+        dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday"],
+        opens: "08:00",
         closes: "18:00",
+      },
+      {
+        "@type": "OpeningHoursSpecification",
+        dayOfWeek: "Friday",
+        opens: "08:00",
+        closes: "13:30",
+      },
+      {
+        "@type": "OpeningHoursSpecification",
+        dayOfWeek: "Saturday",
+        opens: "10:00",
+        closes: "14:00",
       },
     ],
   };
