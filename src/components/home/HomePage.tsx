@@ -19,6 +19,7 @@ import { Hero } from "./Hero";
 import { Pricing } from "./Pricing";
 import { Problem } from "./Problem";
 import { Process } from "./Process";
+import { ServiceLinks } from "./ServiceLinks";
 import { Services } from "./Services";
 
 const SITE_URL = "https://korolov-it-service.de";
@@ -55,6 +56,7 @@ export function HomePage({ locale }: { locale: Locale }) {
         <Hero locale={locale} />
         <Problem locale={locale} />
         <Services locale={locale} />
+        <ServiceLinks locale={locale} />
         <ForWhom locale={locale} />
         <Pricing locale={locale} />
         <Process locale={locale} />
