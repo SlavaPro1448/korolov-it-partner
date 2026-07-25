@@ -154,6 +154,46 @@ function getTransporter() {
   return cachedTransporter;
 }
 
+// Mail-Versand: bevorzugt Resend (HTTP-API, zuverlässig auf Serverless/Vercel),
+// sonst SMTP via nodemailer (lokal/klassisches Hosting). Steuerung per Env:
+// RESEND_API_KEY gesetzt → Resend, andernfalls SMTP_*.
+const useResend = () => !!process.env.RESEND_API_KEY;
+
+async function sendViaResend({ from, to, replyTo, subject, text, html, headers }) {
+  const res = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from,
+      to: Array.isArray(to) ? to : [to],
+      subject,
+      text,
+      html,
+      ...(replyTo ? { reply_to: replyTo } : {}),
+      ...(headers ? { headers } : {}),
+    }),
+  });
+  if (!res.ok) {
+    const detail = await res.text().catch(() => "");
+    const err = new Error(`resend_failed_${res.status}`);
+    err.responseCode = res.status;
+    err.detail = detail.slice(0, 300);
+    throw err;
+  }
+}
+
+async function sendEmail(msg) {
+  if (useResend()) {
+    await sendViaResend(msg);
+    return;
+  }
+  const transporter = getTransporter();
+  await transporter.sendMail(msg);
+}
+
 function sanitizeLine(s) {
   return String(s ?? "")
     .replace(/[\r\n]+/g, " ")
@@ -298,16 +338,18 @@ export async function handleContact(rawBody, meta = {}) {
 
   const topicLabel = TOPIC_LABELS[locale][clean.topic] ?? clean.topic;
 
-  let transporter;
-  try {
-    transporter = getTransporter();
-  } catch (err) {
-    console.error("[contact] SMTP misconfigured:", err.message);
-    return {
-      ok: false,
-      status: 500,
-      body: { ok: false, error: VALIDATION_MESSAGES[locale].server },
-    };
+  // Ohne Resend muss SMTP konfiguriert sein — sonst früh mit 500 abbrechen.
+  if (!useResend()) {
+    try {
+      getTransporter();
+    } catch (err) {
+      console.error("[contact] Kein Mail-Transport konfiguriert:", err.message);
+      return {
+        ok: false,
+        status: 500,
+        body: { ok: false, error: VALIDATION_MESSAGES[locale].server },
+      };
+    }
   }
 
   const from = process.env.MAIL_FROM ?? process.env.SMTP_USER;
@@ -317,7 +359,7 @@ export async function handleContact(rawBody, meta = {}) {
   const { text, html } = buildEmail({ clean, locale, topicLabel, ip, userAgent });
 
   try {
-    await transporter.sendMail({
+    await sendEmail({
       from,
       to,
       replyTo: `${clean.name} <${clean.email}>`,
@@ -333,7 +375,7 @@ export async function handleContact(rawBody, meta = {}) {
     if (sendClientCopy) {
       const copy = buildClientCopyEmail(locale, clean.name);
       try {
-        await transporter.sendMail({
+        await sendEmail({
           from,
           to: clean.email,
           replyTo: to,
