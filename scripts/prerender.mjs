@@ -83,20 +83,31 @@ const server = createServer((req, res) => {
   res.end(readFileSync(filePath));
 });
 
-const chrome = findChrome();
-if (!chrome) {
-  console.error(
-    "[prerender] Kein Chrome/Chromium gefunden — Prerender übersprungen (Build bleibt gültig).",
-  );
-  process.exit(1);
+// Chrome-Auflösung: lokal/CI mit System-Chrome (findChrome), auf Vercel mit
+// gebündeltem @sparticuz/chromium (der Build-Container hat kein System-Chrome).
+let executablePath;
+let launchArgs = ["--no-sandbox", "--disable-gpu"];
+
+if (process.env.VERCEL || process.env.PRERENDER_USE_CHROMIUM) {
+  const { default: chromium } = await import("@sparticuz/chromium");
+  executablePath = await chromium.executablePath();
+  launchArgs = chromium.args;
+} else {
+  executablePath = findChrome();
+  if (!executablePath) {
+    console.error(
+      "[prerender] Kein Chrome/Chromium gefunden — Prerender übersprungen (Build bleibt gültig).",
+    );
+    process.exit(1);
+  }
 }
 
 await new Promise((resolve) => server.listen(PORT, resolve));
 
 const browser = await puppeteer.launch({
-  executablePath: chrome,
+  executablePath,
   headless: "new",
-  args: ["--no-sandbox", "--disable-gpu"],
+  args: launchArgs,
 });
 
 try {
