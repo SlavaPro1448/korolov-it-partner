@@ -55,7 +55,7 @@ export const cases: Case[] = [
     thumbnailWidth: 1200,
     thumbnailHeight: 750,
     thumbnailStyle: "screenshot",
-    liveUrl: "/projects/erbrecht-leverkusen/",
+    liveUrl: "/projects/erbrecht-leverkusen",
     featured: true,
   },
   {
