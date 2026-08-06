@@ -79,9 +79,47 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://korolov-it-service.de/referenzen</loc>
-    <lastmod>2026-07-21</lastmod>
+    <loc>https://korolov-it-service.de/website-fuer-handwerker-leverkusen</loc>
+    <lastmod>2026-08-06</lastmod>
     <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://korolov-it-service.de/website-fuer-hausverwaltung-leverkusen</loc>
+    <lastmod>2026-08-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://korolov-it-service.de/website-fuer-anwaltskanzlei-leverkusen</loc>
+    <lastmod>2026-08-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Referenzen -->
+  <url>
+    <loc>https://korolov-it-service.de/referenzen</loc>
+    <lastmod>2026-08-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://korolov-it-service.de/referenzen/wupperstahl</loc>
+    <lastmod>2026-08-06</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://korolov-it-service.de/referenzen/erbrecht-leverkusen</loc>
+    <lastmod>2026-08-06</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://korolov-it-service.de/referenzen/hausverwaltung-frank</loc>
+    <lastmod>2026-08-06</lastmod>
+    <changefreq>yearly</changefreq>
     <priority>0.6</priority>
   </url>
 

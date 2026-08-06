@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { Link } from "@tanstack/react-router";
 import { ArrowRight, Briefcase, Quote } from "lucide-react";
 import type { Case } from "@/data/cases";
 import { cases } from "@/data/cases";
@@ -131,18 +132,28 @@ function CaseCard({ item, locale, openLabel }: CaseCardProps) {
         ))}
       </div>
 
-      {item.liveUrl && (
-        <Button asChild variant="outline" className="mt-5 self-start">
-          <a
-            href={item.liveUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label={`${openLabel}: ${item.client}`}
-          >
-            {openLabel} <ArrowRight className="h-4 w-4" aria-hidden="true" />
-          </a>
-        </Button>
-      )}
+      <div className="mt-5 flex flex-wrap items-center gap-3">
+        {/* Detailseiten gibt es nur auf Deutsch — auf /ru und /uk bleibt die Karte beim Live-Link. */}
+        {locale === "de" && item.detail && (
+          <Button asChild variant="brand" className="bg-accent-blue hover:bg-accent-blue/90">
+            <Link to={item.detail.path} aria-label={`Projekt im Detail: ${item.client}`}>
+              Projekt im Detail <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            </Link>
+          </Button>
+        )}
+        {item.liveUrl && (
+          <Button asChild variant="outline">
+            <a
+              href={item.liveUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`${openLabel}: ${item.client}`}
+            >
+              {openLabel} <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            </a>
+          </Button>
+        )}
+      </div>
     </article>
   );
 }

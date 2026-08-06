@@ -11,6 +11,9 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WiderrufRouteImport } from './routes/widerruf'
 import { Route as WebsiteWartungLeverkusenRouteImport } from './routes/website-wartung-leverkusen'
+import { Route as WebsiteFuerHausverwaltungLeverkusenRouteImport } from './routes/website-fuer-hausverwaltung-leverkusen'
+import { Route as WebsiteFuerHandwerkerLeverkusenRouteImport } from './routes/website-fuer-handwerker-leverkusen'
+import { Route as WebsiteFuerAnwaltskanzleiLeverkusenRouteImport } from './routes/website-fuer-anwaltskanzlei-leverkusen'
 import { Route as WebdesignLeverkusenRouteImport } from './routes/webdesign-leverkusen'
 import { Route as WartungsvertragItRouteImport } from './routes/wartungsvertrag-it'
 import { Route as UkRouteImport } from './routes/uk'
@@ -24,6 +27,9 @@ import { Route as ItBeratungLeverkusenRouteImport } from './routes/it-beratung-l
 import { Route as ImpressumRouteImport } from './routes/impressum'
 import { Route as DatenschutzRouteImport } from './routes/datenschutz'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ReferenzenWupperstahlRouteImport } from './routes/referenzen_.wupperstahl'
+import { Route as ReferenzenHausverwaltungFrankRouteImport } from './routes/referenzen_.hausverwaltung-frank'
+import { Route as ReferenzenErbrechtLeverkusenRouteImport } from './routes/referenzen_.erbrecht-leverkusen'
 
 const WiderrufRoute = WiderrufRouteImport.update({
   id: '/widerruf',
@@ -34,6 +40,24 @@ const WebsiteWartungLeverkusenRoute =
   WebsiteWartungLeverkusenRouteImport.update({
     id: '/website-wartung-leverkusen',
     path: '/website-wartung-leverkusen',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const WebsiteFuerHausverwaltungLeverkusenRoute =
+  WebsiteFuerHausverwaltungLeverkusenRouteImport.update({
+    id: '/website-fuer-hausverwaltung-leverkusen',
+    path: '/website-fuer-hausverwaltung-leverkusen',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const WebsiteFuerHandwerkerLeverkusenRoute =
+  WebsiteFuerHandwerkerLeverkusenRouteImport.update({
+    id: '/website-fuer-handwerker-leverkusen',
+    path: '/website-fuer-handwerker-leverkusen',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const WebsiteFuerAnwaltskanzleiLeverkusenRoute =
+  WebsiteFuerAnwaltskanzleiLeverkusenRouteImport.update({
+    id: '/website-fuer-anwaltskanzlei-leverkusen',
+    path: '/website-fuer-anwaltskanzlei-leverkusen',
     getParentRoute: () => rootRouteImport,
   } as any)
 const WebdesignLeverkusenRoute = WebdesignLeverkusenRouteImport.update({
@@ -102,6 +126,23 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ReferenzenWupperstahlRoute = ReferenzenWupperstahlRouteImport.update({
+  id: '/referenzen_/wupperstahl',
+  path: '/referenzen/wupperstahl',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReferenzenHausverwaltungFrankRoute =
+  ReferenzenHausverwaltungFrankRouteImport.update({
+    id: '/referenzen_/hausverwaltung-frank',
+    path: '/referenzen/hausverwaltung-frank',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ReferenzenErbrechtLeverkusenRoute =
+  ReferenzenErbrechtLeverkusenRouteImport.update({
+    id: '/referenzen_/erbrecht-leverkusen',
+    path: '/referenzen/erbrecht-leverkusen',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -117,8 +158,14 @@ export interface FileRoutesByFullPath {
   '/uk': typeof UkRoute
   '/wartungsvertrag-it': typeof WartungsvertragItRoute
   '/webdesign-leverkusen': typeof WebdesignLeverkusenRoute
+  '/website-fuer-anwaltskanzlei-leverkusen': typeof WebsiteFuerAnwaltskanzleiLeverkusenRoute
+  '/website-fuer-handwerker-leverkusen': typeof WebsiteFuerHandwerkerLeverkusenRoute
+  '/website-fuer-hausverwaltung-leverkusen': typeof WebsiteFuerHausverwaltungLeverkusenRoute
   '/website-wartung-leverkusen': typeof WebsiteWartungLeverkusenRoute
   '/widerruf': typeof WiderrufRoute
+  '/referenzen/erbrecht-leverkusen': typeof ReferenzenErbrechtLeverkusenRoute
+  '/referenzen/hausverwaltung-frank': typeof ReferenzenHausverwaltungFrankRoute
+  '/referenzen/wupperstahl': typeof ReferenzenWupperstahlRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -134,8 +181,14 @@ export interface FileRoutesByTo {
   '/uk': typeof UkRoute
   '/wartungsvertrag-it': typeof WartungsvertragItRoute
   '/webdesign-leverkusen': typeof WebdesignLeverkusenRoute
+  '/website-fuer-anwaltskanzlei-leverkusen': typeof WebsiteFuerAnwaltskanzleiLeverkusenRoute
+  '/website-fuer-handwerker-leverkusen': typeof WebsiteFuerHandwerkerLeverkusenRoute
+  '/website-fuer-hausverwaltung-leverkusen': typeof WebsiteFuerHausverwaltungLeverkusenRoute
   '/website-wartung-leverkusen': typeof WebsiteWartungLeverkusenRoute
   '/widerruf': typeof WiderrufRoute
+  '/referenzen/erbrecht-leverkusen': typeof ReferenzenErbrechtLeverkusenRoute
+  '/referenzen/hausverwaltung-frank': typeof ReferenzenHausverwaltungFrankRoute
+  '/referenzen/wupperstahl': typeof ReferenzenWupperstahlRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -152,8 +205,14 @@ export interface FileRoutesById {
   '/uk': typeof UkRoute
   '/wartungsvertrag-it': typeof WartungsvertragItRoute
   '/webdesign-leverkusen': typeof WebdesignLeverkusenRoute
+  '/website-fuer-anwaltskanzlei-leverkusen': typeof WebsiteFuerAnwaltskanzleiLeverkusenRoute
+  '/website-fuer-handwerker-leverkusen': typeof WebsiteFuerHandwerkerLeverkusenRoute
+  '/website-fuer-hausverwaltung-leverkusen': typeof WebsiteFuerHausverwaltungLeverkusenRoute
   '/website-wartung-leverkusen': typeof WebsiteWartungLeverkusenRoute
   '/widerruf': typeof WiderrufRoute
+  '/referenzen_/erbrecht-leverkusen': typeof ReferenzenErbrechtLeverkusenRoute
+  '/referenzen_/hausverwaltung-frank': typeof ReferenzenHausverwaltungFrankRoute
+  '/referenzen_/wupperstahl': typeof ReferenzenWupperstahlRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -171,8 +230,14 @@ export interface FileRouteTypes {
     | '/uk'
     | '/wartungsvertrag-it'
     | '/webdesign-leverkusen'
+    | '/website-fuer-anwaltskanzlei-leverkusen'
+    | '/website-fuer-handwerker-leverkusen'
+    | '/website-fuer-hausverwaltung-leverkusen'
     | '/website-wartung-leverkusen'
     | '/widerruf'
+    | '/referenzen/erbrecht-leverkusen'
+    | '/referenzen/hausverwaltung-frank'
+    | '/referenzen/wupperstahl'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -188,8 +253,14 @@ export interface FileRouteTypes {
     | '/uk'
     | '/wartungsvertrag-it'
     | '/webdesign-leverkusen'
+    | '/website-fuer-anwaltskanzlei-leverkusen'
+    | '/website-fuer-handwerker-leverkusen'
+    | '/website-fuer-hausverwaltung-leverkusen'
     | '/website-wartung-leverkusen'
     | '/widerruf'
+    | '/referenzen/erbrecht-leverkusen'
+    | '/referenzen/hausverwaltung-frank'
+    | '/referenzen/wupperstahl'
   id:
     | '__root__'
     | '/'
@@ -205,8 +276,14 @@ export interface FileRouteTypes {
     | '/uk'
     | '/wartungsvertrag-it'
     | '/webdesign-leverkusen'
+    | '/website-fuer-anwaltskanzlei-leverkusen'
+    | '/website-fuer-handwerker-leverkusen'
+    | '/website-fuer-hausverwaltung-leverkusen'
     | '/website-wartung-leverkusen'
     | '/widerruf'
+    | '/referenzen_/erbrecht-leverkusen'
+    | '/referenzen_/hausverwaltung-frank'
+    | '/referenzen_/wupperstahl'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -223,8 +300,14 @@ export interface RootRouteChildren {
   UkRoute: typeof UkRoute
   WartungsvertragItRoute: typeof WartungsvertragItRoute
   WebdesignLeverkusenRoute: typeof WebdesignLeverkusenRoute
+  WebsiteFuerAnwaltskanzleiLeverkusenRoute: typeof WebsiteFuerAnwaltskanzleiLeverkusenRoute
+  WebsiteFuerHandwerkerLeverkusenRoute: typeof WebsiteFuerHandwerkerLeverkusenRoute
+  WebsiteFuerHausverwaltungLeverkusenRoute: typeof WebsiteFuerHausverwaltungLeverkusenRoute
   WebsiteWartungLeverkusenRoute: typeof WebsiteWartungLeverkusenRoute
   WiderrufRoute: typeof WiderrufRoute
+  ReferenzenErbrechtLeverkusenRoute: typeof ReferenzenErbrechtLeverkusenRoute
+  ReferenzenHausverwaltungFrankRoute: typeof ReferenzenHausverwaltungFrankRoute
+  ReferenzenWupperstahlRoute: typeof ReferenzenWupperstahlRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -241,6 +324,27 @@ declare module '@tanstack/react-router' {
       path: '/website-wartung-leverkusen'
       fullPath: '/website-wartung-leverkusen'
       preLoaderRoute: typeof WebsiteWartungLeverkusenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/website-fuer-hausverwaltung-leverkusen': {
+      id: '/website-fuer-hausverwaltung-leverkusen'
+      path: '/website-fuer-hausverwaltung-leverkusen'
+      fullPath: '/website-fuer-hausverwaltung-leverkusen'
+      preLoaderRoute: typeof WebsiteFuerHausverwaltungLeverkusenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/website-fuer-handwerker-leverkusen': {
+      id: '/website-fuer-handwerker-leverkusen'
+      path: '/website-fuer-handwerker-leverkusen'
+      fullPath: '/website-fuer-handwerker-leverkusen'
+      preLoaderRoute: typeof WebsiteFuerHandwerkerLeverkusenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/website-fuer-anwaltskanzlei-leverkusen': {
+      id: '/website-fuer-anwaltskanzlei-leverkusen'
+      path: '/website-fuer-anwaltskanzlei-leverkusen'
+      fullPath: '/website-fuer-anwaltskanzlei-leverkusen'
+      preLoaderRoute: typeof WebsiteFuerAnwaltskanzleiLeverkusenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/webdesign-leverkusen': {
@@ -334,6 +438,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/referenzen_/wupperstahl': {
+      id: '/referenzen_/wupperstahl'
+      path: '/referenzen/wupperstahl'
+      fullPath: '/referenzen/wupperstahl'
+      preLoaderRoute: typeof ReferenzenWupperstahlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/referenzen_/hausverwaltung-frank': {
+      id: '/referenzen_/hausverwaltung-frank'
+      path: '/referenzen/hausverwaltung-frank'
+      fullPath: '/referenzen/hausverwaltung-frank'
+      preLoaderRoute: typeof ReferenzenHausverwaltungFrankRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/referenzen_/erbrecht-leverkusen': {
+      id: '/referenzen_/erbrecht-leverkusen'
+      path: '/referenzen/erbrecht-leverkusen'
+      fullPath: '/referenzen/erbrecht-leverkusen'
+      preLoaderRoute: typeof ReferenzenErbrechtLeverkusenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -351,8 +476,16 @@ const rootRouteChildren: RootRouteChildren = {
   UkRoute: UkRoute,
   WartungsvertragItRoute: WartungsvertragItRoute,
   WebdesignLeverkusenRoute: WebdesignLeverkusenRoute,
+  WebsiteFuerAnwaltskanzleiLeverkusenRoute:
+    WebsiteFuerAnwaltskanzleiLeverkusenRoute,
+  WebsiteFuerHandwerkerLeverkusenRoute: WebsiteFuerHandwerkerLeverkusenRoute,
+  WebsiteFuerHausverwaltungLeverkusenRoute:
+    WebsiteFuerHausverwaltungLeverkusenRoute,
   WebsiteWartungLeverkusenRoute: WebsiteWartungLeverkusenRoute,
   WiderrufRoute: WiderrufRoute,
+  ReferenzenErbrechtLeverkusenRoute: ReferenzenErbrechtLeverkusenRoute,
+  ReferenzenHausverwaltungFrankRoute: ReferenzenHausverwaltungFrankRoute,
+  ReferenzenWupperstahlRoute: ReferenzenWupperstahlRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

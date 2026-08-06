@@ -9,7 +9,7 @@
  * Läuft lokal (macOS-Chrome) und im CI (ubuntu-latest hat Chrome vorinstalliert).
  */
 import { createServer } from "node:http";
-import { existsSync, readFileSync, statSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { execSync } from "node:child_process";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -34,6 +34,12 @@ const ROUTES = [
   "/it-beratung-leverkusen",
   "/wartungsvertrag-it",
   "/referenzen",
+  "/website-fuer-handwerker-leverkusen",
+  "/website-fuer-hausverwaltung-leverkusen",
+  "/website-fuer-anwaltskanzlei-leverkusen",
+  "/referenzen/wupperstahl",
+  "/referenzen/erbrecht-leverkusen",
+  "/referenzen/hausverwaltung-frank",
 ];
 
 const MIME = {
@@ -145,6 +151,8 @@ try {
 
     const outFile =
       route === "/" ? path.join(DIST, "index.html") : path.join(DIST, `${route.slice(1)}.html`);
+    // Verschachtelte Routen (z. B. /referenzen/<slug>) brauchen ihr Verzeichnis.
+    mkdirSync(path.dirname(outFile), { recursive: true });
     writeFileSync(outFile, html);
     console.log(
       `[prerender] ${route} -> ${path.relative(DIST, outFile)} (${(html.length / 1024).toFixed(0)} KB)`,

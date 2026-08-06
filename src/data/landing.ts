@@ -133,8 +133,11 @@ export const webdesignLeverkusen: LandingContent = {
   ctaTitle: "Website-Projekt in Leverkusen starten?",
   ctaText:
     "Schildern Sie kurz Ihr Vorhaben — Sie erhalten eine ehrliche Einschätzung und ein klares Angebot. Unverbindlich und kostenlos.",
-  relatedTitle: "Passende Leistungen",
+  relatedTitle: "Websites nach Branche & passende Leistungen",
   related: [
+    { label: "Website für Handwerker", to: "/website-fuer-handwerker-leverkusen" },
+    { label: "Website für Hausverwaltungen", to: "/website-fuer-hausverwaltung-leverkusen" },
+    { label: "Website für Anwaltskanzleien", to: "/website-fuer-anwaltskanzlei-leverkusen" },
     { label: "Website-Wartung & Pflege", to: "/website-wartung-leverkusen" },
     { label: "IT-Support für kleine Unternehmen", to: "/it-support-leverkusen" },
     { label: "IT-Service in Leverkusen", to: "/it-service-leverkusen" },
@@ -801,7 +804,8 @@ export const wartungsvertragIt: LandingContent = {
     },
   ],
   includedTitle: "Leistungen im Überblick",
-  includedSubtitle: "Der Vertragsumfang wird auf Ihren Betrieb zugeschnitten — üblicherweise enthalten:",
+  includedSubtitle:
+    "Der Vertragsumfang wird auf Ihren Betrieb zugeschnitten — üblicherweise enthalten:",
   included: [
     {
       title: "Regelmäßige Wartungsläufe",
@@ -902,6 +906,384 @@ export const wartungsvertragIt: LandingContent = {
   },
 };
 
+export const websiteFuerHandwerker: LandingContent = {
+  path: "/website-fuer-handwerker-leverkusen",
+  eyebrow: "Website für Handwerker",
+  h1: "Website für Handwerker in Leverkusen: Anfragen statt digitaler Visitenkarte",
+  lede: "Eine Handwerker-Website, die auf dem Smartphone sofort lädt, Ihr Einsatzgebiet klar benennt und den Anruf nur einen Fingertipp entfernt macht. Festpreis ab 890 €, umgesetzt von einem Ansprechpartner aus Leverkusen.",
+  intro: [
+    "Wer einen Dachdecker, Elektriker oder Sanitärbetrieb sucht, tut das unterwegs und mit dem Handy in der Hand — oft, wenn es gerade dringend ist. Entscheidend sind dann drei Dinge: Kommt die Seite schnell? Sehe ich sofort, ob der Betrieb mein Gewerk und meinen Ort abdeckt? Und wie erreiche ich jemanden?",
+    "Viele Handwerks-Websites scheitern genau daran: Sie sind für den Desktop gebaut, laden träge, verstecken die Telefonnummer im Impressum und nennen das Einsatzgebiet gar nicht. Ich baue Seiten, die diese drei Fragen in den ersten Sekunden beantworten — ohne Baukasten-Optik und ohne monatliche Pflichtgebühren.",
+  ],
+  benefitsTitle: "Warum diese Website zu einem Handwerksbetrieb passt",
+  benefits: [
+    {
+      title: "Für den Daumen gebaut, nicht für die Maus",
+      text: "Der Großteil Ihrer Besucher kommt vom Smartphone. Telefonnummer als Tippen-und-Anrufen-Button, große Schaltflächen, kurze Wege — die Seite wird zuerst mobil entworfen und erst danach für den Desktop.",
+    },
+    {
+      title: "Einsatzgebiet und Gewerke sofort sichtbar",
+      text: "Leverkusen, Köln, Bergisch Gladbach oder der ganze Rhein-Kreis: Ihr Radius und Ihre Leistungen stehen dort, wo man sie zuerst sucht — das hilft Kunden und Google gleichermaßen.",
+    },
+    {
+      title: "Ihre Arbeit als Beweis",
+      text: "Fotos von abgeschlossenen Aufträgen wirken stärker als jeder Werbetext. Ich richte eine Projektgalerie ein, die Sie später ohne Technikkenntnisse mit neuen Bildern füttern können.",
+    },
+  ],
+  includedTitle: "Was bei einer Handwerker-Website enthalten ist",
+  includedSubtitle: "Alles, was ein Betrieb braucht, um online gefunden und angerufen zu werden.",
+  included: [
+    {
+      title: "Leistungen & Gewerke",
+      text: "Jedes Gewerk bekommt einen eigenen verständlichen Abschnitt — damit Kunden und Suchmaschinen erkennen, was Sie tatsächlich machen.",
+    },
+    {
+      title: "Anruf-Button & Rückruf",
+      text: "Telefonnummer als klickbarer Button in Kopf- und Fußzeile, dazu ein kurzes Formular für Rückrufwünsche außerhalb der Arbeitszeit.",
+    },
+    {
+      title: "Projektgalerie",
+      text: "Ein Bereich für Referenzfotos Ihrer Arbeiten, technisch so aufgesetzt, dass große Handybilder die Ladezeit nicht ruinieren.",
+    },
+    {
+      title: "Einsatzgebiet & Anfahrt",
+      text: "Klar benannter Radius mit Karte, damit Anfragen aus der Region kommen und nicht von weit außerhalb.",
+    },
+    {
+      title: "Lokale SEO-Grundlagen",
+      text: "Saubere Seitenstruktur, Meta-Angaben, strukturierte Daten für lokale Betriebe und eine Sitemap für Google.",
+    },
+    {
+      title: "Domain, SSL & E-Mail",
+      text: "Eigene Domain, verschlüsselte Verbindung und geschäftliche E-Mail-Adressen statt einer privaten Freemail-Adresse.",
+    },
+  ],
+  price: {
+    label: "Website-Erstellung",
+    value: "ab 890 €",
+    suffix: "netto, einmalig",
+    note: "1–3 Seiten inklusive Design, Anruf-Button, Kontaktformular, SSL und Basis-SEO. Umfangreichere Auftritte mit eigener Galerie und mehreren Gewerkeseiten ab 1.500 €.",
+  },
+  stepsTitle: "So läuft es ab",
+  steps: [
+    {
+      title: "Kurzes Gespräch",
+      text: "Wir klären Gewerke, Einsatzgebiet und was Sie an Anfragen brauchen — telefonisch oder direkt bei Ihnen im Betrieb.",
+    },
+    {
+      title: "Struktur & Festpreis",
+      text: "Sie bekommen einen Aufbauvorschlag und ein verbindliches Angebot. Erst danach fange ich an.",
+    },
+    {
+      title: "Texte & Bilder",
+      text: "Sie liefern Fotos Ihrer Arbeiten, ich kümmere mich um Struktur, Formulierung und technische Aufbereitung.",
+    },
+    {
+      title: "Livegang & Einweisung",
+      text: "Die Seite geht online, Sie erhalten eine kurze Einweisung. Auf Wunsch pflege ich sie danach weiter.",
+    },
+  ],
+  faqTitle: "Häufige Fragen von Handwerksbetrieben",
+  faq: [
+    {
+      question: "Ich habe kaum Zeit — wie aufwendig ist das für mich?",
+      answer:
+        "Gering. Nötig sind ein Gespräch von etwa einer halben Stunde, Ihre Fotos und eine kurze Freigabe am Ende. Texte formuliere ich vor, Sie korrigieren nur, was fachlich nicht stimmt.",
+    },
+    {
+      question: "Brauche ich überhaupt eine Website, wenn ich bei Google Maps stehe?",
+      answer:
+        "Der Maps-Eintrag bringt Sichtbarkeit, beantwortet aber keine Detailfragen. Eine Website zeigt Leistungsumfang, Referenzen und Einsatzgebiet — und stärkt zusätzlich Ihren Maps-Eintrag, weil beide aufeinander verweisen.",
+    },
+    {
+      question: "Kann ich Referenzfotos später selbst hochladen?",
+      answer:
+        "Ja. Die Galerie wird so eingerichtet, dass Sie neue Bilder ohne technische Kenntnisse ergänzen können. Wenn Sie das lieber abgeben, übernehme ich es im Rahmen der Wartung ab 79 € monatlich.",
+    },
+    {
+      question: "Was ist mit Notdienst-Anfragen am Wochenende?",
+      answer:
+        "Auf Wunsch bekommt die Seite einen deutlich sichtbaren Notdienst-Bereich mit eigener Nummer und Hinweis auf Ihre Erreichbarkeit — so landen dringende Anrufe dort, wo Sie sie haben wollen.",
+    },
+    {
+      question: "Was kostet die Website im laufenden Betrieb?",
+      answer:
+        "Für Domain und Hosting fallen geringe laufende Kosten an, die ich Ihnen vorab transparent nenne. Pflege und Updates sind optional ab 79 € monatlich — es gibt keine versteckte Pflichtgebühr.",
+    },
+  ],
+  ctaTitle: "Website für Ihren Betrieb in Leverkusen?",
+  ctaText:
+    "Sagen Sie kurz, welches Gewerk Sie ausüben und in welchem Umkreis Sie arbeiten — Sie bekommen eine ehrliche Einschätzung und ein Festpreis-Angebot.",
+  relatedTitle: "Passende Leistungen",
+  related: [
+    { label: "Webdesign in Leverkusen", to: "/webdesign-leverkusen" },
+    { label: "Website-Wartung & Pflege", to: "/website-wartung-leverkusen" },
+    { label: "IT-Support für kleine Unternehmen", to: "/it-support-leverkusen" },
+  ],
+  breadcrumbName: "Website für Handwerker",
+  serviceType: "Webdesign",
+  formTopic: "Website für Handwerker",
+  seo: {
+    title: "Website für Handwerker Leverkusen – Homepage erstellen ab 890 € | Korolov IT-Service",
+    description:
+      "Handwerker-Website aus Leverkusen: mobil optimiert, mit Anruf-Button, Projektgalerie und Einsatzgebiet. Festpreis ab 890 €, ein Ansprechpartner, keine Pflichtgebühren.",
+    keywords:
+      "Website für Handwerker, Homepage Handwerker Leverkusen, Webdesign Handwerksbetrieb, Website Dachdecker Elektriker Sanitär, Handwerker Website erstellen lassen",
+  },
+};
+
+export const websiteFuerHausverwaltung: LandingContent = {
+  path: "/website-fuer-hausverwaltung-leverkusen",
+  eyebrow: "Website für Hausverwaltungen",
+  h1: "Website für Hausverwaltungen: seriös auftreten, Rückfragen reduzieren",
+  lede: "Ein Webauftritt, der Eigentümer überzeugt und Mietern die Wege abnimmt — mit strukturierter Schadensmeldung, klaren Zuständigkeiten und einer technischen Basis, die auch bei sensiblen Daten sauber bleibt.",
+  intro: [
+    "Eine Hausverwaltung wird von zwei sehr unterschiedlichen Gruppen gesucht: Eigentümer und Verwaltungsbeiräte prüfen, ob sie ihr Objekt in gute Hände geben; Mieter suchen schnell einen Weg, einen Schaden zu melden oder den richtigen Ansprechpartner zu finden.",
+    "Wenn die Website beides nicht leistet, landet alles auf demselben Telefon — meistens gleichzeitig. Ich baue Auftritte, die den Erstkontakt vorsortieren: Eigentümer finden Leistungsumfang und Zuständigkeiten, Mieter finden ein strukturiertes Formular. Das spart Anrufe und wirkt nach außen professionell.",
+  ],
+  benefitsTitle: "Warum sich das für eine Verwaltung rechnet",
+  benefits: [
+    {
+      title: "Weniger Telefon, mehr Struktur",
+      text: "Ein Meldeformular mit den richtigen Pflichtfeldern — Objekt, Wohneinheit, Art des Schadens, Erreichbarkeit — bringt Anliegen vollständig herein statt in drei Rückrufen.",
+    },
+    {
+      title: "Seriosität als Akquise-Argument",
+      text: "Bei der Suche nach einer neuen Verwaltung entscheidet der erste Eindruck mit. Ein aufgeräumter, aktueller Auftritt signalisiert Sorgfalt — genau die Eigenschaft, die Eigentümer suchen.",
+    },
+    {
+      title: "Datensparsam von Anfang an",
+      text: "Formulare erheben nur, was gebraucht wird, Übertragung verschlüsselt, keine unnötigen Drittanbieter-Skripte. Bei Mieterdaten ist das keine Kür, sondern Grundlage.",
+    },
+  ],
+  includedTitle: "Was bei einer Verwaltungs-Website enthalten ist",
+  includedSubtitle: "Aufgebaut entlang der beiden Zielgruppen: Eigentümer und Mieter.",
+  included: [
+    {
+      title: "Leistungen für Eigentümer",
+      text: "WEG-Verwaltung, Mietverwaltung, Sondereigentum — verständlich getrennt dargestellt, damit Interessenten den passenden Bereich sofort finden.",
+    },
+    {
+      title: "Schadensmeldung",
+      text: "Strukturiertes Formular mit Pflichtfeldern und optionalem Foto-Upload, damit Meldungen vollständig und zuordenbar ankommen.",
+    },
+    {
+      title: "Ansprechpartner & Sprechzeiten",
+      text: "Klar benannte Zuständigkeiten und Erreichbarkeiten — reduziert Anrufe außerhalb der Zeiten und Fehlleitungen.",
+    },
+    {
+      title: "Downloads & Formulare",
+      text: "Bereich für wiederkehrende Dokumente wie Vollmachten oder Formulare, jederzeit erweiterbar.",
+    },
+    {
+      title: "Rechtstexte sauber eingebunden",
+      text: "Impressum und Datenschutzerklärung technisch korrekt verlinkt, Cookie-Banner nur dort, wo tatsächlich erforderlich.",
+    },
+    {
+      title: "Domain, SSL & E-Mail",
+      text: "Eigene Domain, verschlüsselte Verbindung und geschäftliche Postfächer, komplett eingerichtet und übergeben.",
+    },
+  ],
+  price: {
+    label: "Website-Erstellung",
+    value: "ab 890 €",
+    suffix: "netto, einmalig",
+    note: "Kompakter Auftritt mit Leistungen, Kontakt und Schadensmeldung. Umfangreichere Strukturen mit Downloadbereich und mehreren Zielgruppenpfaden ab 1.500 €.",
+  },
+  stepsTitle: "So entsteht Ihr Auftritt",
+  steps: [
+    {
+      title: "Bestandsaufnahme",
+      text: "Wir klären, welche Anliegen heute am meisten Zeit kosten und welche davon die Website vorsortieren soll.",
+    },
+    {
+      title: "Struktur & Angebot",
+      text: "Sie erhalten einen Aufbau für beide Zielgruppen und ein Festpreis-Angebot mit klarem Umfang.",
+    },
+    {
+      title: "Umsetzung & Formulare",
+      text: "Ich baue den Auftritt, richte Meldeformulare mit den passenden Feldern ein und stimme Zwischenstände ab.",
+    },
+    {
+      title: "Livegang & Übergabe",
+      text: "Nach Freigabe geht die Seite online, inklusive Einweisung. Laufende Pflege übernehme ich auf Wunsch.",
+    },
+  ],
+  faqTitle: "Häufige Fragen von Hausverwaltungen",
+  faq: [
+    {
+      question: "Können Mieter Schäden mit Foto melden?",
+      answer:
+        "Ja. Das Meldeformular lässt sich mit Foto-Upload einrichten, inklusive Größenbegrenzung, damit große Handybilder nichts blockieren. Die Meldung erreicht Sie als strukturierte E-Mail.",
+    },
+    {
+      question: "Wie sicher sind die übermittelten Daten?",
+      answer:
+        "Die Übertragung erfolgt verschlüsselt über SSL, Formulare erheben nur die tatsächlich benötigten Felder und es werden keine unnötigen Drittanbieter-Dienste eingebunden. Für die rechtliche Ausgestaltung Ihrer Datenschutzerklärung empfehle ich ergänzend juristische Prüfung.",
+    },
+    {
+      question: "Brauchen wir ein Eigentümerportal mit Login?",
+      answer:
+        "In den meisten Fällen nicht. Ein Portal verursacht dauerhaften Pflege- und Datenschutzaufwand. Für den Anfang reichen strukturierte Formulare und ein Downloadbereich fast immer aus — falls doch mehr nötig wird, lässt es sich später ergänzen.",
+    },
+    {
+      question: "Können wir Objekte oder Dokumente selbst ergänzen?",
+      answer:
+        "Ja, der Downloadbereich ist so aufgebaut, dass Sie Dokumente ohne technische Kenntnisse austauschen können. Alternativ übernehme ich Aktualisierungen im Rahmen der Wartung ab 79 € monatlich.",
+    },
+    {
+      question: "Haben Sie damit schon gearbeitet?",
+      answer:
+        "Ja — unter anderem für die Hausverwaltung Natalie Frank. Das Projekt finden Sie unter Referenzen mit Beschreibung des Umfangs und Link zur laufenden Seite.",
+    },
+  ],
+  ctaTitle: "Auftritt für Ihre Hausverwaltung?",
+  ctaText:
+    "Schildern Sie kurz, wie viele Objekte Sie betreuen und was heute am meisten Zeit frisst — Sie erhalten eine ehrliche Einschätzung und ein klares Angebot.",
+  relatedTitle: "Passende Leistungen",
+  related: [
+    { label: "Webdesign in Leverkusen", to: "/webdesign-leverkusen" },
+    { label: "Website-Wartung & Pflege", to: "/website-wartung-leverkusen" },
+    { label: "IT-Betreuung für kleine Unternehmen", to: "/it-betreuung-kleine-unternehmen" },
+  ],
+  breadcrumbName: "Website für Hausverwaltungen",
+  serviceType: "Webdesign",
+  formTopic: "Website für Hausverwaltung",
+  seo: {
+    title: "Website für Hausverwaltung – Webdesign ab 890 € | Korolov IT-Service Leverkusen",
+    description:
+      "Website für Hausverwaltungen aus Leverkusen: Schadensmeldung, klare Zuständigkeiten, datensparsame Formulare. Festpreis ab 890 €, ein Ansprechpartner, referenzerprobt.",
+    keywords:
+      "Website für Hausverwaltung, Webdesign Immobilienverwaltung, Homepage Hausverwaltung erstellen, WEG-Verwaltung Website, Hausverwaltung Leverkusen Website",
+  },
+};
+
+export const websiteFuerAnwaltskanzlei: LandingContent = {
+  path: "/website-fuer-anwaltskanzlei-leverkusen",
+  eyebrow: "Website für Kanzleien",
+  h1: "Website für Anwaltskanzleien: Vertrauen aufbauen, Termine vereinfachen",
+  lede: "Ein Kanzleiauftritt, der Rechtsgebiete verständlich zeigt, die Terminanfrage abnimmt und den berufsrechtlichen Anforderungen an Pflichtangaben technisch sauber gerecht wird.",
+  intro: [
+    "Mandanten kommen selten gut gelaunt auf eine Kanzlei-Website. Sie haben ein Problem, sind unsicher und prüfen in wenigen Minuten: Bearbeitet diese Kanzlei mein Rechtsgebiet? Wirkt sie seriös? Und wie bekomme ich einen Termin, ohne dreimal anzurufen?",
+    "Genau daran scheitern viele Kanzleiauftritte: Rechtsgebiete stehen als reine Aufzählung da, die Anwältinnen und Anwälte bleiben gesichtslos, und die Terminvereinbarung führt zu einer allgemeinen E-Mail-Adresse. Ich baue Auftritte, die diese drei Fragen beantworten — zurückhaltend im Ton, wie es zum Berufsbild passt.",
+  ],
+  benefitsTitle: "Worauf es bei einem Kanzleiauftritt ankommt",
+  benefits: [
+    {
+      title: "Rechtsgebiete, die man versteht",
+      text: "Jedes Rechtsgebiet bekommt einen eigenen Abschnitt in verständlicher Sprache — das hilft Mandanten bei der Einordnung und Google bei der Zuordnung zu passenden Suchanfragen.",
+    },
+    {
+      title: "Terminanfrage statt Telefonschleife",
+      text: "Ein strukturiertes Formular für Terminwunsch und Rückruf nimmt Ihrem Sekretariat die Vorsortierung ab und dokumentiert das Anliegen gleich schriftlich.",
+    },
+    {
+      title: "Pflichtangaben technisch korrekt",
+      text: "Impressum und Datenschutz werden vollständig eingebunden und von jeder Seite erreichbar — inklusive der berufsrechtlichen Pflichtangaben, die Sie vorgeben.",
+    },
+  ],
+  includedTitle: "Was bei einer Kanzlei-Website enthalten ist",
+  includedSubtitle: "Ein Auftritt, der Seriosität ausstrahlt und den Erstkontakt erleichtert.",
+  included: [
+    {
+      title: "Rechtsgebiete im Detail",
+      text: "Eigene Abschnitte je Tätigkeitsschwerpunkt — von Erbrecht über Arbeitsrecht bis Zivilrecht, verständlich statt paragraphenlastig.",
+    },
+    {
+      title: "Anwaltsprofile",
+      text: "Foto, Werdegang und Schwerpunkte der Berufsträger — Menschen schaffen Vertrauen schneller als Kanzleitexte.",
+    },
+    {
+      title: "Terminanfrage & Rückruf",
+      text: "Formular mit Terminwunsch, Rechtsgebiet und Erreichbarkeit sowie ein separater Rückruf-Service für kurze Anliegen.",
+    },
+    {
+      title: "Anfahrt & Erreichbarkeit",
+      text: "Kanzleianschrift, Sprechzeiten, Parkmöglichkeiten und Barrierefreiheit — Angaben, nach denen tatsächlich gesucht wird.",
+    },
+    {
+      title: "Pflichtangaben & Datenschutz",
+      text: "Impressum mit berufsrechtlichen Angaben und Datenschutzerklärung technisch sauber eingebunden, datensparsame Formulare, keine unnötigen Tracker.",
+    },
+    {
+      title: "Domain, SSL & E-Mail",
+      text: "Eigene Domain, verschlüsselte Verbindung und geschäftliche Postfächer auf Ihrer Kanzlei-Domain.",
+    },
+  ],
+  price: {
+    label: "Website-Erstellung",
+    value: "ab 890 €",
+    suffix: "netto, einmalig",
+    note: "Kompakter Kanzleiauftritt mit Rechtsgebieten, Profil und Terminanfrage. Umfangreichere Auftritte mit eigener Seite je Rechtsgebiet und mehreren Berufsträgern ab 1.500 €.",
+  },
+  stepsTitle: "So entsteht Ihr Kanzleiauftritt",
+  steps: [
+    {
+      title: "Erstgespräch",
+      text: "Wir klären Rechtsgebiete, Zielmandanten und wie der Erstkontakt heute abläuft — telefonisch oder in Ihrer Kanzlei.",
+    },
+    {
+      title: "Struktur & Angebot",
+      text: "Sie erhalten einen Aufbauvorschlag und ein Festpreis-Angebot mit klar umrissenem Leistungsumfang.",
+    },
+    {
+      title: "Inhalte & Umsetzung",
+      text: "Ich strukturiere und formuliere vor, Sie prüfen fachlich und berufsrechtlich. Erst nach Ihrer Freigabe geht ein Text online.",
+    },
+    {
+      title: "Livegang & Betreuung",
+      text: "Die Seite geht live, Sie erhalten eine Einweisung. Laufende Pflege und Aktualisierungen auf Wunsch.",
+    },
+  ],
+  faqTitle: "Häufige Fragen von Kanzleien",
+  faq: [
+    {
+      question: "Achten Sie auf die berufsrechtlichen Vorgaben?",
+      answer:
+        "Technisch ja: Pflichtangaben werden vollständig und von jeder Seite erreichbar eingebunden, Formulare bleiben datensparsam. Die inhaltliche Bewertung berufsrechtlicher Zulässigkeit — etwa bei Werbeaussagen oder Schwerpunktbezeichnungen — bleibt bei Ihnen; ich setze um, was Sie freigeben.",
+    },
+    {
+      question: "Wer schreibt die Texte zu den Rechtsgebieten?",
+      answer:
+        "Ich erstelle verständliche Entwürfe auf Basis Ihrer Angaben, Sie prüfen und korrigieren fachlich. So bleibt die Formulierung laienverständlich, ohne dass juristisch etwas schiefgeht.",
+    },
+    {
+      question: "Können Mandanten online einen Termin anfragen?",
+      answer:
+        "Ja. Standard ist ein strukturiertes Anfrageformular mit Terminwunsch und Rechtsgebiet. Eine Anbindung an einen echten Kalender ist möglich, lohnt sich aber meist erst bei hohem Anfragevolumen.",
+    },
+    {
+      question: "Wie gehen Sie mit Mandantendaten um?",
+      answer:
+        "Formulare erheben nur die für die Terminanfrage nötigen Angaben, die Übertragung ist verschlüsselt. Vertrauliche Sachverhalte gehören nicht ins Webformular — darauf weise ich im Formular selbst hin.",
+    },
+    {
+      question: "Haben Sie Erfahrung mit Kanzleien?",
+      answer:
+        "Ja. Neben laufender IT-Betreuung einer Kanzlei habe ich ein vollständiges Redesign-Konzept für eine Leverkusener Kanzlei umgesetzt — Sie finden es unter Referenzen und können es dort direkt ansehen.",
+    },
+  ],
+  ctaTitle: "Neuer Auftritt für Ihre Kanzlei?",
+  ctaText:
+    "Nennen Sie kurz Ihre Rechtsgebiete und was Sie am aktuellen Auftritt stört — Sie erhalten eine ehrliche Einschätzung und ein Festpreis-Angebot.",
+  relatedTitle: "Passende Leistungen",
+  related: [
+    { label: "Webdesign in Leverkusen", to: "/webdesign-leverkusen" },
+    { label: "IT-Betreuung für kleine Unternehmen", to: "/it-betreuung-kleine-unternehmen" },
+    { label: "Website-Wartung & Pflege", to: "/website-wartung-leverkusen" },
+  ],
+  breadcrumbName: "Website für Anwaltskanzleien",
+  serviceType: "Webdesign",
+  formTopic: "Website für Anwaltskanzlei",
+  seo: {
+    title: "Website für Anwaltskanzlei – Kanzlei-Webdesign ab 890 € | Korolov IT-Service",
+    description:
+      "Kanzlei-Website aus Leverkusen: Rechtsgebiete verständlich, Terminanfrage online, Pflichtangaben technisch sauber eingebunden. Festpreis ab 890 €, ein Ansprechpartner.",
+    keywords:
+      "Website für Anwaltskanzlei, Kanzlei Webdesign, Homepage Rechtsanwalt erstellen, Anwaltswebsite Leverkusen, Kanzleiauftritt Website",
+  },
+};
+
 export const landingPages: LandingContent[] = [
   webdesignLeverkusen,
   itSupportLeverkusen,
@@ -910,4 +1292,7 @@ export const landingPages: LandingContent[] = [
   itBetreuungKleineUnternehmen,
   itBeratungLeverkusen,
   wartungsvertragIt,
+  websiteFuerHandwerker,
+  websiteFuerHausverwaltung,
+  websiteFuerAnwaltskanzlei,
 ];
