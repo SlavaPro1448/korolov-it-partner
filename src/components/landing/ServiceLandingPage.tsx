@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, Check, ChevronRight, Mail, Phone } from "lucide-react";
+import { ArrowRight, Check, ChevronRight, Mail, Phone, Quote, Star } from "lucide-react";
 
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
@@ -20,6 +20,7 @@ import {
   serviceSchema,
 } from "@/lib/structured-data";
 import type { LandingContent } from "@/data/landing";
+import { testimonials } from "@/data/testimonials";
 
 const SITE_URL = "https://korolov-it-service.de";
 
@@ -247,6 +248,61 @@ export function ServiceLandingPage({ content }: { content: LandingContent }) {
             </Accordion>
           </div>
         </section>
+
+        {/* Kundenstimme — nur auf den Webdesign-Seiten: die Rezension bezieht
+            sich auf ein Website-Projekt und wäre auf IT-Seiten off-topic. */}
+        {content.serviceType === "Webdesign" && testimonials.length > 0 && (
+          <section className="py-14 md:py-20" aria-labelledby="landing-testimonial">
+            <div className="container-page max-w-3xl">
+              <h2
+                id="landing-testimonial"
+                className="text-2xl md:text-3xl font-bold text-brand text-balance"
+              >
+                Was Kunden sagen
+              </h2>
+              {testimonials.map((t) => (
+                <figure key={t.id} className="card-soft mt-8 p-6 md:p-7">
+                  <div className="flex items-center gap-2">
+                    <Quote className="h-5 w-5 text-accent-blue" aria-hidden="true" />
+                    <div
+                      className="flex items-center gap-0.5"
+                      aria-label={`${t.rating} von 5 Sternen`}
+                    >
+                      {Array.from({ length: t.rating }, (_, i) => (
+                        <Star
+                          key={i}
+                          className="h-4 w-4 fill-amber-400 text-amber-400"
+                          aria-hidden="true"
+                        />
+                      ))}
+                    </div>
+                  </div>
+                  <blockquote
+                    lang={t.quoteLocale}
+                    className="mt-4 text-foreground/90 leading-relaxed"
+                  >
+                    {t.quote}
+                  </blockquote>
+                  <figcaption className="mt-5 text-sm">
+                    <div className="font-medium text-brand">{t.author}</div>
+                    <div className="text-muted-foreground">
+                      <a
+                        href={t.sourceUrl}
+                        target="_blank"
+                        rel="noopener noreferrer nofollow"
+                        className="hover:text-accent-blue transition-colors"
+                      >
+                        {t.source}
+                      </a>
+                      {" · "}
+                      {t.date}
+                    </div>
+                  </figcaption>
+                </figure>
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* CTA + related */}
         <section className="py-16 md:py-24" aria-labelledby="landing-cta">

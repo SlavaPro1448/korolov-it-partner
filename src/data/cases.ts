@@ -37,11 +37,6 @@ export type Case = {
   /** "logo" = no crop, full visible content. "screenshot" = 16:9, object-cover. "icon" = small centred icon. */
   thumbnailStyle?: "logo" | "screenshot" | "icon";
   liveUrl?: string;
-  testimonial?: {
-    quote: { de: string; ru: string; uk: string };
-    author: string;
-    role: string;
-  };
   featured: boolean;
 };
 
@@ -287,15 +282,6 @@ export const cases: Case[] = [
       uk: "Регулярна техпідтримка для офісу: стабільна пошта, обслуговування та швидка реакція на збої.",
     },
     thumbnailStyle: "icon",
-    testimonial: {
-      quote: {
-        de: "Schnelle Reaktion, klare Kommunikation und verlässliche technische Unterstützung im Alltag.",
-        ru: "Быстрая реакция, понятная коммуникация и надежная техническая поддержка в ежедневной работе.",
-        uk: "Швидка реакція, зрозуміла комунікація та надійна технічна підтримка в щоденній роботі.",
-      },
-      author: "Anonym",
-      role: "Office Management",
-    },
     featured: true,
   },
 ];

@@ -1,8 +1,9 @@
 import { useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, Briefcase, Quote } from "lucide-react";
+import { ArrowRight, Briefcase, Quote, Star } from "lucide-react";
 import type { Case } from "@/data/cases";
 import { cases } from "@/data/cases";
+import { testimonials } from "@/data/testimonials";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,6 +26,7 @@ const copy: Record<
     moreOnRequest: string;
     testimonialsTitle: string;
     testimonialsSubtitle: string;
+    outOfFive: string;
   }
 > = {
   de: {
@@ -34,7 +36,8 @@ const copy: Record<
     openProject: "Projekt ansehen",
     moreOnRequest: "Weitere Projekte auf Anfrage",
     testimonialsTitle: "Kundenstimmen",
-    testimonialsSubtitle: "Freigegebene Rückmeldungen aus der Zusammenarbeit.",
+    testimonialsSubtitle: "Echte Rezensionen — direkt bei der Quelle nachprüfbar.",
+    outOfFive: "von 5 Sternen",
   },
   ru: {
     eyebrow: "Референсы",
@@ -43,7 +46,8 @@ const copy: Record<
     openProject: "Открыть проект",
     moreOnRequest: "Другие проекты — по запросу",
     testimonialsTitle: "Отзывы клиентов",
-    testimonialsSubtitle: "Публикуются только после согласования.",
+    testimonialsSubtitle: "Настоящие отзывы — их можно проверить в первоисточнике.",
+    outOfFive: "из 5 звёзд",
   },
   uk: {
     eyebrow: "Референси",
@@ -52,7 +56,8 @@ const copy: Record<
     openProject: "Переглянути проєкт",
     moreOnRequest: "Інші проєкти — за запитом",
     testimonialsTitle: "Відгуки клієнтів",
-    testimonialsSubtitle: "Публікуються тільки після погодження.",
+    testimonialsSubtitle: "Справжні відгуки — їх можна перевірити в першоджерелі.",
+    outOfFive: "з 5 зірок",
   },
 };
 
@@ -159,8 +164,6 @@ function CaseCard({ item, locale, openLabel }: CaseCardProps) {
 }
 
 function TestimonialsCarousel({ locale }: { locale: Locale }) {
-  const testimonials = useMemo(() => cases.filter((item) => item.testimonial), []);
-
   if (testimonials.length === 0) {
     return null;
   }
@@ -180,13 +183,43 @@ function TestimonialsCarousel({ locale }: { locale: Locale }) {
           {testimonials.map((item) => (
             <CarouselItem key={`testimonial-${item.id}`}>
               <figure className="card-soft p-6 md:p-7">
-                <Quote className="h-5 w-5 text-accent-blue" aria-hidden="true" />
-                <blockquote className="mt-4 text-foreground/90 leading-relaxed">
-                  {item.testimonial?.quote[locale]}
+                <div className="flex items-center gap-2">
+                  <Quote className="h-5 w-5 text-accent-blue" aria-hidden="true" />
+                  <div
+                    className="flex items-center gap-0.5"
+                    aria-label={`${item.rating} ${copy[locale].outOfFive}`}
+                  >
+                    {Array.from({ length: item.rating }, (_, i) => (
+                      <Star
+                        key={i}
+                        className="h-4 w-4 fill-amber-400 text-amber-400"
+                        aria-hidden="true"
+                      />
+                    ))}
+                  </div>
+                </div>
+                {/* Originalzitat, unverändert — auch auf /ru und /uk. Die Quelle
+                    ist verlinkt, damit der Wortlaut überprüfbar bleibt. */}
+                <blockquote
+                  lang={item.quoteLocale}
+                  className="mt-4 text-foreground/90 leading-relaxed"
+                >
+                  {item.quote}
                 </blockquote>
                 <figcaption className="mt-5 text-sm">
-                  <div className="font-medium text-brand">{item.testimonial?.author}</div>
-                  <div className="text-muted-foreground">{item.testimonial?.role}</div>
+                  <div className="font-medium text-brand">{item.author}</div>
+                  <div className="text-muted-foreground">
+                    <a
+                      href={item.sourceUrl}
+                      target="_blank"
+                      rel="noopener noreferrer nofollow"
+                      className="hover:text-accent-blue transition-colors"
+                    >
+                      {item.source}
+                    </a>
+                    {" · "}
+                    {item.date}
+                  </div>
                 </figcaption>
               </figure>
             </CarouselItem>
