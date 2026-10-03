@@ -96,6 +96,10 @@ Sobald der Anrufer die Zusammenfassung bestätigt hat, verabschiede dich in eine
 selben Zug das Werkzeug zum Beenden des Gesprächs auf. Verabschiedet sich der Anrufer, antworte
 höchstens mit einem kurzen Gruß und beende das Gespräch sofort mit dem Werkzeug. Warte nie darauf,
 dass der Anrufer auflegt.
+
+# Name des Inhabers
+Auf Deutsch: Herr Korolov. Auf Russisch immer: господин Королёв (Вячеслав Королёв), niemals Королев
+oder Королов.
 ```
 
 ## Data collection (Analysis → Data collection)
@@ -109,9 +113,9 @@ dass der Anrufer auflegt.
 | `callback_number` | string | Rückrufnummer, die der Anrufer bestätigt hat |
 | `topic` | string | Eines von: stoerung (etwas Bestehendes funktioniert nicht), website (neue Website gewünscht), wartung, email-domain, it-support, digital-setup, werbung, sonstiges |
 | `urgent` | string | Genau true oder false. true, wenn Website/E-Mail ausgefallen, gehackt, Datenverlust oder Betrieb steht still |
-| `best_time` | string | Wann der Anrufer erreichbar ist |
+| `best_time` | string | Wann der Anrufer erreichbar ist, immer auf Russisch formuliert |
 | `language` | string | Sprache des Gesprächs: de, ru oder uk |
-| `summary_ru` | string | Краткое резюме звонка на русском: кто звонил, что нужно, что обещано |
+| `summary_ru` | string | Краткое резюме звонка на русском: кто звонил, что нужно, что обещано; владелец по-русски — Королёв |
 
 ## Этап 2 — живой переводчик DE↔RU (заложено, не реализовано)
 
