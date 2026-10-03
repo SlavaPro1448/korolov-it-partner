@@ -7,7 +7,8 @@ import { sendEmail, escapeHtml } from "./contactHandler.mjs";
 const SIGNATURE_TOLERANCE_SECS = 30 * 60;
 
 const TOPIC_LABELS = {
-  website: "Создание сайта",
+  stoerung: "Сбой: сайт, почта или IT не работает",
+  website: "Новый сайт",
   wartung: "Поддержка сайта",
   "email-domain": "Почта, домен, хостинг",
   "it-support": "IT-поддержка",

@@ -104,7 +104,7 @@ Bedanke dich, bestätige den Rückruf und verabschiede dich. Beende danach das G
 | `caller_name` | string | Name des Anrufers |
 | `company` | string | Firma des Anrufers, leer wenn keine genannt |
 | `callback_number` | string | Rückrufnummer, die der Anrufer bestätigt hat |
-| `topic` | string | Eines von: website, wartung, email-domain, it-support, digital-setup, werbung, sonstiges |
+| `topic` | string | Eines von: stoerung (etwas Bestehendes funktioniert nicht), website (neue Website gewünscht), wartung, email-domain, it-support, digital-setup, werbung, sonstiges |
 | `urgent` | string | Genau true oder false. true, wenn Website/E-Mail ausgefallen, gehackt, Datenverlust oder Betrieb steht still |
 | `best_time` | string | Wann der Anrufer erreichbar ist |
 | `language` | string | Sprache des Gesprächs: de, ru oder uk |
