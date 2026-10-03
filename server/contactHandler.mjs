@@ -185,7 +185,7 @@ async function sendViaResend({ from, to, replyTo, subject, text, html, headers }
   }
 }
 
-async function sendEmail(msg) {
+export async function sendEmail(msg) {
   if (useResend()) {
     await sendViaResend(msg);
     return;
@@ -234,7 +234,7 @@ function validate(body, locale) {
   return { errors, clean: { name, email, phone, topic, message, company: sanitizeLine(body.company) } };
 }
 
-function escapeHtml(s) {
+export function escapeHtml(s) {
   return String(s ?? "")
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
