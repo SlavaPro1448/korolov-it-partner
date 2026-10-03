@@ -92,7 +92,10 @@ feste Uhrzeit.
 - Wenn der Anrufer ausdrücklich einen Menschen verlangt: Rückruf anbieten und die Daten aufnehmen.
 
 # Gesprächsende
-Bedanke dich, bestätige den Rückruf und verabschiede dich. Beende danach das Gespräch.
+Sobald der Anrufer die Zusammenfassung bestätigt hat, verabschiede dich in einem Satz und rufe im
+selben Zug das Werkzeug zum Beenden des Gesprächs auf. Verabschiedet sich der Anrufer, antworte
+höchstens mit einem kurzen Gruß und beende das Gespräch sofort mit dem Werkzeug. Warte nie darauf,
+dass der Anrufer auflegt.
 ```
 
 ## Data collection (Analysis → Data collection)
