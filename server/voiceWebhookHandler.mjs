@@ -56,14 +56,16 @@ function formatDuration(secs) {
 
 function formatTranscript(transcript) {
   if (!Array.isArray(transcript)) return "";
-  return transcript
-    .filter((turn) => turn?.message)
-    // Sprechstil-Marker der Sprachausgabe wie "[friendly]" gehören nicht ins Protokoll.
-    .map((turn) => {
-      const message = String(turn.message).replace(/^\s*\[[^\]]{1,30}\]\s*/, "");
-      return `${turn.role === "agent" ? "Ассистент" : "Клиент"}: ${message}`;
-    })
-    .join("\n");
+  return (
+    transcript
+      .filter((turn) => turn?.message)
+      // Sprechstil-Marker der Sprachausgabe wie "[friendly]" gehören nicht ins Protokoll.
+      .map((turn) => {
+        const message = String(turn.message).replace(/^\s*\[[^\]]{1,30}\]\s*/, "");
+        return `${turn.role === "agent" ? "Ассистент" : "Клиент"}: ${message}`;
+      })
+      .join("\n")
+  );
 }
 
 export function buildCallEmail(data) {
