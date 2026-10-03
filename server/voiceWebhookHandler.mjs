@@ -61,7 +61,9 @@ function formatTranscript(transcript) {
       .filter((turn) => turn?.message)
       // Sprechstil-Marker der Sprachausgabe wie "[friendly]" gehören nicht ins Protokoll.
       .map((turn) => {
-        const message = String(turn.message).replace(/^\s*\[[^\]]{1,30}\]\s*/, "");
+        const message = String(turn.message)
+          .replace(/\[[\p{L} ]{1,24}\]\s*/gu, "")
+          .trim();
         return `${turn.role === "agent" ? "Ассистент" : "Клиент"}: ${message}`;
       })
       .join("\n")
