@@ -29,6 +29,7 @@ export const OPERATOR_PAGE = `<!doctype html>
 </style>
 <h1>Переводчик зала — оператор</h1>
 <div class="row">
+  <label>Источник: <select id="source"><option value="mic">микрофон этого компьютера</option><option value="stream">стрим зала (с пульта)</option></select></label>
   <label>Вход: <select id="device"></select></label>
   <button id="start" class="primary">Старт</button>
   <button id="pause" class="pause" disabled>Пауза</button>
@@ -102,11 +103,12 @@ async function start() {
     $("meter").firstElementChild.style.width = Math.min(100, e.data.rms / 40) + "%";
     if (ws.readyState === 1) ws.send(e.data.buf);
   };
-  ws.onopen = () => { ws.send(JSON.stringify({ threshold: Number(thr.value) })); $("state").textContent = "В эфире. Распознаю речь зала (" + MODELS.stt + " → " + MODELS.text + " → " + MODELS.tts + ")."; };
+  ws.onopen = () => { ws.send(JSON.stringify({ threshold: Number(thr.value) })); ws.send(JSON.stringify({ source: $("source").value })); $("state").textContent = "В эфире. Распознаю речь зала (" + MODELS.stt + " → " + MODELS.text + " → " + MODELS.tts + ")."; };
   ws.onmessage = (e) => {
     const m = JSON.parse(e.data);
     if (m.type === "phrase") phrase(m);
     else if (m.type === "partial") $("live").textContent = m.text ? "… " + m.text : "";
+    else if (m.type === "source") $("state").textContent = m.source === "stream" ? "В эфире: звук со стрима зала (пульт). Микрофон этого компьютера не используется." : "В эфире: микрофон этого компьютера.";
     else if (m.type === "stats") $("stats").textContent = "Слушают: RU " + m.listeners.ru + ", DE " + m.listeners.de + " · фраз " + m.phrases + " · распознано " + m.sttMinutes.toFixed(1) + " мин · ≈ $" + m.cost.toFixed(2) + " · сессия " + m.minutes.toFixed(0) + " мин";
     else if (m.type === "error") $("err").textContent = "Ошибка: " + m.message;
   };
@@ -116,6 +118,7 @@ async function start() {
   $("start").textContent = "Стоп"; $("start").className = "stop"; $("pause").disabled = false;
 }
 $("start").onclick = () => (stop ? stop() : start().catch((e) => ($("err").textContent = "Ошибка: " + e.message)));
+$("source").onchange = () => { if (ws && ws.readyState === 1) ws.send(JSON.stringify({ source: $("source").value })); };
 $("pause").onclick = () => { paused = !paused; ws && ws.send(JSON.stringify({ paused })); $("pause").textContent = paused ? "Продолжить" : "Пауза"; $("state").textContent = paused ? "ПАУЗА — звук не распознаётся (пение, музыка)." : "В эфире."; };
 </script>
 </html>`;

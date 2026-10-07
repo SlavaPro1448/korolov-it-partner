@@ -6,6 +6,7 @@ import { WebSocketServer } from "ws";
 import { createPipeline } from "./pipeline.mjs";
 import { createStreamingPipeline } from "./stream.mjs";
 import { estimateCost } from "./stages.mjs";
+import { startStreamSource } from "./source.mjs";
 import { OPERATOR_PAGE } from "./pages.mjs";
 import { LISTEN_PAGE } from "./listen.mjs";
 
@@ -16,6 +17,7 @@ const config = {
   sttModel: env.STT_MODEL || "gpt-4o-transcribe",
   sttMode: env.STT_MODE || "stream", // stream = Realtime-VAD, batch = по паузам на сервере
   vadSilenceMs: Number(env.VAD_SILENCE_MS || 400),
+  streamSourceUrl: env.STREAM_SOURCE_URL || "http://gemeinde-icecast:8000/de.mp3",
   textModel: env.TEXT_MODEL || "gpt-5.4-mini",
   ttsModel: env.TTS_MODEL || "gpt-4o-mini-tts",
   voices: { ru: env.VOICE_RU || "cedar", de: env.VOICE_DE || "marin" },
@@ -135,8 +137,31 @@ function attachOperator(ws) {
   broadcastState();
   sendJson(ws, { type: "hello", threshold: me.threshold, models: publicModels() });
 
+  me.source = "mic";
+  me.streamSource = null;
+  const setSource = (source) => {
+    if (source !== "mic" && source !== "stream") return;
+    if (source === me.source) return;
+    me.source = source;
+    me.streamSource?.stop();
+    me.streamSource = null;
+    if (source === "stream") {
+      me.streamSource = startStreamSource({
+        url: config.streamSourceUrl,
+        onChunk: (chunk) => {
+          if (operator !== me) return;
+          const level = me.pipeline.send(chunk);
+          levelAcc += level;
+          levelN += 1;
+        },
+      });
+    }
+    console.info(`[operator] Quelle: ${source}`);
+    sendJson(ws, { type: "source", source });
+  };
   ws.on("message", (data, isBinary) => {
     if (isBinary) {
+      if (me.source !== "mic") return; // звук идёт со стрима зала, микрофон игнорируем
       const level = me.pipeline.send(Buffer.from(data));
       levelAcc += level;
       levelN += 1;
@@ -156,6 +181,7 @@ function attachOperator(ws) {
       me.threshold = msg.threshold;
     }
     if (msg.flush) me.pipeline.flush();
+    if (msg.source) setSource(msg.source);
   });
   ws.on("close", () => {
     if (operator === me) {
@@ -168,6 +194,7 @@ function attachOperator(ws) {
 }
 
 function detachOperator(op) {
+  op.streamSource?.stop();
   clearTimeout(op.timer);
   clearInterval(op.statsTimer);
   op.pipeline.close();

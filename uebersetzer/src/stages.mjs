@@ -38,7 +38,9 @@ export function createStages({
               `${LANG_NAMES[src]}en ins ${LANG_NAMES[dst]}e. Die Antwort ist ausschließlich der übersetzte Text auf ` +
               `${LANG_NAMES[dst]} — nie der Originaltext, keine Anführungszeichen, keine Erklärungen. ` +
               "Treu und vollständig, natürlich, im Ton einer Predigt. Bibelstellen, Namen und Zahlen exakt. " +
-              "Auch Satzfragmente übersetzen, so wie sie sind. Vorherige Sätze sind nur Kontext." +
+              "Auch Satzfragmente übersetzen, so wie sie sind. Der Text kommt aus automatischer Spracherkennung im " +
+              "Saal und kann Hörfehler enthalten: übersetze den offensichtlich gemeinten Sinn (biblische Namen, " +
+              "Kirchenbegriffe, Bibelstellen) statt wörtlichen Unsinn. Vorherige Sätze sind nur Kontext." +
               (strict ? ` WICHTIG: Der vorige Versuch war nicht auf ${LANG_NAMES[dst]}. Antworte jetzt auf ${LANG_NAMES[dst]}.` : ""),
           },
           ...(context.length ? [{ role: "user", content: `Kontext:\n${context.join("\n")}` }] : []),

@@ -113,6 +113,7 @@ function stopAll() {
   for (const s of sources) { try { s.stop(); } catch {} }
   sources = []; playhead = 0; cur = null;
   sayQueue.length = 0; saying = false; if (window.speechSynthesis) speechSynthesis.cancel();
+  bgQueue.length = 0; for (const k in collecting) delete collecting[k];
 }
 
 function onPhrase(p) {
@@ -128,7 +129,7 @@ function connect() {
   ws.onmessage = (e) => {
     if (typeof e.data !== "string") {
       const view = new DataView(e.data); const id = view.getUint32(0, true); const kind = view.getUint8(4);
-      if (kind === 1 && voiceMode === "server") playPcm(id, new Uint8Array(e.data, 5));
+      onAudioFrame(id, kind, new Uint8Array(e.data, 5));
       return;
     }
     const m = JSON.parse(e.data);
@@ -153,6 +154,35 @@ function silentWav(seconds) {
   return URL.createObjectURL(new Blob([buf], { type: "audio/wav" }));
 }
 const keepalive = new Audio(); keepalive.loop = true; keepalive.setAttribute("playsinline", "");
+let silentUrl = null;
+// Фон (экран погашен): Web Audio на iPhone засыпает, а обычный <audio> играет дальше. Поэтому в фоне
+// куски фразы собираются в WAV и проигрываются тем же элементом, что крутит тишину.
+let hidden = document.visibilityState !== "visible";
+const collecting = {}; const bgQueue = []; let bgPlaying = false;
+function wavBlob(chunks) {
+  const n = chunks.reduce((a, c) => a + c.byteLength, 0); const buf = new ArrayBuffer(44 + n), v = new DataView(buf), u = new Uint8Array(buf);
+  const str = (o, t) => { for (let i = 0; i < t.length; i++) v.setUint8(o + i, t.charCodeAt(i)); };
+  str(0, "RIFF"); v.setUint32(4, 36 + n, true); str(8, "WAVEfmt "); v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
+  v.setUint32(24, 24000, true); v.setUint32(28, 48000, true); v.setUint16(32, 2, true); v.setUint16(34, 16, true); str(36, "data"); v.setUint32(40, n, true);
+  let o = 44; for (const c of chunks) { u.set(c, o); o += c.byteLength; }
+  return new Blob([buf], { type: "audio/wav" });
+}
+function playBgNext() {
+  if (bgPlaying || !bgQueue.length) return;
+  bgPlaying = true; keepalive.loop = false; keepalive.src = URL.createObjectURL(bgQueue.shift()); keepalive.play().catch(() => { bgPlaying = false; });
+}
+keepalive.onended = () => {
+  if (keepalive.src !== silentUrl) URL.revokeObjectURL(keepalive.src);
+  bgPlaying = false;
+  if (bgQueue.length) playBgNext();
+  else { keepalive.loop = true; keepalive.src = silentUrl; keepalive.play().catch(() => {}); }
+};
+function onAudioFrame(id, kind, bytes) {
+  if (voiceMode !== "server") return;
+  if (!hidden && !bgPlaying) { if (kind === 1) playPcm(id, bytes); return; }
+  if (kind === 1) { (collecting[id] = collecting[id] || []).push(bytes.slice(0)); }
+  else if (kind === 2 && collecting[id]) { bgQueue.push(wavBlob(collecting[id])); delete collecting[id]; while (bgQueue.length > 3) bgQueue.shift(); playBgNext(); }
+}
 
 $("go").onclick = () => {
   started = true; $("go").style.display = "none"; $("explain").style.display = "none";
@@ -160,7 +190,7 @@ $("go").onclick = () => {
   try { ctx = new AudioContext({ sampleRate: 24000 }); ctx.resume().catch(() => {}); } catch { ctx = new AudioContext(); }
   // Короткий звук в жесте пользователя — разблокирует Web Audio на iPhone
   try { const b = ctx.createBuffer(1, 240, ctx.sampleRate); const s = ctx.createBufferSource(); s.buffer = b; s.connect(ctx.destination); s.start(); } catch {}
-  keepalive.src = silentWav(2); keepalive.play().catch(() => {});
+  silentUrl = silentWav(2); keepalive.src = silentUrl; keepalive.play().catch(() => {});
   if (window.speechSynthesis) { speechSynthesis.getVoices(); const u = new SpeechSynthesisUtterance(" "); u.volume = 0; speechSynthesis.speak(u); }
   if ("mediaSession" in navigator) {
     try {
@@ -173,7 +203,8 @@ $("go").onclick = () => {
   connect();
 };
 document.addEventListener("visibilitychange", () => {
-  if (!started || document.visibilityState !== "visible") return;
+  hidden = document.visibilityState !== "visible";
+  if (!started || hidden) return;
   if (keepalive.paused) keepalive.play().catch(() => {});
   if (ctx && ctx.state !== "running") ctx.resume().catch(() => {});
 });
