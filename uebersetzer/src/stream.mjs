@@ -53,13 +53,20 @@ export function createStreamingPipeline({
   let pending = "";
   let pendingTimer = null;
   const FLUSH_MS = 2000;
+  const FLUSH_SHORT_MS = 4500; // одно-два слова ждут продолжения дольше
   const PENDING_MAX_CHARS = 220;
+  const wordCount = (t) => t.split(/\s+/).filter(Boolean).length;
   const flushPending = () => {
     clearTimeout(pendingTimer);
     pendingTimer = null;
     if (!pending) return;
     const text = pending;
     pending = "";
+    // Одиночное слово без продолжения — заикание или обрыв: переводить нечего
+    if (wordCount(text) < 2) {
+      log.info("[stream] одиночное слово отброшено");
+      return;
+    }
     enqueueText(text);
   };
   const audioBacklog = [];
@@ -145,7 +152,7 @@ export function createStreamingPipeline({
     } else if (pending) {
       onPartial?.(pending);
       clearTimeout(pendingTimer);
-      pendingTimer = setTimeout(flushPending, FLUSH_MS);
+      pendingTimer = setTimeout(flushPending, wordCount(pending) <= 2 ? FLUSH_SHORT_MS : FLUSH_MS);
     } else {
       onPartial?.("");
     }

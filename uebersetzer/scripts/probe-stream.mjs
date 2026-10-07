@@ -11,7 +11,7 @@ const stamp = () => ((Date.now() - t0) / 1000).toFixed(1) + "s";
 let audioBytes = 0;
 const p = createStreamingPipeline({
   apiKey: process.env.OPENAI_API_KEY,
-  sttPrompt: process.env.STT_PROMPT ?? "Predigt in einer russlanddeutschen Gemeinde: Deutsch mit russischem Akzent und Russisch. Bibel, Gemeinde, Jesus Christus, Heiliger Geist, Römerbrief. Проповедь, Библия, община, Иисус Христос, Святой Дух.",
+  sttPrompt: process.env.STT_PROMPT ?? "",
   onPartial: (text) => text && console.log(`${stamp()} partial: ${text}`),
   onPhrase: (ph) => console.log(`${stamp()} phrase #${ph.id} [${ph.src}] ${ph.srcText}\n       -> [${ph.dst}] ${ph.dstText}`),
   onAudio: (id, lang, chunk) => {
