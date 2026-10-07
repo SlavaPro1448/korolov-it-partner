@@ -54,7 +54,8 @@ export function createPipeline({
   voices = { ru: "cedar", de: "marin" },
   getThreshold = () => 500,
   onPhrase, // ({id, src, srcText, dst, dstText})
-  onAudio, // (id, dst, mp3Buffer)
+  onAudio, // (id, dst, pcmChunk) — PCM16 LE mono 24 kHz, кусками
+  onAudioEnd = null, // (id, dst)
   onError = () => {},
   log = console,
   fetchImpl = fetch,
@@ -126,7 +127,8 @@ export function createPipeline({
     return { lang, translation };
   }
 
-  async function speak(text, lang) {
+  // Озвучка потоком: PCM16 24 кГц уходит слушателям кусками по мере генерации.
+  async function speak(id, text, lang) {
     const res = await fetchImpl("https://api.openai.com/v1/audio/speech", {
       method: "POST",
       headers: { ...headers, "Content-Type": "application/json" },
@@ -134,7 +136,7 @@ export function createPipeline({
         model: ttsModel,
         voice: voices[lang] ?? "cedar",
         input: text,
-        response_format: "mp3",
+        response_format: "pcm",
         instructions:
           lang === "ru"
             ? "Говори спокойно, ясно и тепло, как переводчик проповеди в церкви. Без спешки."
@@ -143,7 +145,23 @@ export function createPipeline({
     });
     if (!res.ok) throw new Error(`TTS ${res.status}`);
     stats.ttsChars += text.length;
-    return Buffer.from(await res.arrayBuffer());
+    let rest = Buffer.alloc(0);
+    let total = 0;
+    let first = 0;
+    const t0 = Date.now();
+    for await (const chunk of res.body) {
+      if (closed) return { total, first };
+      const data = Buffer.concat([rest, Buffer.from(chunk)]);
+      const usable = data.length - (data.length % 2);
+      rest = data.subarray(usable);
+      if (usable > 0) {
+        if (!first) first = Date.now() - t0;
+        total += usable;
+        onAudio(id, lang, data.subarray(0, usable));
+      }
+    }
+    onAudioEnd?.(id, lang);
+    return { total, first };
   }
 
   function finishSegment() {
@@ -180,10 +198,11 @@ export function createPipeline({
           .then(async () => {
             if (closed) return;
             const t0 = Date.now();
-            const mp3 = await speak(translation, dst);
+            const { total, first } = await speak(id, translation, dst);
             if (closed) return;
-            log.info(`[pipe] #${id} tts ${Date.now() - t0} ms, ${mp3.length} bytes`);
-            onAudio(id, dst, mp3);
+            log.info(
+              `[pipe] #${id} tts first ${first} ms, all ${Date.now() - t0} ms, ${(total / 48000).toFixed(1)} s audio`,
+            );
           })
           .catch((error) => {
             log.error(`[pipe] #${id} tts:`, error.message);

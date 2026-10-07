@@ -4,7 +4,8 @@ import http from "node:http";
 import { timingSafeEqual } from "node:crypto";
 import { WebSocketServer } from "ws";
 import { createPipeline, estimateCost } from "./pipeline.mjs";
-import { LISTEN_PAGE, OPERATOR_PAGE } from "./pages.mjs";
+import { OPERATOR_PAGE } from "./pages.mjs";
+import { LISTEN_PAGE } from "./listen.mjs";
 
 const env = process.env;
 const config = {
@@ -50,10 +51,12 @@ function broadcastPhrase(phrase) {
   if (operator) sendJson(operator.ws, { type: "phrase", ...phrase });
 }
 
-function broadcastAudio(id, lang, mp3) {
-  const frame = Buffer.alloc(4 + mp3.length);
+// Бинарный кадр: [uint32 id][uint8 kind: 1 = кусок PCM, 2 = конец фразы][payload]
+function broadcastAudio(id, lang, pcm, kind = 1) {
+  const frame = Buffer.alloc(5 + pcm.length);
   frame.writeUInt32LE(id, 0);
-  mp3.copy(frame, 4);
+  frame.writeUInt8(kind, 4);
+  pcm.copy(frame, 5);
   for (const l of listeners) if (l.lang === lang && l.ws.readyState === 1) l.ws.send(frame);
 }
 
@@ -91,6 +94,7 @@ function attachOperator(ws) {
     getThreshold: () => me.threshold,
     onPhrase: broadcastPhrase,
     onAudio: broadcastAudio,
+    onAudioEnd: (id, lang) => broadcastAudio(id, lang, Buffer.alloc(0), 2),
     onError: (error) => sendJson(ws, { type: "error", message: error.message }),
   });
   operator = me;

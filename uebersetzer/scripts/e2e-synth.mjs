@@ -13,12 +13,15 @@ const wsBase = base.replace(/^http/, "ws");
 const pcm = readFileSync(file);
 const CHUNK = 2400 * 2; // 100 ms
 const t0 = Date.now();
+const audioBytes = {};
 const stamp = () => ((Date.now() - t0) / 1000).toFixed(1) + "s";
 
 const listener = new WebSocket(`${wsBase}/listen-ws?key=${encodeURIComponent(listenKey)}&lang=${lang}`);
 listener.on("message", (data, isBinary) => {
   if (isBinary) {
-    console.log(`${stamp()} listener: audio #${data.readUInt32LE(0)} ${data.length - 4} bytes mp3`);
+    const id = data.readUInt32LE(0), kind = data.readUInt8(4);
+    if (kind === 2) console.log(`${stamp()} listener: audio #${id} end, total ${(audioBytes[id] / 48000).toFixed(1)} s`);
+    else { if (!audioBytes[id]) console.log(`${stamp()} listener: audio #${id} first chunk`); audioBytes[id] = (audioBytes[id] || 0) + data.length - 5; }
   } else {
     const m = JSON.parse(String(data));
     if (m.type === "phrase") console.log(`${stamp()} listener: [${m.src}] ${m.srcText}\n       -> [${m.dst}] ${m.dstText}`);
