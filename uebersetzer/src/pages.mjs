@@ -175,7 +175,7 @@ function applyLang() {
 function showState() {
   if (!started) { $("state").textContent = ""; return; }
   if (!ws || ws.readyState !== 1) $("state").textContent = t().no;
-  else if (!state.live) $("state").textContent = t().off;
+  else if (!state.live) $("state").textContent = t().off + " ✓";
   else if (state.paused) $("state").textContent = t().paused;
   else $("state").textContent = t().live;
 }
@@ -231,15 +231,36 @@ async function keepAwake() {
   try { if (navigator.wakeLock) { let lock = await navigator.wakeLock.request("screen"); document.addEventListener("visibilitychange", async () => { if (document.visibilityState === "visible") lock = await navigator.wakeLock.request("screen").catch(() => lock); }); } } catch {}
 }
 
+// Тихий зацикленный звук: пока он играет, iOS не усыпляет страницу при погашенном экране,
+// WebSocket живёт, а озвучка перевода играет поверх (как у веб-радио).
+function silentWav(seconds) {
+  const rate = 8000, n = rate * seconds, buf = new ArrayBuffer(44 + n * 2), v = new DataView(buf);
+  const str = (o, s) => { for (let i = 0; i < s.length; i++) v.setUint8(o + i, s.charCodeAt(i)); };
+  str(0, "RIFF"); v.setUint32(4, 36 + n * 2, true); str(8, "WAVEfmt "); v.setUint32(16, 16, true); v.setUint16(20, 1, true);
+  v.setUint16(22, 1, true); v.setUint32(24, rate, true); v.setUint32(28, rate * 2, true); v.setUint16(32, 2, true); v.setUint16(34, 16, true);
+  str(36, "data"); v.setUint32(40, n * 2, true);
+  return URL.createObjectURL(new Blob([buf], { type: "audio/wav" }));
+}
+const keepalive = new Audio(); keepalive.loop = true; keepalive.setAttribute("playsinline", "");
+
 $("go").onclick = async () => {
   started = true; $("go").style.display = "none";
   // Разблокировать звук жестом пользователя (iOS) и перевести в режим воспроизведения, чтобы играло при выключенном звонке
   try { if (navigator.audioSession) navigator.audioSession.type = "playback"; } catch {}
+  try { keepalive.src = silentWav(2); await keepalive.play(); } catch {}
   try { audio.src = "data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YQAAAAA="; await audio.play(); } catch {}
   if (window.speechSynthesis) { speechSynthesis.getVoices(); const u = new SpeechSynthesisUtterance(" "); u.volume = 0; speechSynthesis.speak(u); }
+  if ("mediaSession" in navigator) {
+    try {
+      navigator.mediaSession.metadata = new MediaMetadata({ title: lang === "de" ? "Übersetzung" : "Перевод", artist: "Gemeinde Leverkusen" });
+      navigator.mediaSession.setActionHandler("pause", () => {}); navigator.mediaSession.setActionHandler("play", () => {});
+    } catch {}
+  }
   keepAwake();
   connect();
 };
+// Если iOS всё же остановил фоновый звук (звонок, другое приложение) — возобновить при возврате
+document.addEventListener("visibilitychange", () => { if (started && document.visibilityState === "visible" && keepalive.paused) keepalive.play().catch(() => {}); });
 applyLang();
 </script>
 </html>`;

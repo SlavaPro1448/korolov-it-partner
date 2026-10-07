@@ -1,17 +1,23 @@
 // Konvейер: пауза в речи -> распознавание (язык любой) -> определение языка + перевод текстом
 // -> озвучка перевода. Аудио нигде не сохраняется, текст в лог не пишется (только тайминги).
 const RATE = 24000;
-const endSilenceMs = (totalMs) => (totalMs < 4000 ? 600 : totalMs < 9000 ? 350 : 250);
-const MIN_SPEECH_MS = 400;
-const MAX_SEGMENT_MS = 12000;
+// Проповедь: режем по фразам, а не по коротким вдохам. Чем дольше уже говорят, тем короче
+// допустимая пауза, чтобы не упереться в лимит посреди слова.
+const endSilenceMs = (totalMs) => (totalMs < 5000 ? 900 : totalMs < 10000 ? 650 : 450);
+const MIN_SPEECH_MS = 600;
+const MAX_SEGMENT_MS = 18000;
 const PREROLL_MS = 300;
 const CONTEXT_PHRASES = 3;
 
 const LANG_NAMES = { de: "Deutsch", ru: "Russisch" };
 
-const STT_PROMPT =
-  "Gottesdienst der Gemeinde Leverkusen: Predigt, Gebet, Bibel, Jesus Christus, Evangelium, Gemeinde. " +
-  "Церковное собрание: проповедь, молитва, Библия, Иисус Христос, Евангелие, церковь, братья и сёстры.";
+// Язык по алфавиту: кириллица → ru, латиница → de. Надёжнее, чем просить модель.
+export function detectLang(text) {
+  const cyr = (text.match(/[Ѐ-ӿ]/g) || []).length;
+  const lat = (text.match(/[A-Za-zÄÖÜäöüß]/g) || []).length;
+  if (cyr + lat < 3) return "other";
+  return cyr >= lat ? "ru" : "de";
+}
 
 export function rms(buffer) {
   let sum = 0;
@@ -70,7 +76,7 @@ export function createPipeline({
     const form = new FormData();
     form.append("file", new Blob([wav(pcm)], { type: "audio/wav" }), "speech.wav");
     form.append("model", sttModel);
-    form.append("prompt", STT_PROMPT);
+    // Без prompt: на шуме и коротких отрезках модель повторяла текст подсказки как «распознанное».
     const res = await fetchImpl("https://api.openai.com/v1/audio/transcriptions", {
       method: "POST",
       headers,
@@ -80,44 +86,26 @@ export function createPipeline({
     return ((await res.json()).text ?? "").trim();
   }
 
-  async function detectAndTranslate(text) {
+  async function translate(text, src, dst, strict = false) {
     const res = await fetchImpl("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: { ...headers, "Content-Type": "application/json" },
       body: JSON.stringify({
         model: textModel,
         reasoning_effort: "none",
-        response_format: {
-          type: "json_schema",
-          json_schema: {
-            name: "translation",
-            strict: true,
-            schema: {
-              type: "object",
-              additionalProperties: false,
-              required: ["lang", "translation"],
-              properties: {
-                lang: { type: "string", enum: ["ru", "de", "other"] },
-                translation: { type: "string" },
-              },
-            },
-          },
-        },
         messages: [
           {
             role: "system",
             content:
-              "Du bist Simultandolmetscher in einem christlichen Gottesdienst (Gemeinde Leverkusen). " +
-              "Im Saal wird abwechselnd Russisch und Deutsch gesprochen. Du bekommst eine erkannte Äußerung. " +
-              "Bestimme ihre Sprache (ru oder de; wenn sie weder Russisch noch Deutsch ist oder nur Geräusch/Gesang " +
-              "ohne Sinn, dann other und leere Übersetzung). Übersetze Russisch ins Deutsche und Deutsch ins " +
-              "Russische: treu, vollständig, natürlich, im Stil einer Predigt. Bibelstellen, Namen, Zahlen exakt. " +
-              "Nichts hinzufügen, nichts erklären. Vorherige Äußerungen dienen nur als Kontext und werden nicht übersetzt.",
+              `Du bist Dolmetscher in einem christlichen Gottesdienst. Übersetze den Satz des Predigers aus dem ` +
+              `${LANG_NAMES[src]}en ins ${LANG_NAMES[dst]}e. Die Antwort ist ausschließlich der übersetzte Text auf ` +
+              `${LANG_NAMES[dst]} — nie der Originaltext, keine Anführungszeichen, keine Erklärungen. ` +
+              "Treu und vollständig, natürlich, im Ton einer Predigt. Bibelstellen, Namen und Zahlen exakt. " +
+              "Auch Satzfragmente übersetzen, so wie sie sind. Vorherige Sätze sind nur Kontext." +
+              (strict ? ` WICHTIG: Der vorige Versuch war nicht auf ${LANG_NAMES[dst]}. Antworte jetzt auf ${LANG_NAMES[dst]}.` : ""),
           },
-          ...(context.length
-            ? [{ role: "user", content: `Kontext (nicht übersetzen):\n${context.join("\n")}` }]
-            : []),
-          { role: "user", content: `Äußerung:\n${text}` },
+          ...(context.length ? [{ role: "user", content: `Kontext:\n${context.join("\n")}` }] : []),
+          { role: "user", content: text },
         ],
       }),
     });
@@ -125,13 +113,17 @@ export function createPipeline({
     const data = await res.json();
     stats.inTokens += data.usage?.prompt_tokens ?? 0;
     stats.outTokens += data.usage?.completion_tokens ?? 0;
-    const content = data.choices?.[0]?.message?.content ?? "{}";
-    try {
-      const parsed = JSON.parse(content);
-      return { lang: parsed.lang, translation: (parsed.translation ?? "").trim() };
-    } catch {
-      return { lang: "other", translation: "" };
-    }
+    return (data.choices?.[0]?.message?.content ?? "").trim().replace(/^["«„]|["»“]$/g, "");
+  }
+
+  async function detectAndTranslate(text) {
+    const lang = detectLang(text);
+    if (lang === "other") return { lang, translation: "" };
+    const dst = lang === "ru" ? "de" : "ru";
+    let translation = await translate(text, lang, dst);
+    if (detectLang(translation) !== dst) translation = await translate(text, lang, dst, true);
+    if (detectLang(translation) !== dst) return { lang, translation: "" };
+    return { lang, translation };
   }
 
   async function speak(text, lang) {
@@ -170,6 +162,7 @@ export function createPipeline({
         stats.sttSeconds += seconds;
         const text = await transcribe(pcm);
         if (!text || closed) return;
+        if (detectLang(text) === "other") return; // шум, музыка, «…»
         const afterStt = Date.now();
         const { lang, translation } = await detectAndTranslate(text);
         const afterText = Date.now();
