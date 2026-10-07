@@ -1,0 +1,15 @@
+{
+  "name": "gemeinde-uebersetzer",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node src/server.mjs",
+    "dev": "node --watch src/server.mjs"
+  },
+  "dependencies": {
+    "ws": "^8.18.0"
+  }
+}
