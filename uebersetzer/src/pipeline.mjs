@@ -3,9 +3,9 @@
 const RATE = 24000;
 // Проповедь: режем по фразам, а не по коротким вдохам. Чем дольше уже говорят, тем короче
 // допустимая пауза, чтобы не упереться в лимит посреди слова.
-const endSilenceMs = (totalMs) => (totalMs < 5000 ? 900 : totalMs < 10000 ? 650 : 450);
+const endSilenceMs = (totalMs) => (totalMs < 4000 ? 650 : totalMs < 8000 ? 450 : 350);
 const MIN_SPEECH_MS = 600;
-const MAX_SEGMENT_MS = 18000;
+const MAX_SEGMENT_MS = 12000;
 const PREROLL_MS = 300;
 const CONTEXT_PHRASES = 3;
 
