@@ -16,7 +16,8 @@ const config = {
   apiKey: env.OPENAI_API_KEY || "",
   sttModel: env.STT_MODEL || "gpt-4o-transcribe",
   sttMode: env.STT_MODE || "stream", // stream = Realtime-VAD, batch = по паузам на сервере
-  vadSilenceMs: Number(env.VAD_SILENCE_MS || 400),
+  vadSilenceMs: Number(env.VAD_SILENCE_MS || 600),
+  noiseReduction: env.NOISE_REDUCTION || "near_field",
   streamSourceUrl: env.STREAM_SOURCE_URL || "http://gemeinde-icecast:8000/de.mp3",
   textModel: env.TEXT_MODEL || "gpt-5.4-mini",
   ttsModel: env.TTS_MODEL || "gpt-4o-mini-tts",
@@ -96,6 +97,7 @@ function attachOperator(ws) {
   me.pipeline = make({
     apiKey: config.apiKey,
     silenceMs: config.vadSilenceMs,
+    noiseReduction: config.noiseReduction,
     onPartial: (text) => {
       // Живая строка распознавания: не чаще 4 раз в секунду, пустая строка = реплика закончена
       const now = Date.now();

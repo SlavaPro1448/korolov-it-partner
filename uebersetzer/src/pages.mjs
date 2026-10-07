@@ -92,7 +92,8 @@ async function start() {
   const ctx = new AudioContext({ sampleRate: 24000 });
   const deviceId = $("device").value;
   const stream = await navigator.mediaDevices.getUserMedia({
-    audio: { deviceId: deviceId ? { exact: deviceId } : undefined, channelCount: 1, echoCancellation: false, noiseSuppression: true, autoGainControl: true },
+    // Сигнал идёт с пульта (линейный вход): никаких браузерных обработок для микрофона
+    audio: { deviceId: deviceId ? { exact: deviceId } : undefined, channelCount: 1, echoCancellation: false, noiseSuppression: false, autoGainControl: false },
   });
   await listDevices();
   await ctx.audioWorklet.addModule(URL.createObjectURL(new Blob([WORKLET], { type: "text/javascript" })));

@@ -24,7 +24,8 @@ export function createStreamingPipeline({
   textModel,
   ttsModel,
   voices,
-  silenceMs = 400,
+  silenceMs = 600,
+  noiseReduction = "near_field", // чистый сигнал с пульта; far_field — для микрофона в зале
   onPhrase, // ({id, src, srcText, dst, dstText})
   onAudio, // (id, dst, pcmChunk)
   onAudioEnd = null,
@@ -122,7 +123,7 @@ export function createStreamingPipeline({
             audio: {
               input: {
                 format: { type: "audio/pcm", rate: RATE },
-                noise_reduction: { type: "far_field" },
+                noise_reduction: noiseReduction === "none" ? null : { type: noiseReduction },
                 transcription: { model: sttModel },
                 turn_detection: {
                   type: "server_vad",
