@@ -76,12 +76,13 @@ $("voice").onchange = () => { voiceMode = $("voice").value; localStorage.setItem
 
 // --- Озвучка: потоковый PCM через Web Audio -------------------------------------
 let ctx = null, playhead = 0, sources = [], cur = null;
-const BACKLOG_SKIP = 12; // секунд: если отстаём сильнее, новую фразу не озвучиваем (текст остаётся)
+const BACKLOG_SKIP = 25; // секунд: если отстаём сильнее, новую фразу не озвучиваем (текст остаётся)
 function backlog() { return ctx ? Math.max(0, playhead - ctx.currentTime) : 0; }
 function playPcm(id, bytes) {
   if (!ctx) return;
   if (ctx.state !== "running") ctx.resume().catch(() => {});
-  if (!cur || cur.id !== id) cur = { id, skip: backlog() > BACKLOG_SKIP };
+  // Решение о темпе и пропуске — один раз на фразу, чтобы скорость не прыгала внутри неё
+  if (!cur || cur.id !== id) { const lag = backlog(); cur = { id, skip: lag > BACKLOG_SKIP, rate: lag > 8 ? 1.2 : lag > 4 ? 1.1 : 1 }; }
   if (cur.skip) return;
   // Заголовок кадра 5 байт → смещение нечётное; Int16Array требует выравнивания, поэтому копируем
   const pcm = new Int16Array(bytes.slice(0, bytes.byteLength - (bytes.byteLength % 2)).buffer);
@@ -91,7 +92,7 @@ function playPcm(id, bytes) {
   for (let i = 0; i < pcm.length; i++) ch[i] = pcm[i] / 32768;
   const src = ctx.createBufferSource(); src.buffer = buffer; src.connect(ctx.destination);
   // Догон: отстали больше 3 с — читаем чуть быстрее, больше 6 с — заметно быстрее
-  const lag = backlog(); const rate = lag > 6 ? 1.3 : lag > 3 ? 1.15 : 1;
+  const rate = cur.rate;
   src.playbackRate.value = rate;
   playhead = Math.max(playhead, ctx.currentTime + 0.08);
   src.start(playhead); playhead += buffer.duration / rate;

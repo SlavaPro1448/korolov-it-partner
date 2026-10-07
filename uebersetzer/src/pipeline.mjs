@@ -139,8 +139,8 @@ export function createPipeline({
         response_format: "pcm",
         instructions:
           lang === "ru"
-            ? "Говори спокойно, ясно и тепло, как переводчик проповеди в церкви. Без спешки."
-            : "Sprich ruhig, klar und warm, wie ein Dolmetscher einer Predigt in der Kirche. Ohne Hast.",
+            ? "Говори ясно и тепло, как синхронный переводчик проповеди: в живом, довольно быстром темпе, без долгих пауз между предложениями."
+            : "Sprich klar und warm, wie ein Simultandolmetscher einer Predigt: in lebendigem, zügigem Tempo, ohne lange Pausen zwischen den Sätzen.",
       }),
     });
     if (!res.ok) throw new Error(`TTS ${res.status}`);
