@@ -18,6 +18,10 @@ const config = {
   sttMode: env.STT_MODE || "stream", // stream = Realtime-VAD, batch = по паузам на сервере
   vadSilenceMs: Number(env.VAD_SILENCE_MS || 600),
   noiseReduction: env.NOISE_REDUCTION || "near_field",
+  sttPrompt:
+    env.STT_PROMPT ??
+    "Predigt in einer russlanddeutschen Gemeinde: Deutsch mit russischem Akzent und Russisch. " +
+      "Bibel, Gemeinde, Jesus Christus, Heiliger Geist, Römerbrief. Проповедь, Библия, община, Иисус Христос, Святой Дух.",
   streamSourceUrl: env.STREAM_SOURCE_URL || "http://gemeinde-icecast:8000/de.mp3",
   textModel: env.TEXT_MODEL || "gpt-5.4-mini",
   ttsModel: env.TTS_MODEL || "gpt-4o-mini-tts",
@@ -98,6 +102,7 @@ function attachOperator(ws) {
     apiKey: config.apiKey,
     silenceMs: config.vadSilenceMs,
     noiseReduction: config.noiseReduction,
+    sttPrompt: config.sttPrompt,
     onPartial: (text) => {
       // Живая строка распознавания: не чаще 4 раз в секунду, пустая строка = реплика закончена
       const now = Date.now();

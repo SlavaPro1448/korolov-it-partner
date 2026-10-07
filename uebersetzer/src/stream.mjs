@@ -6,7 +6,9 @@ import { createStages, detectLang } from "./stages.mjs";
 
 const RATE = 24000;
 const ENDPOINT = "wss://api.openai.com/v1/realtime?intent=transcription";
-const SENTENCE_END = /^([\s\S]*?[.!?…]+["»“”)]?)\s+(?=\S)/;
+// Конец предложения: . ! ? (но не многоточие — им распознаватель помечает обрыв фразы)
+const SENTENCE_END = /^([\s\S]*?(?:[!?]+|(?<!\.)\.(?!\.))["»“”)]?)\s+(?=\S)/;
+const ENDS_SENTENCE = /(?:[!?]|(?<!\.)\.(?!\.))["»“”)]?$/;
 
 export function rms(buffer) {
   let sum = 0;
@@ -25,6 +27,7 @@ export function createStreamingPipeline({
   ttsModel,
   voices,
   silenceMs = 600,
+  sttPrompt = "",
   noiseReduction = "near_field", // чистый сигнал с пульта; far_field — для микрофона в зале
   onPhrase, // ({id, src, srcText, dst, dstText})
   onAudio, // (id, dst, pcmChunk)
@@ -44,7 +47,22 @@ export function createStreamingPipeline({
   let textQueue = Promise.resolve();
   let audioQueue = Promise.resolve();
   const items = new Map(); // item_id -> { text, consumed }
-  const pending = [];
+  // Обрывок без точки в конце (проповедник сделал паузу посреди предложения) ждёт продолжения:
+  // приклеивается к следующей реплике и переводится, когда предложение закончилось, либо если
+  // речь не возобновилась за FLUSH_MS.
+  let pending = "";
+  let pendingTimer = null;
+  const FLUSH_MS = 2000;
+  const PENDING_MAX_CHARS = 220;
+  const flushPending = () => {
+    clearTimeout(pendingTimer);
+    pendingTimer = null;
+    if (!pending) return;
+    const text = pending;
+    pending = "";
+    enqueueText(text);
+  };
+  const audioBacklog = [];
   const append = (chunk) => {
     stats.sttSeconds += chunk.length / 2 / RATE;
     ws.send(JSON.stringify({ type: "input_audio_buffer.append", audio: chunk.toString("base64") }));
@@ -83,19 +101,30 @@ export function createStreamingPipeline({
       });
   }
 
+  // Отрезать законченные предложения из (pending + хвост реплики); вернуть, сколько символов
+  // хвоста реплики ушло в перевод.
+  function cutSentences(rest) {
+    let consumedRest = 0;
+    for (;;) {
+      const combined = pending ? `${pending} ${rest.slice(consumedRest)}` : rest.slice(consumedRest);
+      const m = SENTENCE_END.exec(combined);
+      if (!m) return consumedRest;
+      enqueueText(m[1]);
+      consumedRest += m[0].length - (pending ? pending.length + 1 : 0);
+      pending = "";
+    }
+  }
+
   function onDelta(itemId, delta) {
+    clearTimeout(pendingTimer);
+    pendingTimer = null;
     const item = items.get(itemId) ?? { text: "", consumed: "" };
     item.text += delta;
     items.set(itemId, item);
-    onPartial?.(item.text.slice(item.consumed.length));
-    // Законченные предложения внутри длинной реплики переводим сразу
-    let rest = item.text.slice(item.consumed.length);
-    let m;
-    while ((m = SENTENCE_END.exec(rest))) {
-      enqueueText(m[1]);
-      item.consumed += rest.slice(0, m[0].length);
-      rest = item.text.slice(item.consumed.length);
-    }
+    const rest = item.text.slice(item.consumed.length);
+    onPartial?.(pending ? `${pending} ${rest}` : rest);
+    const used = cutSentences(rest);
+    item.consumed += rest.slice(0, used);
   }
 
   function onCompleted(itemId, transcript) {
@@ -106,8 +135,20 @@ export function createStreamingPipeline({
     if (!item.consumed) rest = full;
     else if (full.startsWith(item.consumed.trim())) rest = full.slice(item.consumed.trim().length);
     else rest = item.text.slice(item.consumed.length); // итог разошёлся с дельтами — берём хвост дельт
-    onPartial?.("");
-    enqueueText(rest);
+    rest = rest.trim();
+    const used = cutSentences(rest);
+    const tail = rest.slice(used).trim();
+    if (tail) pending = pending ? `${pending} ${tail}` : tail;
+    // Хвост заканчивается знаком конца предложения (без пробела после — регулярка его не взяла)
+    if (pending && (ENDS_SENTENCE.test(pending) || pending.length >= PENDING_MAX_CHARS)) {
+      flushPending();
+    } else if (pending) {
+      onPartial?.(pending);
+      clearTimeout(pendingTimer);
+      pendingTimer = setTimeout(flushPending, FLUSH_MS);
+    } else {
+      onPartial?.("");
+    }
   }
 
   function connect() {
@@ -124,7 +165,7 @@ export function createStreamingPipeline({
               input: {
                 format: { type: "audio/pcm", rate: RATE },
                 noise_reduction: noiseReduction === "none" ? null : { type: noiseReduction },
-                transcription: { model: sttModel },
+                transcription: sttPrompt ? { model: sttModel, prompt: sttPrompt } : { model: sttModel },
                 turn_detection: {
                   type: "server_vad",
                   threshold: 0.5,
@@ -150,6 +191,13 @@ export function createStreamingPipeline({
         case "transcription_session.updated":
           if (!ready) log.info(`[stream] Sitzung bereit (${event.type})`);
           ready = true;
+          break;
+        case "input_audio_buffer.speech_started":
+          clearTimeout(pendingTimer);
+          pendingTimer = null;
+          break;
+        case "input_audio_buffer.speech_stopped":
+          // речь кончилась, а текста ещё нет: если хвост висит, таймер снова пойдёт после completed
           break;
         case "conversation.item.input_audio_transcription.delta":
           if (typeof event.delta === "string") onDelta(event.item_id, event.delta);
@@ -195,17 +243,18 @@ export function createStreamingPipeline({
       if (paused) return level;
       if (!ready || ws.readyState !== 1) {
         // Сессия ещё поднимается: придержать до 5 с звука, чтобы не потерять первые слова
-        pending.push(chunk);
-        while (pending.length > 50) pending.shift();
+        audioBacklog.push(chunk);
+        while (audioBacklog.length > 50) audioBacklog.shift();
         return level;
       }
-      for (const c of pending.splice(0)) append(c);
+      for (const c of audioBacklog.splice(0)) append(c);
       append(chunk);
       return level;
     },
     flush() {},
     close() {
       closed = true;
+      clearTimeout(pendingTimer);
       try {
         ws?.close();
       } catch {
