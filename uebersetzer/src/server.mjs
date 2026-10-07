@@ -3,7 +3,9 @@
 import http from "node:http";
 import { timingSafeEqual } from "node:crypto";
 import { WebSocketServer } from "ws";
-import { createPipeline, estimateCost } from "./pipeline.mjs";
+import { createPipeline } from "./pipeline.mjs";
+import { createStreamingPipeline } from "./stream.mjs";
+import { estimateCost } from "./stages.mjs";
 import { OPERATOR_PAGE } from "./pages.mjs";
 import { LISTEN_PAGE } from "./listen.mjs";
 
@@ -12,6 +14,8 @@ const config = {
   port: Number(env.PORT || 8080),
   apiKey: env.OPENAI_API_KEY || "",
   sttModel: env.STT_MODEL || "gpt-4o-transcribe",
+  sttMode: env.STT_MODE || "stream", // stream = Realtime-VAD, batch = по паузам на сервере
+  vadSilenceMs: Number(env.VAD_SILENCE_MS || 400),
   textModel: env.TEXT_MODEL || "gpt-5.4-mini",
   ttsModel: env.TTS_MODEL || "gpt-4o-mini-tts",
   voices: { ru: env.VOICE_RU || "cedar", de: env.VOICE_DE || "marin" },
@@ -85,8 +89,20 @@ function attachOperator(ws) {
     detachOperator(operator);
   }
   const me = { ws, threshold: 500, startedAt: Date.now() };
-  me.pipeline = createPipeline({
+  const make = config.sttMode === "batch" ? createPipeline : createStreamingPipeline;
+  let lastPartial = 0;
+  me.pipeline = make({
     apiKey: config.apiKey,
+    silenceMs: config.vadSilenceMs,
+    onPartial: (text) => {
+      // Живая строка распознавания: не чаще 4 раз в секунду, пустая строка = реплика закончена
+      const now = Date.now();
+      if (text && now - lastPartial < 250) return;
+      lastPartial = now;
+      const payload = JSON.stringify({ type: "partial", text });
+      for (const l of listeners) if (l.ws.readyState === 1) l.ws.send(payload);
+      sendJson(ws, { type: "partial", text });
+    },
     sttModel: config.sttModel,
     textModel: config.textModel,
     ttsModel: config.ttsModel,
@@ -183,7 +199,7 @@ function attachListener(ws, lang) {
 
 // Удалённый из конфигурации ключ API не должен уходить на страницу
 const publicModels = () => ({
-  stt: config.sttModel,
+  stt: `${config.sttModel}/${config.sttMode}`,
   text: config.textModel,
   tts: config.ttsModel,
   voices: config.voices,
@@ -243,6 +259,6 @@ setInterval(() => {
 
 server.listen(config.port, () => {
   console.info(
-    `[server] Port ${config.port}, stt ${config.sttModel}, text ${config.textModel}, tts ${config.ttsModel}`,
+    `[server] Port ${config.port}, stt ${config.sttModel} (${config.sttMode}), text ${config.textModel}, tts ${config.ttsModel}`,
   );
 });

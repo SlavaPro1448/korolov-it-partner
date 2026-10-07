@@ -34,6 +34,7 @@ export const LISTEN_PAGE = `<!doctype html>
 <div id="state"></div>
 <div id="now"></div>
 <div id="orig"></div>
+<div id="partial" style="color:#9aa;font-style:italic;min-height:1.4rem"></div>
 <div id="hist"></div>
 <p><small id="hint"></small></p>
 <script>
@@ -132,6 +133,7 @@ function connect() {
     }
     const m = JSON.parse(e.data);
     if (m.type === "phrase") onPhrase(m);
+    else if (m.type === "partial") { const cyr = (m.text.match(/[\u0400-\u04FF]/g) || []).length, lat = (m.text.match(/[A-Za-z]/g) || []).length; $("partial").textContent = m.text && (cyr >= lat ? "ru" : "de") === lang ? "… " + m.text : ""; }
     else if (m.type === "state") { state = m; showState(); }
     else if (m.type === "hello") { phrases.length = 0; for (const p of m.recent || []) phrases.push(p); render(); }
   };

@@ -38,6 +38,7 @@ export const OPERATOR_PAGE = `<!doctype html>
   <label>Порог речи <input id="thr" type="range" min="100" max="4000" step="50" value="500"> <span id="thrv">500</span></label>
 </div>
 <div id="state">Не запущено.</div>
+<div id="live" style="color:#9aa;min-height:1.4rem;font-style:italic"></div>
 <div id="stats"></div>
 <div id="err"></div>
 <div id="log"></div>
@@ -105,6 +106,7 @@ async function start() {
   ws.onmessage = (e) => {
     const m = JSON.parse(e.data);
     if (m.type === "phrase") phrase(m);
+    else if (m.type === "partial") $("live").textContent = m.text ? "… " + m.text : "";
     else if (m.type === "stats") $("stats").textContent = "Слушают: RU " + m.listeners.ru + ", DE " + m.listeners.de + " · фраз " + m.phrases + " · распознано " + m.sttMinutes.toFixed(1) + " мин · ≈ $" + m.cost.toFixed(2) + " · сессия " + m.minutes.toFixed(0) + " мин";
     else if (m.type === "error") $("err").textContent = "Ошибка: " + m.message;
   };
