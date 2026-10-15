@@ -194,6 +194,48 @@ export default function DatenschutzPage() {
                 Platforms Ireland Limited übertragen. Wenn Sie diesen Datenfluss vermeiden möchten,
                 nutzen Sie bitte E-Mail oder das Kontaktformular.
               </p>
+
+              <h3 id="telefonassistent" className="font-semibold text-brand mt-5 mb-2 scroll-mt-20">
+                KI-Telefonassistent
+              </h3>
+              <p>
+                Anrufe auf meiner geschäftlichen Festnetznummer nimmt ein KI-gestützter
+                Telefonassistent entgegen. Darauf werden Sie zu Beginn des Gesprächs hingewiesen.
+                Der Assistent beantwortet allgemeine Fragen zu meinen Leistungen und nimmt Ihr
+                Anliegen für einen persönlichen Rückruf auf. Er trifft keine Entscheidungen mit
+                rechtlicher Wirkung.
+              </p>
+              <p className="mt-3">
+                Verarbeitet werden dabei Ihre Rufnummer, Zeitpunkt und Dauer des Anrufs, Ihre
+                Stimme, soweit dies zur Umwandlung in Text und zur Sprachausgabe erforderlich ist,
+                der Gesprächsinhalt als Textprotokoll sowie die von Ihnen genannten Angaben (z. B.
+                Name, Firma, Rückrufnummer, Anliegen). Aus dem Protokoll wird automatisch eine
+                Zusammenfassung erstellt und mir per E-Mail zugestellt. Eine Tonaufzeichnung des
+                Gesprächs wird nicht gespeichert.
+              </p>
+              <p className="mt-3">
+                Die Verarbeitung dient der Annahme und Bearbeitung Ihrer Anfrage und erfolgt auf
+                Grundlage von Art. 6 Abs. 1 lit. b DSGVO (vorvertragliche Maßnahmen) bzw. Art. 6
+                Abs. 1 lit. f DSGVO. Mein berechtigtes Interesse liegt darin, auch dann erreichbar
+                zu sein, wenn ich Anrufe nicht persönlich annehmen kann. Wenn Sie nicht mit dem
+                Assistenten sprechen möchten, erreichen Sie mich per E-Mail oder über das
+                Kontaktformular.
+              </p>
+              <p className="mt-3">
+                Für den Telefonassistenten setze ich folgende Dienstleister als Auftragsverarbeiter
+                gemäß Art. 28 DSGVO ein: <strong>Twilio Ireland Limited</strong>, Dublin, Irland
+                (Bereitstellung der Rufnummer und Vermittlung des Anrufs) sowie{" "}
+                <strong>ElevenLabs Inc.</strong>, New York, USA (Spracherkennung, Gesprächsführung
+                und Sprachausgabe). Dabei können Daten in die USA übermittelt werden; die
+                Übermittlung ist durch Standardvertragsklauseln der EU-Kommission abgesichert. Die
+                Daten werden von den Dienstleistern nicht zum Training von KI-Modellen verwendet.
+              </p>
+              <p className="mt-3">
+                Die Gesprächsprotokolle werden beim Dienstleister nach spätestens 30 Tagen gelöscht.
+                Die Zusammenfassung in meinem E-Mail-Postfach wird gelöscht, sobald Ihre Anfrage
+                abschließend bearbeitet ist und keine gesetzlichen Aufbewahrungspflichten
+                entgegenstehen.
+              </p>
             </section>
 
             <section id="demo-bot" className="scroll-mt-20">
