@@ -36,3 +36,8 @@ runtime-config.php
 *.njsproj
 *.sln
 *.sw?
+
+# iOS-App des Dolmetschers: Schlüssel nur lokal
+dolmetscher-ios/Secrets.xcconfig
+dolmetscher-ios/*.xcodeproj
+dolmetscher-ios/build
