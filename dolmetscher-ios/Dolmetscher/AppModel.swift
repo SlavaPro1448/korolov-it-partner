@@ -28,6 +28,10 @@ final class AppModel: ObservableObject {
     @Published var mode: CallMode = .translate
     @Published var serverURL: String { didSet { UserDefaults.standard.set(serverURL, forKey: "serverURL") } }
     @Published var key: String { didSet { Keychain.set(key, for: "callKey") } }
+    /// Баланс Twilio для плашки «мало минут»; обновляется при открытии приложения и после звонка.
+    @Published var account: Account?
+    @Published var lowBalanceMinutes: Int { didSet { UserDefaults.standard.set(lowBalanceMinutes, forKey: "lowBalanceMinutes") } }
+    @Published var showLive = false
 
     init() {
         let info = Bundle.main.infoDictionary ?? [:]
@@ -35,7 +39,18 @@ final class AppModel: ObservableObject {
         let defaultKey = (info["DolmetscherKey"] as? String) ?? ""
         serverURL = UserDefaults.standard.string(forKey: "serverURL") ?? defaultURL
         key = Keychain.get("callKey") ?? defaultKey
+        let threshold = UserDefaults.standard.integer(forKey: "lowBalanceMinutes")
+        lowBalanceMinutes = threshold > 0 ? threshold : 30
         if let saved = UserDefaults.standard.string(forKey: "mode"), let m = CallMode(rawValue: saved) { mode = m }
+    }
+
+    var balanceIsLow: Bool {
+        guard let left = account?.minutesLeft else { return false }
+        return left < lowBalanceMinutes
+    }
+
+    func refreshAccount() async {
+        if let fresh = try? await api.account() { account = fresh }
     }
 
     var api: APIClient { APIClient(baseURL: serverURL, key: key) }

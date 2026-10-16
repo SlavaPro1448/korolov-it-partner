@@ -6,31 +6,38 @@ struct KeypadView: View {
     @State private var status = ""
     @State private var calling = false
     @State private var showSettings = false
+    @State private var quote: Quote?
 
     private let keys: [(String, String)] = [
         ("1", ""), ("2", "ABC"), ("3", "DEF"), ("4", "GHI"), ("5", "JKL"), ("6", "MNO"),
         ("7", "PQRS"), ("8", "TUV"), ("9", "WXYZ"), ("*", ""), ("0", "+"), ("#", ""),
     ]
     private let columns = Array(repeating: GridItem(.fixed(74), spacing: 24), count: 3)
+    static let twilioBilling = URL(string: "https://console.twilio.com/us1/billing/manage-billing/billing-overview")!
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: 16) {
+            VStack(spacing: 12) {
                 Picker("Режим", selection: $model.mode) {
                     ForEach(CallMode.allCases) { Text($0.title).tag($0) }
                 }
                 .pickerStyle(.segmented)
                 .onChange(of: model.mode) { model.rememberMode() }
 
-                Text(model.mode.hint)
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
-                    .frame(minHeight: 30)
+                if model.balanceIsLow, let account = model.account {
+                    lowBalanceBanner(account)
+                } else {
+                    Text(model.mode.hint)
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.center)
+                        .frame(minHeight: 30)
+                }
 
                 Spacer(minLength: 0)
 
                 display
+                quoteLine
 
                 Text(status)
                     .font(.subheadline)
@@ -58,12 +65,69 @@ struct KeypadView: View {
             .navigationTitle("Переводчик")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button { model.showLive = true } label: { Image(systemName: "text.bubble") }
+                        .accessibilityLabel("Текст разговора")
+                }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button { showSettings = true } label: { Image(systemName: "gearshape") }
                 }
             }
             .sheet(isPresented: $showSettings) { SettingsView() }
+            // Цена набранного номера: запрос после паузы в наборе
+            .task(id: model.number) {
+                quote = nil
+                let number = model.number
+                guard number.filter(\.isNumber).count >= 5 else { return }
+                try? await Task.sleep(for: .milliseconds(400))
+                guard !Task.isCancelled, let fresh = try? await model.api.quote(number: number), number == model.number else { return }
+                quote = fresh
+            }
+            .task { if model.account == nil { await model.refreshAccount() } }
         }
+    }
+
+    private func lowBalanceBanner(_ account: Account) -> some View {
+        Link(destination: Self.twilioBilling) {
+            HStack(spacing: 8) {
+                Image(systemName: "exclamationmark.triangle.fill")
+                Text("Осталось ≈\(account.minutesLeft ?? 0) мин · \(Money.amount(account.balance, account.currency))")
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+                Spacer(minLength: 4)
+                Text("Пополнить").bold()
+                Image(systemName: "chevron.right")
+            }
+            .font(.footnote.weight(.medium))
+            .foregroundStyle(.orange)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(Capsule().fill(Color.orange.opacity(0.15)))
+        }
+        .frame(minHeight: 30)
+    }
+
+    /// «Мобильный · 0.093 $/мин (+0.068 ИИ) · 162 мин» или почему номер нельзя набрать.
+    @ViewBuilder private var quoteLine: some View {
+        Group {
+            if let quote, !quote.allowed {
+                Text(quote.reason == "length" ? "Проверьте количество цифр" : "Этот номер набрать нельзя: только Германия и Чехия, без платных")
+                    .foregroundStyle(quote.reason == "length" ? Color.secondary : Color.red)
+            } else if let quote, quote.found, let unit = quote.unit {
+                let plain = model.mode == .plain
+                let rate = (plain ? quote.plainPerMinute : quote.perMinute) ?? 0
+                let minutes = plain ? quote.plainMinutes : quote.minutes
+                let kind = quote.mobile == true ? "Мобильный" : "Стационарный"
+                let ai = !plain ? String(format: " (+%.3f ИИ)", quote.openaiPerMinute ?? 0) : ""
+                Text("\(kind) · \(String(format: "%.3f", rate)) \(unit)/мин\(ai) · \(Money.minutes(minutes))")
+                    .foregroundStyle(.secondary)
+            } else {
+                Text(" ")
+            }
+        }
+        .font(.footnote)
+        .lineLimit(1)
+        .minimumScaleFactor(0.8)
     }
 
     private var display: some View {
@@ -73,7 +137,7 @@ struct KeypadView: View {
                 .lineLimit(1)
                 .minimumScaleFactor(0.5)
                 .frame(maxWidth: .infinity)
-                .frame(minHeight: 56)
+                .frame(minHeight: 52)
                 .contentShape(Rectangle())
                 .contextMenu {
                     if !model.number.isEmpty {
@@ -93,17 +157,19 @@ struct KeypadView: View {
         }
     }
 
+    private var blocked: Bool { quote?.allowed == false && quote?.reason == "number" }
+
     private var callButton: some View {
         Button(action: call) {
             ZStack {
-                Circle().fill(calling ? Color.green.opacity(0.5) : Color.green)
+                Circle().fill(calling || blocked ? Color.green.opacity(0.4) : Color.green)
                 if calling { ProgressView().tint(.white) } else {
                     Image(systemName: "phone.fill").font(.system(size: 32)).foregroundStyle(.white)
                 }
             }
             .frame(width: 74, height: 74)
         }
-        .disabled(calling || model.number.isEmpty)
+        .disabled(calling || model.number.isEmpty || blocked)
         .accessibilityLabel("Позвонить")
     }
 
@@ -130,18 +196,21 @@ struct KeypadView: View {
 
     private func call() {
         let number = model.number
+        let mode = model.mode
         guard !number.isEmpty else { return }
         calling = true
         status = "Сейчас зазвонит ваш телефон…"
         Task {
             defer { calling = false }
             do {
-                let result = try await model.api.call(to: number, mode: model.mode)
+                let result = try await model.api.call(to: number, mode: mode)
                 if result.ok {
-                    status = model.mode == .plain
+                    status = mode == .plain
                         ? "Возьмите трубку — дальше набираем собеседника."
                         : "Возьмите трубку — подключаю переводчика."
                     UINotificationFeedbackGenerator().notificationOccurred(.success)
+                    // Живой текст открывается сам: пока вы берёте трубку, он уже подключён
+                    if mode != .plain { model.showLive = true }
                 } else {
                     status = Self.messages[result.error ?? ""] ?? "Не получилось: \(result.error ?? "ошибка")"
                     UINotificationFeedbackGenerator().notificationOccurred(.error)

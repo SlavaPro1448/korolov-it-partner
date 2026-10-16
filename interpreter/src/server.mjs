@@ -72,6 +72,7 @@ export function buildServer(config, deps = {}) {
     deps.twilio ??
     createTwilioClient({ accountSid: config.accountSid, authToken: config.authToken });
   const live = createLiveFeed();
+  let liveSessionId = null; // "start" nur einmal je Gespräch, nicht bei jedem Moduswechsel
   const apiRoutes = createApiRoutes({
     config,
     twilioApi: deps.twilioApi ?? createTwilioApi({ accountSid: config.accountSid, authToken: config.authToken }),
@@ -112,8 +113,11 @@ export function buildServer(config, deps = {}) {
     createTranslator:
       deps.createTranslator ??
       ((options) => {
-        const role = options.label.split(":").pop();
-        if (role === "owner") live.event("start");
+        const [sessionId, role] = options.label.split(":");
+        if (role === "owner" && sessionId !== liveSessionId) {
+          liveSessionId = sessionId;
+          live.event("start");
+        }
         const onTranscript = (dir, text) => live.publish(role, dir, text);
         if (options.mode === "seq") {
           // Der Satz-für-Satz-Übersetzer arbeitet mit PCM 24 kHz; Telefon liefert μ-law 8 kHz
@@ -397,8 +401,9 @@ export function buildServer(config, deps = {}) {
       );
     }
     if (url.pathname === "/live-ws") {
-      if (!config.liveKey || url.searchParams.get("key") !== config.liveKey)
-        return socket.destroy();
+      const byLiveKey = config.liveKey && url.searchParams.get("key") === config.liveKey;
+      const byApp = config.callKey && req.headers.authorization === `Bearer ${config.callKey}`;
+      if (!byLiveKey && !byApp) return socket.destroy();
       return wss.handleUpgrade(req, socket, head, (ws) => live.attach(ws));
     }
     if (url.pathname !== "/media") return socket.destroy();

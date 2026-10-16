@@ -1,0 +1,228 @@
+// Tests für die JSON-API der iOS-App, den Live-Text und die Warteschleife bei eingehenden Anrufen.
+import assert from "node:assert/strict";
+import crypto from "node:crypto";
+import { once } from "node:events";
+import { test } from "node:test";
+import WebSocket from "ws";
+import { createApiRoutes, groupCalls, rateForNumber, toE164 } from "../src/api.mjs";
+import { createLiveFeed } from "../src/live.mjs";
+import { buildServer } from "../src/server.mjs";
+
+const config = {
+  publicUrl: "https://dolmetscher.test",
+  wsUrl: "wss://dolmetscher.test/media",
+  authToken: "secret",
+  twilioNumber: "+4921400000",
+  ownerNumber: "+491630000000",
+  peerCallerId: "+491630000000",
+  languages: { owner: "ru", peer: "de" },
+  secretaryNumber: "",
+  allowedPrefixes: ["+49", "+420"],
+  maxSessions: 1,
+  maxCallSeconds: 60,
+  adminToken: "",
+  callKey: "app-key",
+  liveKey: "live-key",
+  mediaStreamRate: 0.0044,
+  openaiRatePerMin: 0.068,
+};
+const quiet = { info() {}, error() {} };
+
+const DE = {
+  country: "Germany",
+  price_unit: "USD",
+  inbound_call_prices: [{ current_price: "0.010" }],
+  outbound_prefix_prices: [
+    { current_price: "0.042", destination_prefixes: ["49163", "49176"], friendly_name: "Germany - Mobile - From Eea", origination_prefixes: ["49"] },
+    { current_price: "0.3763", destination_prefixes: ["49163", "49176"], friendly_name: "Germany - Mobile", origination_prefixes: ["ALL"] },
+    { current_price: "0.0283", destination_prefixes: ["49"], friendly_name: "Germany", origination_prefixes: ["ALL"] },
+  ],
+};
+const fakeTwilioApi = {
+  balance: async () => ({ balance: "10.00", currency: "USD" }),
+  country: async (iso) => (iso === "DE" ? DE : { country: iso, price_unit: "USD", outbound_prefix_prices: [] }),
+  countries: async () => [{ iso: "DE", name: "Germany" }],
+  calls: async () => ({ calls: [] }),
+};
+
+test("numbers: phone-style input becomes E.164, longest prefix wins", () => {
+  assert.equal(toE164("0214 83263440"), "+4921483263440");
+  assert.equal(toE164("0049 163 1234567"), "+491631234567");
+  assert.equal(toE164("+49 (176) 123-45"), "+4917612345");
+  assert.equal(toE164("12"), null);
+  assert.equal(rateForNumber(DE, "+491631234567", "49").price, 0.042);
+  assert.equal(rateForNumber(DE, "+4921412345", "49").price, 0.0283);
+});
+
+test("quote: price per number, refusal for blocked or foreign numbers", async () => {
+  const routes = createApiRoutes({ config, twilioApi: fakeTwilioApi, log: quiet });
+  const q = (number) => routes["/api/quote"](new URLSearchParams({ number }));
+
+  const mobile = await q("0163 1234567");
+  assert.equal(mobile.allowed, true);
+  assert.equal(mobile.mobile, true);
+  // 0.042 (zu Ihnen) + 0.042 (Gegenseite) + 2 × 0.0044 (Media Streams)
+  assert.equal(mobile.perMinute, 0.0928);
+  assert.equal(mobile.minutes, Math.floor(10 / 0.0928));
+  assert.equal(mobile.plainPerMinute, 0.084);
+
+  const landline = await q("0214 83263440");
+  assert.equal(landline.mobile, false);
+  assert.equal(landline.perMinute, 0.0791);
+
+  assert.equal((await q("0900 123456")).allowed, false);
+  assert.equal((await q("+1 555 0000000")).allowed, false);
+  assert.equal((await q("0214")).allowed, false);
+});
+
+test("account: minutes left for a typical translated call to a German mobile", async () => {
+  const routes = createApiRoutes({ config, twilioApi: fakeTwilioApi, log: quiet });
+  const account = await routes["/api/account"](new URLSearchParams());
+  assert.equal(account.typicalPerMinute, 0.0928);
+  assert.equal(account.minutesLeft, Math.floor(10 / 0.0928));
+});
+
+test("history: both legs merged, full price includes media streams and OpenAI", () => {
+  const at = (s) => new Date(Date.UTC(2026, 9, 15, 12, 0, s)).toUTCString();
+  const calls = [
+    // übersetzt ausgehend: Inhaber 55 s, Gegenseite 47 s
+    { sid: "OWN1", from: config.twilioNumber, to: config.ownerNumber, direction: "outbound-api", date_created: at(0), duration: "55", price: "-0.042", status: "completed" },
+    { sid: "OUT1", from: config.peerCallerId, to: "+4921412345", direction: "outbound-api", date_created: at(5), duration: "47", price: "-0.0283", status: "completed" },
+  ];
+  const [call] = groupCalls(calls, config);
+  assert.equal(call.direction, "out");
+  assert.equal(call.translated, true);
+  assert.equal(call.price, 0.0703);
+  assert.equal(call.mediaPrice, 0.0088); // 2 Streams × 1 angefangene Minute
+  assert.equal(call.openaiPrice, Math.round((47 / 60) * 0.068 * 10000) / 10000);
+  assert.equal(call.totalPrice, Math.round((0.0703 + 0.0088 + call.openaiPrice) * 10000) / 10000);
+
+  const plain = groupCalls(
+    [{ ...calls[1], sid: "OUT2", direction: "outbound-dial" }, { ...calls[0], sid: "OWN2" }],
+    config,
+  )[0];
+  assert.equal(plain.translated, false);
+  assert.equal(plain.totalPrice, plain.price);
+
+  const missed = groupCalls(
+    [
+      { sid: "IN1", from: "+4930111", to: config.twilioNumber, direction: "inbound", date_created: at(0), duration: "30", price: "-0.01", status: "completed" },
+      { sid: "OWN3", from: config.twilioNumber, to: config.ownerNumber, direction: "outbound-api", date_created: at(1), duration: "0", price: null, status: "no-answer" },
+    ],
+    config,
+  )[0];
+  assert.equal(missed.direction, "in");
+  assert.equal(missed.translated, false);
+  assert.equal(missed.openaiPrice, 0);
+
+  const fresh = groupCalls([{ ...calls[0], price: null }, calls[1]], config)[0];
+  assert.equal(fresh.pricePending, true, "Twilio has not priced the owner leg yet");
+  assert.equal(call.pricePending, false);
+});
+
+function sign(path, params) {
+  const data = config.publicUrl + path + Object.keys(params).sort().map((k) => k + params[k]).join("");
+  return crypto.createHmac("sha1", config.authToken).update(data).digest("base64");
+}
+
+async function start() {
+  const created = [];
+  const twilio = {
+    createCall: async (args) => (created.push(args), { sid: `CA_${created.length}` }),
+    updateCall: async () => ({}),
+    hangup: async () => ({}),
+  };
+  const translators = [];
+  const createTranslator = (options) => {
+    const t = { ...options, send() {}, close() {} };
+    translators.push(t);
+    return t;
+  };
+  const clips = { warmup: async () => true, get: (key) => (key === "peerWait" ? Buffer.alloc(800, 0x7f).toString("base64") : null) };
+  const { server } = buildServer(config, { twilio, createTranslator, clips, twilioApi: fakeTwilioApi, log: quiet });
+  server.listen(0);
+  await once(server, "listening");
+  const base = `127.0.0.1:${server.address().port}`;
+  const post = async (path, params) => {
+    const res = await fetch(`http://${base}${path}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded", "X-Twilio-Signature": sign(path, params) },
+      body: new URLSearchParams(params).toString(),
+    });
+    return res.text();
+  };
+  const stream = async (token, streamSid) => {
+    const ws = new WebSocket(`ws://${base}/media`);
+    ws.received = [];
+    ws.on("message", (raw) => ws.received.push(JSON.parse(raw.toString())));
+    await once(ws, "open");
+    ws.send(JSON.stringify({ event: "start", start: { streamSid, customParameters: { token } } }));
+    return ws;
+  };
+  return { base, created, translators, post, stream, close: () => server.close() };
+}
+const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+const tokenFrom = (twimlText) => /name="token" value="([0-9a-f]+)"/.exec(twimlText)[1];
+
+test("incoming: caller hears the hold tone until the owner answers, then it stops", async (t) => {
+  const app = await start();
+  t.after(() => app.close());
+  const incoming = await app.post("/voice/incoming", { From: "+4930123456", CallSid: "CA_peer" });
+  const peer = await app.stream(tokenFrom(incoming), "MZ_peer");
+  await wait(60);
+  const holdFrames = peer.received.filter((m) => m.event === "media").length;
+  assert.ok(holdFrames > 0, "caller must hear something while waiting");
+
+  const legUrl = new URL(app.created[0].url);
+  const ownerTwiml = await app.post(legUrl.pathname + legUrl.search, { CallSid: "CA_1" });
+  const owner = await app.stream(tokenFrom(ownerTwiml), "MZ_owner");
+  await wait(60);
+  assert.ok(peer.received.some((m) => m.event === "clear"), "hold sound is cut on pairing");
+  assert.equal(app.translators.length, 2);
+  peer.close();
+  owner.close();
+});
+
+test("app key: /call and the live text accept Authorization: Bearer <CALL_KEY>", async (t) => {
+  const app = await start();
+  t.after(() => app.close());
+  const call = await fetch(`http://${app.base}/call`, {
+    method: "POST",
+    headers: { Authorization: "Bearer app-key", "Content-Type": "application/json" },
+    body: JSON.stringify({ to: "+15550000000" }),
+  });
+  assert.equal(call.status, 400);
+  assert.deepEqual(await call.json(), { ok: false, error: "number" });
+  const denied = await fetch(`http://${app.base}/call`, { method: "POST", headers: { Authorization: "Bearer nope" }, body: "{}" });
+  assert.equal(denied.status, 404);
+
+  const refused = new WebSocket(`ws://${app.base}/live-ws`, { headers: { Authorization: "Bearer nope" } });
+  const [error] = await once(refused, "error");
+  assert.ok(error, "wrong key is refused");
+
+  const live = new WebSocket(`ws://${app.base}/live-ws`, { headers: { Authorization: "Bearer app-key" } });
+  await once(live, "open");
+  live.close();
+});
+
+test("live text: a client opened mid-call gets the conversation so far, nothing after the end", () => {
+  const feed = createLiveFeed();
+  const client = () => {
+    const ws = { readyState: 1, got: [], send: (p) => ws.got.push(JSON.parse(p)), on() {} };
+    return ws;
+  };
+  feed.publish("peer", "in", "vor dem Gespräch");
+  feed.event("start");
+  feed.publish("peer", "in", "Guten Tag");
+  feed.publish("peer", "out", "Добрый день");
+  const late = client();
+  feed.attach(late);
+  assert.deepEqual(late.got.map((m) => m.event ?? m.text), ["start", "Guten Tag", "Добрый день"]);
+  feed.publish("owner", "out", "Hallo");
+  assert.equal(late.got.at(-1).text, "Hallo");
+
+  feed.event("end");
+  const afterEnd = client();
+  feed.attach(afterEnd);
+  assert.deepEqual(afterEnd.got, [], "text is dropped when the call ends");
+});

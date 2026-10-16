@@ -22,25 +22,27 @@ xcodebuild -project Dolmetscher.xcodeproj -scheme Dolmetscher -destination 'id=<
 xcrun devicectl device install app --device <UDID> build/Build/Products/Debug-iphoneos/Dolmetscher.app
 ```
 
-## Серверная часть (`server/`)
+## Серверная часть
 
-`api.mjs` — новые JSON-маршруты (ключ: `Authorization: Bearer <CALL_KEY>` или `?key=`):
+Сервер лежит в [interpreter/](../interpreter/README.md) (на VPS — `/opt/bots/dolmetscher/src`).
+Для приложения там `src/api.mjs`, ключ `Authorization: Bearer <CALL_KEY>`:
 
-- `GET /api/account` — баланс Twilio, цена плеча к владельцу, Media Streams, оценка OpenAI, разрешённые страны;
-- `GET /api/rates?country=DE` — мобильный/стационарный/входящий: цена минуты и сколько минут хватит;
-- `GET /api/quote?number=+49…` — цена для конкретного номера (самый длинный префикс, правило «из ЕЭЗ» важнее «ALL»);
+- `GET /api/account` — баланс Twilio, сколько минут осталось на типичный звонок, цены составляющих;
+- `GET /api/rates?country=DE` — мобильный/стационарный/входящий: цена минуты и запас минут;
+- `GET /api/quote?number=0163…` — цена на конкретный номер и можно ли его набрать (до звонка);
 - `GET /api/countries` — список стран Twilio (кэш 6 ч);
-- `GET /api/calls` — последние звонки через переводчика (оба плеча склеены: собеседник, время, длительность, цена).
-
-`server.mjs` — копия серверного файла с подключением маршрутов и двумя новыми переменными:
-`MEDIA_STREAM_RATE` (по умолчанию 0.0044 $/мин за плечо) и `OPENAI_RATE_PER_MIN` (0.068 $/мин, оба направления).
+- `GET /api/calls` — звонки через переводчика: оба плеча вместе, цена Twilio, Media Streams, оценка OpenAI;
+- `POST /call` — звонок (сервер звонит вам, потом собеседнику);
+- `WS /live-ws` — живой текст разговора; текст текущего разговора держится в памяти до его конца.
 
 Минута переведённого звонка на стороне Twilio = плечо к владельцу (0.042, мобильный E-Plus из ЕЭЗ)
 + плечо к собеседнику (DE: 0.0283 стационарный / 0.042 мобильный) + 2 × 0.0044 Media Streams.
-Перевод OpenAI списывается с отдельного счёта и в минуты по балансу Twilio не входит.
+Перевод OpenAI (≈0.068 $/мин, `OPENAI_RATE_PER_MIN`) списывается с отдельного счёта.
 
-Деплой: скопировать оба файла в `/opt/bots/dolmetscher/src/src/` и выполнить
-`cd /opt/bots/dolmetscher && docker compose build && docker compose up -d`.
+Деплой: `scp interpreter/src/*.mjs scribe:/opt/bots/dolmetscher/src/src/`, затем на сервере
+`cd /opt/bots/dolmetscher && docker compose build && docker compose up -d`. Тесты: `cd interpreter && npm test`.
+
+После добавления нового .swift-файла нужно заново выполнить `xcodegen generate`.
 
 ## Что iOS не даёт
 

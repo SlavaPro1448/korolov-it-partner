@@ -25,6 +25,7 @@ struct HistoryView: View {
                     List(shown) { call in
                         Button { model.dial(call.number) } label: { row(call) }
                             .swipeActions { Button { UIPasteboard.general.string = call.number } label: { Label("Копировать", systemImage: "doc.on.doc") } }
+                            .contextMenu { breakdown(call) }
                     }
                     .listStyle(.plain)
                 }
@@ -59,7 +60,12 @@ struct HistoryView: View {
                 HStack(spacing: 8) {
                     Text(call.startedAt, format: .dateTime.day().month(.abbreviated).hour().minute())
                     if call.duration > 0 { Text(durationText(call.duration)) }
-                    if call.price > 0 { Text(Money.amount(call.price, call.unit)) }
+                    if call.pricePending == true {
+                        Text("цена уточняется")
+                    } else if let total = call.totalPrice ?? Optional(call.price), total > 0 {
+                        Text("≈" + Money.amount(total, call.unit))
+                    }
+                    if call.translated == false && !call.failed { Text("без перевода") }
                     if call.failed { Text(statusText(call.status)) }
                 }
                 .font(.footnote)
@@ -70,6 +76,20 @@ struct HistoryView: View {
                 Text(Phone.format(call.number)).font(.footnote).foregroundStyle(.tertiary)
             }
         }
+    }
+
+    /// По долгому нажатию: из чего сложилась цена звонка.
+    @ViewBuilder private func breakdown(_ call: CallEntry) -> some View {
+        Section("Цена звонка") {
+            Text("Связь Twilio: " + (call.pricePending == true ? "уточняется" : Money.precise(call.price, call.unit)))
+            if call.translated == true {
+                Text("Media Streams: " + Money.precise(call.mediaPrice ?? 0, call.unit))
+                Text("Перевод ИИ (OpenAI): ≈" + Money.precise(call.openaiPrice ?? 0, "USD"))
+            }
+            if let total = call.totalPrice { Text("Итого: ≈" + Money.precise(total, call.unit)) }
+        }
+        Button { model.dial(call.number) } label: { Label("Набрать", systemImage: "phone") }
+        Button { UIPasteboard.general.string = call.number } label: { Label("Копировать номер", systemImage: "doc.on.doc") }
     }
 
     private func durationText(_ seconds: Int) -> String {

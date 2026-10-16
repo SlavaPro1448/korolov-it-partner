@@ -2,6 +2,8 @@ import Foundation
 
 struct Account: Decodable {
     var balance: Double
+    var minutesLeft: Int?
+    var typicalPerMinute: Double?
     var currency: String
     var ownerLegPerMinute: Double
     var mediaStreamPerMinute: Double
@@ -46,8 +48,30 @@ struct CallEntry: Decodable, Identifiable {
     var status: String
     var price: Double
     var unit: String
+    var translated: Bool?
+    var talkSeconds: Int?
+    var mediaPrice: Double?
+    var openaiPrice: Double?
+    var totalPrice: Double?
+    var pricePending: Bool?
     var isIncoming: Bool { direction == "in" }
     var failed: Bool { ["busy", "no-answer", "failed", "canceled"].contains(status) }
+}
+
+/// Цена звонка на конкретный номер до набора.
+struct Quote: Decodable {
+    var number: String?
+    var iso: String?
+    var allowed: Bool
+    var reason: String?
+    var found: Bool
+    var mobile: Bool?
+    var perMinute: Double?
+    var minutes: Int?
+    var plainPerMinute: Double?
+    var plainMinutes: Int?
+    var openaiPerMinute: Double?
+    var unit: String?
 }
 
 enum APIError: LocalizedError {
@@ -89,10 +113,21 @@ struct APIClient {
             }
             throw APIError.http(code)
         }
-        let decoder = JSONDecoder()
-        decoder.dateDecodingStrategy = .iso8601
-        return try decoder.decode(T.self, from: data)
+        return try Self.decoder.decode(T.self, from: data)
     }
+
+    /// Сервер отдаёт время с миллисекундами (2026-10-16T19:49:55.000Z) — стандартный .iso8601 их не понимает.
+    static let decoder: JSONDecoder = {
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .custom { d in
+            let text = try d.singleValueContainer().decode(String.self)
+            let precise = ISO8601DateFormatter()
+            precise.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+            if let date = precise.date(from: text) ?? ISO8601DateFormatter().date(from: text) { return date }
+            throw DecodingError.dataCorrupted(.init(codingPath: d.codingPath, debugDescription: "Дата: \(text)"))
+        }
+        return decoder
+    }()
 
     private struct ErrorBody: Decodable { var ok: Bool?; var error: String? }
     private struct CallsBody: Decodable { var calls: [CallEntry] }
@@ -107,6 +142,19 @@ struct APIClient {
         try await send(try request("/api/countries"), as: CountriesBody.self).countries
     }
     func calls() async throws -> [CallEntry] { try await send(try request("/api/calls"), as: CallsBody.self).calls }
+    func quote(number: String) async throws -> Quote {
+        try await send(try request("/api/quote", query: ["number": number]), as: Quote.self)
+    }
+
+    /// WebSocket живого текста разговора (ключ — тем же заголовком).
+    func liveRequest() throws -> URLRequest {
+        var req = try request("/live-ws")
+        guard var components = URLComponents(url: req.url!, resolvingAgainstBaseURL: false) else { throw APIError.badURL }
+        components.scheme = components.scheme == "http" ? "ws" : "wss"
+        req.url = components.url
+        req.timeoutInterval = 60
+        return req
+    }
 
     /// Сервер сначала звонит владельцу, после ответа набирает собеседника.
     func call(to number: String, mode: CallMode) async throws -> CallResult {

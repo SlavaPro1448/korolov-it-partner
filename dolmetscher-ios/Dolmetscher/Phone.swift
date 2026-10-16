@@ -70,6 +70,9 @@ enum Money {
     static func amount(_ value: Double, _ unit: String) -> String {
         String(format: "%.2f %@", value, unit)
     }
+    static func precise(_ value: Double, _ unit: String) -> String {
+        String(format: "%.3f %@", value, unit)
+    }
     static func minutes(_ value: Int?) -> String {
         guard let value else { return "—" }
         return "\(value) мин"

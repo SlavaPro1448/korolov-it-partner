@@ -14,6 +14,15 @@ struct SettingsView: View {
                     SecureField("Ключ доступа (CALL_KEY)", text: $model.key)
                 }
                 Section {
+                    Stepper(value: $model.lowBalanceMinutes, in: 5...300, step: 5) {
+                        Text("Предупреждать, когда меньше \(model.lowBalanceMinutes) мин")
+                    }
+                } header: {
+                    Text("Баланс")
+                } footer: {
+                    Text("Минуты считаются для звонка с переводом на немецкий мобильный.")
+                }
+                Section {
                     Button("Проверить связь") {
                         result = "Проверяю…"
                         Task {
