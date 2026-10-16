@@ -12,6 +12,8 @@ import { createSequentialTranslator } from "./sequential.mjs";
 import { realtimeToTwilio, twilioToRealtime } from "./audio.mjs";
 import { SessionStore } from "./sessions.mjs";
 import { createClips } from "./clips.mjs";
+import { createAssist, createHoldWatcher } from "./assist.mjs";
+import { PHRASES, phraseClipKey } from "./phrases.mjs";
 import { createTranslator } from "./translation.mjs";
 import { TEST_PAGE, attachTestSocket } from "./webtest.mjs";
 import {
@@ -90,6 +92,7 @@ export function buildServer(config, deps = {}) {
     log,
   });
   const clips = deps.clips ?? createClips({ apiKey: config.openaiApiKey, log });
+  const assist = deps.assist ?? createAssist({ apiKey: config.openaiApiKey });
   let clipsReady = false;
   const warmup = clips.warmup().then((ok) => {
     clipsReady = ok;
@@ -99,6 +102,15 @@ export function buildServer(config, deps = {}) {
   });
   const sessions = new SessionStore({
     onCue: (session, name, extra) => live.event(name, extra),
+    // Warteschleife: erkannte Ansagen laufen als Text mit, damit man sieht, dass gewartet wird
+    createWatcher: (session, onHuman) =>
+      (deps.createWatcher ?? createHoldWatcher)({
+        assist,
+        onHuman,
+        onText: (text) => live.publish("peer", "in", text + " "),
+        log,
+        label: `:${session.id}`,
+      }),
     languages: config.languages,
     maxSessions: config.maxSessions,
     maxCallSeconds: config.maxCallSeconds,
@@ -359,6 +371,54 @@ export function buildServer(config, deps = {}) {
     },
   };
 
+  // Das laufende Gespräch (höchstens eins), in dem beide Seiten verbunden sind
+  const activeSession = () => [...sessions.sessions.values()].find((s) => s.paired) ?? null;
+
+  // POST /api/say {text} oder {phrase}: Gegenseite hört es auf Deutsch.
+  // POST /api/wait {on}: für den Inhaber in der Warteschleife warten.
+  async function handleAssist(req, res, url) {
+    const allowed = config.callKey && req.headers.authorization === `Bearer ${config.callKey}`;
+    if (!allowed) return send(res, 404, "text/plain", "Not found");
+    const reply = (status, body) => send(res, status, "application/json", JSON.stringify(body));
+    let body;
+    try {
+      body = JSON.parse((await readBody(req)) || "{}");
+    } catch {
+      return reply(400, { ok: false, error: "json" });
+    }
+    const session = activeSession();
+    if (!session) return reply(409, { ok: false, error: "no-call" });
+    if (session.plain || !session.legs.peer) return reply(409, { ok: false, error: "plain" });
+
+    if (url.pathname === "/api/wait") {
+      const ok = body.on ? sessions.startWait(session) : sessions.stopWait(session);
+      return reply(200, { ok: true, waiting: Boolean(session.waiting), changed: ok });
+    }
+
+    if (body.phrase) {
+      const phrase = PHRASES.find((p) => p.key === body.phrase);
+      const audio = phrase && clips.get(phraseClipKey(phrase.key));
+      if (!phrase) return reply(400, { ok: false, error: "phrase" });
+      const payload = audio ?? (await assist.speak(phrase.de));
+      sessions.say(session, payload);
+      live.event("said", { text: phrase.ru, de: phrase.de });
+      return reply(200, { ok: true, de: phrase.de });
+    }
+    const text = String(body.text ?? "").trim().slice(0, 500);
+    if (!text) return reply(400, { ok: false, error: "text" });
+    try {
+      const de = await assist.toGerman(text);
+      const audio = await assist.speak(de);
+      if (!sessions.sessions.has(session.id)) return reply(409, { ok: false, error: "no-call" });
+      sessions.say(session, audio);
+      live.event("said", { text, de });
+      return reply(200, { ok: true, de });
+    } catch (error) {
+      log.error("[say]", error.message);
+      return reply(502, { ok: false, error: "speech" });
+    }
+  }
+
   async function handleAdminCall(req, res) {
     const url = new URL(req.url, config.publicUrl);
     const byToken =
@@ -437,6 +497,14 @@ export function buildServer(config, deps = {}) {
           "application/json",
           JSON.stringify({ token, expiresAt, identity: config.clientIdentity, incoming: appIncoming() }),
         );
+      }
+      if (req.method === "POST" && (url.pathname === "/api/say" || url.pathname === "/api/wait")) {
+        return await handleAssist(req, res, url);
+      }
+      if (req.method === "GET" && url.pathname === "/api/phrases") {
+        const allowed = config.callKey && req.headers.authorization === `Bearer ${config.callKey}`;
+        if (!allowed) return send(res, 404, "text/plain", "Not found");
+        return send(res, 200, "application/json", JSON.stringify({ phrases: PHRASES }));
       }
       if (req.method === "GET" && apiRoutes[url.pathname]) {
         const bearer = req.headers.authorization === `Bearer ${config.callKey}`;

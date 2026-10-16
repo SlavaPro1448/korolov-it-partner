@@ -148,6 +148,40 @@ struct APIClient {
         try await send(try request("/api/countries"), as: CountriesBody.self).countries
     }
     func calls() async throws -> [CallEntry] { try await send(try request("/api/calls"), as: CallsBody.self).calls }
+    struct Phrase: Decodable, Identifiable, Hashable { var key: String; var ru: String; var de: String; var id: String { key } }
+    private struct PhrasesBody: Decodable { var phrases: [Phrase] }
+    struct AssistResult: Decodable { var ok: Bool; var de: String?; var waiting: Bool?; var error: String? }
+
+    func phrases() async throws -> [Phrase] { try await send(try request("/api/phrases"), as: PhrasesBody.self).phrases }
+
+    private func post(_ path: String, _ body: [String: Any]) async throws -> AssistResult {
+        var req = try request(path)
+        req.httpMethod = "POST"
+        req.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        req.httpBody = try JSONSerialization.data(withJSONObject: body)
+        req.timeoutInterval = 30
+        let (data, response): (Data, URLResponse)
+        do { (data, response) = try await URLSession.shared.data(for: req) } catch { throw APIError.offline }
+        if let result = try? JSONDecoder().decode(AssistResult.self, from: data) {
+            if !result.ok { throw APIError.server(Self.assistMessages[result.error ?? ""] ?? "Не получилось: \(result.error ?? "ошибка")") }
+            return result
+        }
+        throw APIError.http((response as? HTTPURLResponse)?.statusCode ?? 0)
+    }
+
+    private static let assistMessages = [
+        "no-call": "Сейчас нет разговора через переводчика.",
+        "plain": "В режиме «Без перевода» это недоступно.",
+        "speech": "Не удалось озвучить, попробуйте ещё раз.",
+        "text": "Введите текст.",
+    ]
+
+    /// Собеседник услышит это по-немецки: свой текст (переводится, номера — по цифрам) или готовая фраза.
+    func say(text: String) async throws -> AssistResult { try await post("/api/say", ["text": text]) }
+    func say(phrase: String) async throws -> AssistResult { try await post("/api/say", ["phrase": phrase]) }
+    /// Ждать в очереди за вас: перевод выключается, сервер позовёт, когда ответит человек.
+    func wait(_ on: Bool) async throws -> AssistResult { try await post("/api/wait", ["on": on]) }
+
     struct VoiceToken: Decodable { var token: String; var incoming: Bool? }
     /// Токен Twilio Voice SDK для звонка через интернет (живёт час, берётся перед каждым звонком).
     func voiceToken() async throws -> String { try await voiceTokenInfo().token }

@@ -7,6 +7,8 @@ import WebSocket from "ws";
 import { createApiRoutes, groupCalls, rateForNumber, toE164 } from "../src/api.mjs";
 import { createVoiceToken } from "../src/voicetoken.mjs";
 import { compressPauses } from "../src/clips.mjs";
+import { createHoldWatcher } from "../src/assist.mjs";
+import { pcm16ToMulaw } from "../src/audio.mjs";
 import { createLiveFeed } from "../src/live.mjs";
 import { buildServer } from "../src/server.mjs";
 
@@ -141,9 +143,12 @@ const CLIPS = {
   peerWait: Buffer.alloc(800, 0x7f).toString("base64"),
   peerNotice: Buffer.alloc(800, 0x7d).toString("base64"),
   ownerReady: Buffer.alloc(400, 0x7e).toString("base64"),
+  ownerWait: Buffer.alloc(160, 0x6a).toString("base64"),
+  ownerHuman: Buffer.alloc(160, 0x6b).toString("base64"),
+  phrase_repeat: Buffer.alloc(160, 0x6c).toString("base64"),
 };
 
-async function start(cfg = config) {
+async function start(cfg = config, extraDeps = {}) {
   const created = [];
   const updated = [];
   const twilio = {
@@ -158,7 +163,7 @@ async function start(cfg = config) {
     return t;
   };
   const clips = { warmup: async () => true, get: (key) => CLIPS[key] ?? null };
-  const { server, sessions } = buildServer(cfg, { twilio, createTranslator, clips, twilioApi: fakeTwilioApi, log: quiet });
+  const { server, sessions } = buildServer(cfg, { twilio, createTranslator, clips, twilioApi: fakeTwilioApi, log: quiet, ...extraDeps });
   server.listen(0);
   await once(server, "listening");
   const base = `127.0.0.1:${server.address().port}`;
@@ -434,4 +439,110 @@ test("incoming declined in the app goes straight to the assistant, not to the mo
   await app.post(status.pathname + status.search, { CallStatus: "busy" });
   assert.equal(app.created.length, 1, "mobile is not called");
   assert.match(app.updated[0].twiml, /\+4921411111/);
+});
+
+// Ausgehendes übersetztes Gespräch aufbauen; liefert die Media-Stream-Sockets beider Seiten
+async function connectedCall(app) {
+  const call = await fetch(`http://${app.base}/call`, {
+    method: "POST",
+    headers: { Authorization: "Bearer app-key", "Content-Type": "application/json" },
+    body: JSON.stringify({ to: "02141234567", mode: "translate" }),
+  });
+  assert.equal(call.status, 200);
+  const ownerLeg = new URL(app.created[0].url);
+  const owner = await app.stream(tokenFrom(await app.post(ownerLeg.pathname + ownerLeg.search, {})), "MZ_owner");
+  const peerLeg = new URL(app.created[1].url);
+  const peer = await app.stream(tokenFrom(await app.post(peerLeg.pathname + peerLeg.search, {})), "MZ_peer");
+  await wait(40);
+  return { owner, peer };
+}
+const api = (app, path, body) =>
+  fetch(`http://${app.base}${path}`, {
+    method: "POST",
+    headers: { Authorization: "Bearer app-key", "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+const SPOKEN = Buffer.alloc(240, 0x55).toString("base64");
+const fakeAssist = {
+  toGerman: async (text) => `DE: ${text}`,
+  speak: async () => SPOKEN,
+};
+
+test("say: typed text is translated, spoken to the callee and shown in the live text; phrases are instant", async (t) => {
+  const app = await start(config, { assist: fakeAssist });
+  t.after(() => app.close());
+  assert.equal((await api(app, "/api/say", { text: "Привет" })).status, 409, "no call yet");
+
+  const live = new WebSocket(`ws://${app.base}/live-ws`, { headers: { Authorization: "Bearer app-key" } });
+  const events = [];
+  live.on("message", (raw) => { const m = JSON.parse(raw.toString()); if (m.event) events.push(m); });
+  await once(live, "open");
+  const { owner, peer } = await connectedCall(app);
+  t.after(() => { live.close(); owner.close(); peer.close(); });
+
+  const said = await api(app, "/api/say", { text: "Мой номер 123" });
+  assert.deepEqual(await said.json(), { ok: true, de: "DE: Мой номер 123" });
+  assert.ok(peer.received.some((m) => m.media?.payload === SPOKEN), "callee hears it");
+
+  const phrase = await api(app, "/api/say", { phrase: "repeat" });
+  assert.equal((await phrase.json()).de, "Können Sie das bitte wiederholen?");
+  assert.ok(peer.received.some((m) => m.media?.payload === CLIPS.phrase_repeat), "pre-recorded phrase");
+  await wait(20);
+  assert.equal(events.filter((e) => e.event === "said").length, 2);
+
+  const list = await fetch(`http://${app.base}/api/phrases`, { headers: { Authorization: "Bearer app-key" } });
+  assert.ok((await list.json()).phrases.length >= 8);
+});
+
+test("wait: translation stops, the line is watched; when a human answers the owner is called and the notice plays", async (t) => {
+  let watcher;
+  const createWatcher = ({ onHuman }) => (watcher = { pushed: 0, closed: false, onHuman, push() { this.pushed += 1; }, close() { this.closed = true; } });
+  const app = await start(config, { assist: fakeAssist, createWatcher });
+  t.after(() => app.close());
+  const { owner, peer } = await connectedCall(app);
+  t.after(() => { owner.close(); peer.close(); });
+  const before = app.translators.length;
+
+  const on = await api(app, "/api/wait", { on: true });
+  assert.equal((await on.json()).waiting, true);
+  assert.ok(owner.received.some((m) => m.media?.payload === CLIPS.ownerWait), "owner hears 'I wait for you'");
+  peer.send(JSON.stringify({ event: "media", media: { payload: Buffer.alloc(160, 0x10).toString("base64") } }));
+  owner.send(JSON.stringify({ event: "media", media: { payload: "AAAA" } }));
+  await wait(30);
+  assert.equal(watcher.pushed, 1, "callee audio goes to the watcher");
+  assert.equal(app.translators.length, before, "no translation while waiting");
+
+  watcher.onHuman("Guten Tag, Jobcenter, mein Name ist Müller");
+  await wait(30);
+  assert.ok(watcher.closed);
+  assert.equal(app.translators.length, before + 2, "translation restarts");
+  assert.ok(owner.received.some((m) => m.media?.payload === CLIPS.ownerHuman), "owner hears 'a human answered'");
+  assert.ok(peer.received.some((m) => m.media?.payload === CLIPS.peerNotice), "the agent hears the AI notice");
+});
+
+test("hold watcher: recorded announcements are ignored, a human greeting triggers once", async () => {
+  const texts = ["Bitte haben Sie noch etwas Geduld", "Guten Tag, Jobcenter Leverkusen, Müller"];
+  const seen = [];
+  let humans = 0;
+  const assist = {
+    transcribe: async () => texts.shift(),
+    isHuman: async (latest, earlier) => (seen.push([latest, earlier.length]), latest.startsWith("Guten Tag")),
+  };
+  const watcher = createHoldWatcher({ assist, onHuman: () => (humans += 1), log: quiet });
+  const loud = Buffer.alloc(160);
+  for (let i = 0; i < 160; i += 1) loud[i] = pcm16ToMulaw(Math.round(Math.sin(i / 2) * 6000));
+  const quietChunk = Buffer.alloc(160, 0xff).toString("base64");
+  const segment = () => {
+    for (let i = 0; i < 50; i += 1) watcher.push(loud.toString("base64")); // 1 s Sprache
+    for (let i = 0; i < 40; i += 1) watcher.push(quietChunk); // 0,8 s Pause
+  };
+  segment();
+  await wait(20);
+  segment();
+  await wait(20);
+  assert.equal(humans, 1);
+  assert.deepEqual(seen, [["Bitte haben Sie noch etwas Geduld", 0], ["Guten Tag, Jobcenter Leverkusen, Müller", 1]]);
+  segment();
+  await wait(20);
+  assert.equal(humans, 1, "stops after the first human");
 });

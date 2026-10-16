@@ -1,11 +1,14 @@
 // Kurze Sprachhinweise, die der Server selbst in einen Media Stream spielt (statt Twilio <Say>):
 // einmal per OpenAI TTS erzeugt, als μ-law 8 kHz im Speicher gehalten.
 import { realtimeToTwilio } from "./audio.mjs";
+import { PHRASES, phraseClipKey } from "./phrases.mjs";
 
 export const CLIP_TEXT = {
   ownerNoAnswer: "Собеседник не ответил.",
   peerWait: "Einen Moment bitte, Sie werden gleich verbunden.",
   ownerReady: "Можно говорить.",
+  ownerHuman: "Ответил человек! Сейчас ему скажут про переводчика.",
+  ownerWait: "Жду за вас. Позову, когда ответит человек.",
   modeLive: "Синхронный перевод.",
   modeSeq: "Перевод по фразам.",
   modeDirect: "Ваш голос напрямую, без перевода.",
@@ -35,6 +38,9 @@ export function compressPauses(pcm, { maxPauseMs = 200, threshold = 300 } = {}) 
   }
   return Buffer.concat(parts);
 }
+
+// Schnellsätze werden mit den übrigen Hinweisen vertont
+for (const phrase of PHRASES) CLIP_TEXT[phraseClipKey(phrase.key)] = phrase.de;
 
 export function createClips({
   apiKey,

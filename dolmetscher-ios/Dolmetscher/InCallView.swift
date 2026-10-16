@@ -19,7 +19,12 @@ struct InCallView: View {
                 LiveTranscript(placeholder: placeholder)
                     .background(RoundedRectangle(cornerRadius: 18).fill(Color(.secondarySystemBackground).opacity(0.5)))
             }
-            if showKeys { dtmfPad } else { controls }
+            if showKeys {
+                dtmfPad
+            } else {
+                controls
+                if calls.mode != .plain && calls.phase == .connected { AssistButtons() }
+            }
             endButton
         }
         .padding(.horizontal, 16)

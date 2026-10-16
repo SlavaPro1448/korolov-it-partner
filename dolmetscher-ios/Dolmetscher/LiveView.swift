@@ -1,5 +1,6 @@
 import SwiftUI
 import UIKit
+import UserNotifications
 
 /// Реплика в живом тексте: оригинал и перевод одного говорящего подряд.
 struct LiveTurn: Identifiable {
@@ -20,10 +21,25 @@ final class LiveFeed: ObservableObject {
     @Published var noticeUntil: Date?
     /// Предупреждение закончилось, можно говорить
     @Published var readyAt: Date?
+    /// Ждём за вас в очереди с этого момента; nil — не ждём
+    @Published var waitingSince: Date?
+    /// В очереди ответил человек
+    @Published var humanAt: Date?
 
     private var task: URLSessionWebSocketTask?
     private var wanted = false
     private var request: () throws -> URLRequest = { throw APIError.badURL }
+
+    /// Позвать: сильная вибрация и уведомление со звуком (телефон может лежать на столе)
+    static func alertHuman() {
+        UINotificationFeedbackGenerator().notificationOccurred(.warning)
+        let content = UNMutableNotificationContent()
+        content.title = "Ответил человек"
+        content.body = "Возьмите телефон: собеседнику сейчас скажут про переводчика, потом можно говорить."
+        content.sound = .default
+        content.interruptionLevel = .timeSensitive
+        UNUserNotificationCenter.current().add(UNNotificationRequest(identifier: "human", content: content, trigger: nil))
+    }
 
     func start(_ makeRequest: @escaping () throws -> URLRequest) {
         request = makeRequest
@@ -82,13 +98,30 @@ final class LiveFeed: ObservableObject {
 
     private struct Message: Decodable {
         var event: String?; var role: String?; var dir: String?; var text: String?; var ms: Double?; var at: Double?
+        var on: Bool?; var de: String?
     }
 
     private func handle(_ raw: String) {
         guard let message = try? JSONDecoder().decode(Message.self, from: Data(raw.utf8)) else { return }
         switch message.event {
         case "start":
-            turns = []; state = .talking; noticeUntil = nil; readyAt = nil
+            turns = []; state = .talking; noticeUntil = nil; readyAt = nil; waitingSince = nil; humanAt = nil
+            return
+        case "said":
+            // Сказано текстом или кнопкой: отдельной репликой
+            var turn = LiveTurn(role: "owner")
+            turn.original = "⌨︎ " + (message.text ?? "")
+            turn.translation = message.de ?? ""
+            turns.append(turn)
+            return
+        case "wait":
+            let sent = message.at.map { Date(timeIntervalSince1970: $0 / 1000) } ?? Date()
+            waitingSince = message.on == true ? sent : nil
+            return
+        case "human":
+            let sent = message.at.map { Date(timeIntervalSince1970: $0 / 1000) } ?? Date()
+            humanAt = sent
+            if Date().timeIntervalSince(sent) < 10 { Self.alertHuman() }
             return
         case "notice":
             // Время отсчитываем от момента на сервере: при переподключении отсчёт не сбивается
@@ -134,9 +167,13 @@ struct SpeakCue: View {
 
     var body: some View {
         TimelineView(.periodic(from: .now, by: 0.5)) { context in
-            if let until = feed.noticeUntil, until > context.date {
-                cue(icon: "hand.raised.fill",
-                    text: "Подождите: собеседнику читается предупреждение · \(Int(until.timeIntervalSince(context.date).rounded(.up))) с",
+            if let since = feed.waitingSince {
+                let s = Int(context.date.timeIntervalSince(since))
+                cue(icon: "hourglass", text: String(format: "Жду, когда ответит человек · %d:%02d", s / 60, s % 60), color: .indigo)
+            } else if let until = feed.noticeUntil, until > context.date {
+                let human = feed.humanAt.map { context.date.timeIntervalSince($0) < 20 } ?? false
+                cue(icon: human ? "person.wave.2.fill" : "hand.raised.fill",
+                    text: (human ? "Ответил человек! " : "Подождите: ") + "собеседнику читается предупреждение · \(Int(until.timeIntervalSince(context.date).rounded(.up))) с",
                     color: .orange)
             } else if let ready = feed.readyAt, context.date.timeIntervalSince(ready) < 5 {
                 cue(icon: "mic.fill", text: "Говорите", color: .green)
@@ -195,6 +232,8 @@ struct LiveView: View {
             VStack(spacing: 8) {
                 SpeakCue().padding(.horizontal)
                 LiveTranscript(placeholder: placeholder)
+                // Звонок перезвоном на мобильный: помощь в разговоре — здесь
+                if feed.state == .talking { AssistButtons().padding(.bottom, 8) }
             }
             .navigationTitle("Текст разговора")
             .navigationBarTitleDisplayMode(.inline)

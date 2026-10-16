@@ -3,6 +3,9 @@
 import crypto from "node:crypto";
 import { attenuateMulaw, connectedTone, holdTone, mulawToPcm16, ringbackTone } from "./audio.mjs";
 
+// In der Warteschleife hört der Inhaber die Gegenseite leise mit (Musik = Leitung lebt)
+const WAIT_GAIN = 0.4;
+
 const OTHER = { owner: "peer", peer: "owner" };
 
 // Echo-Sperre: Während ein Teilnehmer gerade die Übersetzung hört, kann sein Telefon sie wieder
@@ -55,12 +58,15 @@ export class SessionStore {
     onDtmf = null,
     // Hinweise für die App (Live-Text): "notice" (Ansage an die Gegenseite läuft, ms) und "ready"
     onCue = () => {},
+    // Warteschleife abhören: (session, onHuman) => { push(payload), close() }
+    createWatcher = null,
     clips = null,
     log = console,
   }) {
     this.clips = clips;
     this.onDtmf = onDtmf;
     this.onCue = onCue;
+    this.createWatcher = createWatcher;
     this.createTranslator = createTranslator;
     this.languages = languages; // { owner: "ru", peer: "de" } – Sprache, die der jeweilige Teilnehmer hört
     this.maxSessions = maxSessions;
@@ -153,8 +159,18 @@ export class SessionStore {
 
   media(token, payload, now = Date.now()) {
     const entry = this.byToken(token);
-    if (!entry?.session.translators) return;
+    if (!entry) return;
     const { session, role } = entry;
+    if (session.waiting) {
+      // Warten: nichts übersetzen; die Gegenseite geht an den Wächter und leise an den Inhaber,
+      // der Inhaber selbst wird nicht übertragen (Geräusche am Tisch sollen nicht in die Leitung)
+      if (role === "peer") {
+        session.watcher?.push(payload);
+        if (now >= session.playingUntil.owner) session.legs.owner?.send(attenuateMulaw(payload, WAIT_GAIN));
+      }
+      return;
+    }
+    if (!session.translators) return;
     let hearing = now < session.translationUntil[role] + ECHO_TAIL_MS;
     if (hearing && now < session.translationUntil[role]) {
       session.bargeFrames[role] = rms(payload) > BARGE_IN_RMS ? session.bargeFrames[role] + 1 : 0;
@@ -224,9 +240,51 @@ export class SessionStore {
     session.bargeFrames[listener] = 0;
   }
 
+  // Text oder Schnellsatz des Inhabers an die Gegenseite (μ-law base64)
+  say(session, payload) {
+    if (!session.paired || !session.legs.peer) return false;
+    this.#playback(session, "peer", payload);
+    return true;
+  }
+
+  // "Für mich warten": Übersetzung aus (spart OpenAI), Wächter hört die Warteschleife ab
+  startWait(session) {
+    if (!session.paired || session.waiting || !this.createWatcher) return false;
+    session.waiting = true;
+    session.waitStartedAt = Date.now();
+    session.translators?.owner.close();
+    session.translators?.peer.close();
+    session.translators = null;
+    session.watcher = this.createWatcher(session, () => this.stopWait(session, { human: true }));
+    this.stopPlayback(session, "owner");
+    this.#play(session, "owner", "ownerWait");
+    this.onCue(session, "wait", { on: true });
+    this.log.info(`[session:${session.id}] Warteschleife: Inhaber wartet`);
+    return true;
+  }
+
+  // Warten beenden: von Hand oder weil ein Mensch abgenommen hat (dann Hinweis an ihn + Signal)
+  stopWait(session, { human = false } = {}) {
+    if (!session.waiting || !this.sessions.has(session.id)) return false;
+    session.waiting = false;
+    session.watcher?.close();
+    session.watcher = null;
+    this.#startTranslators(session);
+    this.onCue(session, "wait", { on: false });
+    if (human) {
+      this.stopPlayback(session, "owner");
+      this.#play(session, "owner", "ownerHuman");
+      this.onCue(session, "human", {});
+      this.#announce(session);
+      const waited = Math.round((Date.now() - session.waitStartedAt) / 1000);
+      this.log.info(`[session:${session.id}] Mensch erkannt nach ${waited} s`);
+    }
+    return true;
+  }
+
   // Übersetzungsmodus im Gespräch wechseln: live -> seq -> direct -> live
   switchMode(session) {
-    if (!session.paired) return;
+    if (!session.paired || session.waiting) return;
     const order = ["live", "seq", "direct"];
     const previous = session.mode ?? "live";
     session.mode = order[(order.indexOf(previous) + 1) % order.length];
@@ -314,6 +372,7 @@ export class SessionStore {
     clearInterval(session.holdTimer);
     clearTimeout(session.noticeTimer);
     clearInterval(session.statsTimer);
+    session.watcher?.close();
     this.#logStats(session);
     session.translators?.owner.close();
     session.translators?.peer.close();
