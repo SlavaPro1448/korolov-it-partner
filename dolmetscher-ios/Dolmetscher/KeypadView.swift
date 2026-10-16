@@ -113,7 +113,7 @@ struct KeypadView: View {
     @ViewBuilder private var quoteLine: some View {
         Group {
             if let quote, !quote.allowed {
-                Text(quote.reason == "length" ? "Проверьте количество цифр" : "Этот номер набрать нельзя: только Германия и Чехия, без платных")
+                Text(Self.messages[quote.reason ?? ""] ?? "Этот номер набрать нельзя")
                     .foregroundStyle(quote.reason == "length" ? Color.secondary : Color.red)
             } else if let quote, quote.found, let unit = quote.unit {
                 let plain = model.mode == .plain
@@ -160,7 +160,7 @@ struct KeypadView: View {
         }
     }
 
-    private var blocked: Bool { quote?.allowed == false && quote?.reason == "number" }
+    private var blocked: Bool { quote?.allowed == false && ["premium", "country"].contains(quote?.reason ?? "") }
 
     private var callButton: some View {
         Button(action: call) {
@@ -242,8 +242,11 @@ struct KeypadView: View {
     }
 
     private static let messages = [
-        "number": "Этот номер набрать нельзя: только Германия и Чехия, без платных.",
-        "length": "В номере не то количество цифр — проверьте его.",
+        "format": "Не понял номер: наберите с 0 (0214…) или с кодом страны (+49…)",
+        "country": "Звонить можно только в Германию и Чехию",
+        "premium": "Платные номера (0900, 0180, 0137, 118…) закрыты",
+        "length": "Проверьте количество цифр",
+        "number": "Этот номер набрать нельзя",
         "busy": "Переводчик занят другим разговором.",
     ]
 }

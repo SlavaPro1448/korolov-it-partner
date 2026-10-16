@@ -49,39 +49,49 @@ struct HistoryView: View {
         }
     }
 
+    /// Строка как в «Телефоне»: имя (или номер), под ним номер, ниже — время, длительность, цена.
     private func row(_ call: CallEntry) -> some View {
-        HStack(spacing: 12) {
-            Image(systemName: call.viaApp == true ? "wifi" : call.isIncoming ? "arrow.down.left" : "arrow.up.right")
+        let name = contacts.name(for: call.number)
+        return HStack(spacing: 12) {
+            Image(systemName: call.isIncoming ? "arrow.down.left" : "arrow.up.right")
                 .foregroundStyle(call.failed ? .red : .secondary)
                 .frame(width: 22)
-            VStack(alignment: .leading, spacing: 3) {
-                Text(contacts.name(for: call.number) ?? Phone.format(call.number))
+            VStack(alignment: .leading, spacing: 2) {
+                Text(name ?? Phone.format(call.number))
                     .foregroundStyle(call.failed ? .red : .primary)
-                HStack(spacing: 8) {
-                    Text(call.startedAt, format: .dateTime.day().month(.abbreviated).hour().minute())
-                    if call.duration > 0 { Text(durationText(call.duration)) }
-                    if call.pricePending == true {
-                        Text("цена уточняется")
-                    } else if let total = call.totalPrice ?? Optional(call.price), total > 0 {
-                        Text("≈" + Money.amount(total, call.unit))
-                    }
-                    if call.translated == false && !call.failed { Text("без перевода") }
-                    if call.failed { Text(statusText(call.status)) }
+                    .lineLimit(1)
+                if name != nil {
+                    Text(Phone.format(call.number)).font(.footnote).foregroundStyle(.secondary)
                 }
-                .font(.footnote)
-                .foregroundStyle(.secondary)
+                Text(details(call))
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.85)
             }
-            Spacer()
-            if contacts.name(for: call.number) != nil {
-                Text(Phone.format(call.number)).font(.footnote).foregroundStyle(.tertiary)
-            }
+            Spacer(minLength: 0)
         }
+    }
+
+    private func details(_ call: CallEntry) -> String {
+        var parts = [call.startedAt.formatted(.dateTime.day().month(.abbreviated).hour().minute())]
+        if call.duration > 0 { parts.append(durationText(call.duration)) }
+        if call.failed {
+            parts.append(statusText(call.status))
+        } else if let total = call.totalPrice ?? Optional(call.price), total > 0 {
+            // Пока Twilio не выставил счёт — оценка по тарифу
+            parts.append("≈" + Money.amount(total, call.unit))
+        }
+        if call.viaApp == true { parts.append("интернет") }
+        if call.translated == false && !call.failed { parts.append("без перевода") }
+        return parts.joined(separator: " · ")
     }
 
     /// По долгому нажатию: из чего сложилась цена звонка.
     @ViewBuilder private func breakdown(_ call: CallEntry) -> some View {
         Section("Цена звонка") {
-            Text("Связь Twilio: " + (call.pricePending == true ? "уточняется" : Money.precise(call.price, call.unit)))
+            Text("Связь Twilio: " + Money.precise(call.price, call.unit) + (call.pricePending == true ? " (оценка, Twilio выставит позже)" : ""))
+            if call.viaApp == true { Text("Ваше плечо — через интернет") }
             if call.translated == true {
                 Text("Media Streams: " + Money.precise(call.mediaPrice ?? 0, call.unit))
                 Text("Перевод ИИ (OpenAI): ≈" + Money.precise(call.openaiPrice ?? 0, "USD"))

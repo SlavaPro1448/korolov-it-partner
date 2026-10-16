@@ -3,12 +3,26 @@ import Foundation
 /// Номера: нормализация ввода и показ.
 enum Phone {
     /// Оставить только цифры и ведущий «+»; «00» в начале → «+».
+    /// Так же, как сервер: «+49 (0) 163…» → «+49163…», «0049…» → «+49…», «49 163…» без плюса → «+49163…».
+    /// Номер с 0 в начале остаётся национальным (0214…), как его набирают.
     static func normalize(_ raw: String) -> String {
-        var digits = raw.filter { $0.isNumber || $0 == "+" }
-        if digits.hasPrefix("00") { digits = "+" + digits.dropFirst(2) }
-        if let plus = digits.firstIndex(of: "+"), plus != digits.startIndex { digits.remove(at: plus) }
-        let body = digits.dropFirst(digits.hasPrefix("+") ? 1 : 0).filter(\.isNumber)
-        return (digits.hasPrefix("+") ? "+" : "") + body
+        let cleaned = raw.replacingOccurrences(of: "(0)", with: "")
+        let digits = String(cleaned.filter { $0.isASCII && $0.isNumber })
+        let plus = cleaned.first(where: { ($0.isASCII && $0.isNumber) || $0 == "+" }) == "+"
+        var result: String
+        if plus {
+            result = "+" + digits
+        } else if digits.hasPrefix("00") {
+            result = "+" + digits.dropFirst(2)
+        } else if !digits.hasPrefix("0"), digits.count >= 11, ["49", "420", "43", "41"].contains(where: digits.hasPrefix) {
+            result = "+" + digits
+        } else {
+            return digits
+        }
+        for code in ["+49", "+43", "+41"] where result.hasPrefix(code + "0") {
+            result = code + result.dropFirst(code.count + 1)
+        }
+        return result
     }
 
     /// Похоже ли на телефонный номер (для кнопки «Вставить»).

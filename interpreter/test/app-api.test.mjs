@@ -51,6 +51,13 @@ test("numbers: phone-style input becomes E.164, longest prefix wins", () => {
   assert.equal(toE164("0049 163 1234567"), "+491631234567");
   assert.equal(toE164("+49 (176) 123-45"), "+4917612345");
   assert.equal(toE164("12"), null);
+  // Schreibweisen aus Kontakten
+  assert.equal(toE164("49 163 8252129"), "+491638252129");
+  assert.equal(toE164("+49 (0) 163 8252129"), "+491638252129");
+  assert.equal(toE164("+49 0163 8252129"), "+491638252129");
+  assert.equal(toE164("\u202D+49 163 8252129\u202C"), "+491638252129");
+  assert.equal(toE164("420 601 234 567"), "+420601234567");
+  assert.equal(toE164("1638252129"), null, "without 0 or country code it stays ambiguous");
   assert.equal(rateForNumber(DE, "+491631234567", "49").price, 0.042);
   assert.equal(rateForNumber(DE, "+4921412345", "49").price, 0.0283);
 });
@@ -71,9 +78,11 @@ test("quote: price per number, refusal for blocked or foreign numbers", async ()
   assert.equal(landline.mobile, false);
   assert.equal(landline.perMinute, 0.0791);
 
-  assert.equal((await q("0900 123456")).allowed, false);
-  assert.equal((await q("+1 555 0000000")).allowed, false);
-  assert.equal((await q("0214")).allowed, false);
+  assert.equal((await q("0900 123456")).reason, "premium");
+  assert.equal((await q("+1 555 0000000")).reason, "country");
+  assert.equal((await q("0214")).reason, "format");
+  assert.equal((await q("1638252129")).reason, "format");
+  assert.equal((await q("49 163 1234567")).allowed, true, "German number without plus is understood");
 });
 
 test("account: minutes left for a typical translated call to a German mobile", async () => {
@@ -200,7 +209,7 @@ test("app key: /call and the live text accept Authorization: Bearer <CALL_KEY>",
     body: JSON.stringify({ to: "+15550000000" }),
   });
   assert.equal(call.status, 400);
-  assert.deepEqual(await call.json(), { ok: false, error: "number" });
+  assert.deepEqual(await call.json(), { ok: false, error: "country" });
   const denied = await fetch(`http://${app.base}/call`, { method: "POST", headers: { Authorization: "Bearer nope" }, body: "{}" });
   assert.equal(denied.status, 404);
 
@@ -353,4 +362,24 @@ test("outgoing: after the notice for the callee the owner hears 'you can speak',
   await wait(350);
   assert.ok(owner.received.some((m) => m.media?.payload === CLIPS.ownerReady), "owner hears 'Можно говорить'");
   assert.ok(events.some((e) => e.event === "ready"), "app is told it can speak");
+});
+
+test("history: legs Twilio has not priced yet get a tariff estimate", async () => {
+  const at = (sec) => new Date(Date.UTC(2026, 9, 16, 20, 40, sec)).toUTCString();
+  const api = {
+    ...fakeTwilioApi,
+    calls: async () => ({
+      calls: [
+        { sid: "APP", from: "client:owner", to: "", direction: "inbound", date_created: at(0), duration: "48", price: null, status: "completed" },
+        { sid: "PEER", from: voip.peerCallerId, to: "+491631234567", direction: "outbound-api", date_created: at(0), duration: "44", price: null, status: "completed" },
+      ],
+    }),
+  };
+  const routes = createApiRoutes({ config: voip, twilioApi: api, log: quiet });
+  const [call] = (await routes["/api/calls"](new URLSearchParams())).calls;
+  assert.equal(call.pricePending, true);
+  assert.equal(call.viaApp, true);
+  // 1 Minute App (0.004) + 1 Minute Mobilfunk (0.042)
+  assert.equal(call.price, 0.046);
+  assert.ok(call.totalPrice > call.price, "media streams and OpenAI are added");
 });

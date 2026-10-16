@@ -113,6 +113,7 @@ test("dialed numbers: normalisation and premium block", async () => {
   assert.equal(hasPlausibleLength("+4980026508043809"), false);
   assert.equal(hasPlausibleLength("+498000326326"), true);
   assert.equal(hasPlausibleLength("+4921483263442"), true);
+  assert.equal(hasPlausibleLength("+49214500475100"), true, "number with extension (Durchwahl)");
 });
 
 test("webhooks require a valid Twilio signature", async () => {

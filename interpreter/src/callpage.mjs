@@ -52,7 +52,10 @@ const call = document.getElementById("call"), del = document.getElementById("del
 const key = new URLSearchParams(location.search).get("key");
 let number = "", mode = "translate", holdTimer;
 const MESSAGES = {
-  number: "Этот номер набрать нельзя: только Германия и Чехия, без платных.",
+  format: "Не понял номер. Наберите с 0 (0214…) или с кодом страны (+49…).",
+  country: "Звонить можно только в Германию и Чехию.",
+  premium: "Платные номера (0900, 0180, 0137, 118…) закрыты.",
+  number: "Этот номер набрать нельзя.",
   length: "В номере не то количество цифр — проверьте его.",
   busy: "Переводчик занят другим разговором.",
 };

@@ -17,9 +17,10 @@ import { TEST_PAGE, attachTestSocket } from "./webtest.mjs";
 import {
   TEXT,
   createTwilioClient,
-  hasPlausibleLength,
+  dialProblem,
   isDialAllowed,
   normalizeDialedNumber,
+  toE164,
   samePhone,
   twiml,
   verifyTwilioSignature,
@@ -235,11 +236,8 @@ export function buildServer(config, deps = {}) {
       if (!config.twimlAppSid || params.From !== `client:${config.clientIdentity}`) {
         return twiml.reject();
       }
-      const raw = String(params.to ?? "").trim();
-      const target = raw.startsWith("+") ? "+" + raw.replace(/\D/g, "") : normalizeDialedNumber(raw);
-      if (!isDialAllowed(target, config.allowedPrefixes) || !hasPlausibleLength(target)) {
-        return twiml.ownerMessage(TEXT.ownerBadNumber);
-      }
+      const target = toE164(params.to);
+      if (dialProblem(target, config.allowedPrefixes)) return twiml.ownerMessage(TEXT.ownerBadNumber);
       if (sessions.isFull) return twiml.ownerMessage(TEXT.ownerBusy);
       const plain = params.mode === "plain";
       const session = sessions.create({
@@ -337,13 +335,10 @@ export function buildServer(config, deps = {}) {
     if (!byToken && !byKey) return send(res, 404, "text/plain", "Not found");
     const body = JSON.parse((await readBody(req)) || "{}");
     // Eingabe wie am Telefon (0214…, 0049…) oder direkt als +49…
-    const raw = String(body.to ?? "").trim();
-    const target = raw.startsWith("+") ? "+" + raw.replace(/\D/g, "") : normalizeDialedNumber(raw);
-    if (!isDialAllowed(target, config.allowedPrefixes)) {
-      return send(res, 400, "application/json", JSON.stringify({ ok: false, error: "number" }));
-    }
-    if (!hasPlausibleLength(target)) {
-      return send(res, 400, "application/json", JSON.stringify({ ok: false, error: "length" }));
+    const target = toE164(body.to);
+    const problem = dialProblem(target, config.allowedPrefixes);
+    if (problem) {
+      return send(res, 400, "application/json", JSON.stringify({ ok: false, error: problem }));
     }
     if (sessions.isFull) {
       return send(res, 409, "application/json", JSON.stringify({ ok: false, error: "busy" }));

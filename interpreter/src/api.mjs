@@ -4,17 +4,15 @@ const PRICING_BASE = "https://pricing.twilio.com/v2/Voice/Countries";
 const CACHE_MS = 6 * 60 * 60 * 1000; // Preise ändern sich selten
 const GROUP_WINDOW_MS = 150 * 1000; // Inhaber- und Gegenseiten-Leg desselben Gesprächs
 
-import { hasPlausibleLength, isDialAllowed, normalizeDialedNumber } from "./twilio.mjs";
+import { dialProblem, toE164 } from "./twilio.mjs";
+
+export { toE164 };
 
 const digitsOf = (value) => String(value ?? "").replace(/\D/g, "");
 const PREFIX_COUNTRY = { "+49": "DE", "+420": "CZ", "+43": "AT", "+41": "CH", "+1": "US", "+380": "UA" };
 const round4 = (value) => Math.round(value * 10000) / 10000;
 
-// Eingabe wie am Telefon (0214…, 0049…) oder +49… -> E.164, wie beim Wählen selbst
-export function toE164(raw) {
-  const text = String(raw ?? "").trim();
-  return text.startsWith("+") ? "+" + digitsOf(text) : normalizeDialedNumber(text);
-}
+
 
 export function createTwilioApi({ accountSid, authToken, fetchImpl = fetch }) {
   const auth = "Basic " + Buffer.from(`${accountSid}:${authToken}`).toString("base64");
@@ -102,14 +100,22 @@ const sameNumber = (a, b) => digitsOf(a) !== "" && digitsOf(a) === digitsOf(b);
 // Twilio-Legs zu Gesprächen zusammenfassen: Gegenseite + Zeitpunkt + Dauer + Summe beider Legs.
 export function groupCalls(
   calls,
-  { twilioNumber, ownerNumber, peerCallerId, mediaStreamRate = 0.0044, openaiRatePerMin = 0.068 },
+  {
+    twilioNumber,
+    ownerNumber,
+    peerCallerId,
+    mediaStreamRate = 0.0044,
+    openaiRatePerMin = 0.068,
+    // Vorläufiger Preis eines Legs, das Twilio noch nicht abgerechnet hat (null = 0)
+    estimate = null,
+  },
 ) {
   const legs = calls
     .map((c) => ({
       ...c,
       at: Date.parse(c.date_created),
-      price: Math.abs(Number(c.price) || 0),
-      // Twilio setzt den Preis erst einige Minuten nach Gesprächsende
+      // Twilio setzt den Preis erst einige Minuten nach Gesprächsende – bis dahin Schätzung nach Tarif
+      price: c.price == null ? (estimate?.(c) ?? 0) : Math.abs(Number(c.price) || 0),
       unpriced: c.price == null && Number(c.duration) > 0,
     }))
     .sort((a, b) => b.at - a.at);
@@ -253,20 +259,20 @@ export function createApiRoutes({ config, twilioApi, log = console }) {
     },
     "/api/quote": async (query) => {
       const number = toE164(query.get("number"));
-      if (!number) return { number: null, allowed: false, reason: "number", found: false };
+      if (!number) return { number: null, allowed: false, reason: "format", found: false };
       const prefix = Object.keys(PREFIX_COUNTRY)
         .sort((a, b) => b.length - a.length)
         .find((p) => number.startsWith(p));
-      const allowed = isDialAllowed(number, config.allowedPrefixes);
-      const reason = !allowed ? "number" : !hasPlausibleLength(number) ? "length" : null;
-      if (!prefix) return { number, allowed: false, reason: "number", found: false };
+      const reason = dialProblem(number, config.allowedPrefixes);
+      const allowed = reason === null;
+      if (!prefix) return { number, allowed: false, reason: reason ?? "country", found: false };
       const [pricing, { balance }, owner] = await Promise.all([
         twilioApi.country(PREFIX_COUNTRY[prefix]),
         twilioApi.balance(),
         ownerRate(),
       ]);
       const match = rateForNumber(pricing, number, originPrefix);
-      if (!match) return { number, allowed: allowed && !reason, reason, found: false };
+      if (!match) return { number, allowed, reason, found: false };
       const rate = perMinute(match.price, owner);
       const plain = perMinute(match.price, owner, false);
       const viaApp = perMinute(match.price, appRate);
@@ -280,7 +286,7 @@ export function createApiRoutes({ config, twilioApi, log = console }) {
         },
         number,
         iso: PREFIX_COUNTRY[prefix],
-        allowed: allowed && !reason,
+        allowed,
         reason,
         found: true,
         mobile: /mobile/i.test(match.name),
@@ -294,12 +300,28 @@ export function createApiRoutes({ config, twilioApi, log = console }) {
       };
     },
     "/api/calls": async () => {
-      const { calls } = await twilioApi.calls(100);
+      const [{ calls }, de, cz, owner] = await Promise.all([
+        twilioApi.calls(100),
+        twilioApi.country("DE"),
+        twilioApi.country("CZ"),
+        ownerRate(),
+      ]);
+      const inbound = summarizeCountry(de, originPrefix).inbound ?? 0.01;
+      // Twilio rechnet je angefangene Minute
+      const estimate = (leg) => {
+        const minutes = Math.ceil((Number(leg.duration) || 0) / 60);
+        if (String(leg.from ?? "").startsWith("client:")) return minutes * appRate;
+        if (leg.direction === "inbound") return minutes * inbound;
+        if (sameNumber(leg.to, config.ownerNumber)) return minutes * owner;
+        const pricing = digitsOf(leg.to).startsWith("420") ? cz : de;
+        return minutes * (rateForNumber(pricing, leg.to, originPrefix)?.price ?? 0);
+      };
       return {
         calls: groupCalls(calls, {
           ...config,
           mediaStreamRate: mediaRate,
           openaiRatePerMin: config.openaiRatePerMin,
+          estimate,
         }),
       };
     },

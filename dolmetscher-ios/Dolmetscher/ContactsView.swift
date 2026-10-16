@@ -5,6 +5,20 @@ struct ContactItem: Identifiable, Hashable {
     let id: String
     let name: String
     let phones: [(label: String, number: String)]
+    /// false — у контакта нет видимого имени, показываем номер
+    var named = true
+
+    /// Имя без невидимых символов: пробелы, управляющие, «пустые» буквы (ᅠ U+3164 и подобные),
+    /// которыми иногда скрывают имя. Если видимого ничего нет — пустая строка.
+    static func visible(_ text: String) -> String {
+        let blank: Set<UInt32> = [0x115F, 0x1160, 0x3164, 0xFFA0, 0x2800, 0x180E, 0x200B, 0x200C, 0x200D, 0x2060, 0xFEFF]
+        let shown = text.unicodeScalars.contains { scalar in
+            !blank.contains(scalar.value)
+                && !CharacterSet.whitespacesAndNewlines.union(.controlCharacters).contains(scalar)
+                && scalar.properties.generalCategory != .format
+        }
+        return shown ? text.trimmingCharacters(in: .whitespacesAndNewlines) : ""
+    }
 
     static func == (a: ContactItem, b: ContactItem) -> Bool { a.id == b.id }
     func hash(into hasher: inout Hasher) { hasher.combine(id) }
@@ -42,16 +56,19 @@ final class ContactsStore: ObservableObject {
                     (label: CNLabeledValue<CNPhoneNumber>.localizedString(forLabel: p.label ?? ""), number: p.value.stringValue)
                 }
                 guard !phones.isEmpty else { return }
-                var name = [c.givenName, c.familyName].filter { !$0.isEmpty }.joined(separator: " ")
-                if name.isEmpty { name = c.organizationName }
-                if name.isEmpty { name = phones[0].number }
-                list.append(ContactItem(id: c.identifier, name: name, phones: phones))
+                var name = [ContactItem.visible(c.givenName), ContactItem.visible(c.familyName)]
+                    .filter { !$0.isEmpty }.joined(separator: " ")
+                if name.isEmpty { name = ContactItem.visible(c.organizationName) }
+                let named = !name.isEmpty
+                if !named { name = phones[0].number }
+                list.append(ContactItem(id: c.identifier, name: name, phones: phones, named: named))
             }
             return list
         }.value
         items = result
+        // Несколько контактов на один номер: берём тот, у которого есть настоящее имя
         var index: [String: String] = [:]
-        for item in result { for p in item.phones { index[Phone.matchKey(p.number)] = item.name } }
+        for item in result where item.named { for p in item.phones { index[Phone.matchKey(p.number)] = index[Phone.matchKey(p.number)] ?? item.name } }
         byKey = index
         loaded = true
     }
