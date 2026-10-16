@@ -5,9 +5,10 @@
 
 ## Подпись и пуш
 
-App ID `Viacheslav.Dolmetscher` с Push Notifications, профиль «Dolmetscher Dev» (ручная подпись,
-`project.yml`), сертификат «VoIP Services» (до 15.11.2027). Ключ и сертификат лежат в `push/`
-(в git не попадают). Новый iPhone — добавить его в профиль в Apple Developer и скачать профиль заново.
+App ID `Viacheslav.Dolmetscher` с Push Notifications, подпись автоматическая (Xcode вошёл в аккаунт,
+профиль ведёт сам, новые устройства добавляет при сборке с `-allowProvisioningUpdates`).
+Сертификат «VoIP Services» (до 15.11.2027) нужен Twilio для пушей; ключ и сертификат лежат в `push/`
+(в git не попадают). Ручной профиль «Dolmetscher Dev» больше не используется.
 
 ## Сборка
 
