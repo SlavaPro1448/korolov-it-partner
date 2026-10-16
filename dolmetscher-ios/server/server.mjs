@@ -268,7 +268,11 @@ export function buildServer(config, deps = {}) {
     const url = new URL(req.url, config.publicUrl);
     const byToken =
       config.adminToken && req.headers.authorization === `Bearer ${config.adminToken}`;
-    const byKey = config.callKey && url.searchParams.get("key") === config.callKey;
+    // Schlüssel der Wählseite (?key=) oder der iOS-App (Authorization: Bearer <CALL_KEY>)
+    const byKey =
+      config.callKey &&
+      (url.searchParams.get("key") === config.callKey ||
+        req.headers.authorization === `Bearer ${config.callKey}`);
     if (!byToken && !byKey) return send(res, 404, "text/plain", "Not found");
     const body = JSON.parse((await readBody(req)) || "{}");
     // Eingabe wie am Telefon (0214…, 0049…) oder direkt als +49…
