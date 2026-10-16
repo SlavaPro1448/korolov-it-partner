@@ -3,6 +3,12 @@
 Нативная замена веб-странице `/call`: клавиатура, контакты iPhone, история звонков и тарифы
 по балансу Twilio. Сервер — тот же `dolmetscher` на VPS (`ssh scribe`, `/opt/bots/dolmetscher`).
 
+## Подпись и пуш
+
+App ID `Viacheslav.Dolmetscher` с Push Notifications, профиль «Dolmetscher Dev» (ручная подпись,
+`project.yml`), сертификат «VoIP Services» (до 15.11.2027). Ключ и сертификат лежат в `push/`
+(в git не попадают). Новый iPhone — добавить его в профиль в Apple Developer и скачать профиль заново.
+
 ## Сборка
 
 ```bash

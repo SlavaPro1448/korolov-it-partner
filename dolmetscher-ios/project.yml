@@ -47,5 +47,10 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: Viacheslav.Dolmetscher
+        CODE_SIGN_ENTITLEMENTS: Dolmetscher/Dolmetscher.entitlements
+        # Свой профиль с пуш-уведомлениями (создан в Apple Developer 16.10.2026, «Dolmetscher Dev»)
+        CODE_SIGN_STYLE: Manual
+        CODE_SIGN_IDENTITY: Apple Development
+        "PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]": Dolmetscher Dev
         INFOPLIST_KEY_UIUserInterfaceStyle: Automatic
         GENERATE_INFOPLIST_FILE: false

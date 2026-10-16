@@ -145,9 +145,10 @@ const CLIPS = {
 
 async function start(cfg = config) {
   const created = [];
+  const updated = [];
   const twilio = {
     createCall: async (args) => (created.push(args), { sid: `CA_${created.length}` }),
-    updateCall: async () => ({}),
+    updateCall: async (sid, twimlText) => (updated.push({ sid, twiml: twimlText }), {}),
     hangup: async () => ({}),
   };
   const translators = [];
@@ -177,7 +178,7 @@ async function start(cfg = config) {
     ws.send(JSON.stringify({ event: "start", start: { streamSid, customParameters: { token } } }));
     return ws;
   };
-  return { base, created, translators, sessions, post, stream, close: () => server.close() };
+  return { base, created, updated, translators, sessions, post, stream, close: () => server.close() };
 }
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const tokenFrom = (twimlText) => /name="token" value="([0-9a-f]+)"/.exec(twimlText)[1];
@@ -396,4 +397,41 @@ test("clips: long pauses are cut to 200 ms, speech stays untouched", () => {
   const ms = out.length / 48;
   // 500 + 200 (gekürzt) + 500 + 100 (kurz, bleibt)
   assert.ok(Math.abs(ms - 1300) <= 20, `expected ~1300 ms, got ${ms}`);
+});
+
+const pushed = { ...voip, pushCredentialSid: "CR123", clientRingSeconds: 20, secretaryNumber: "+4921411111" };
+
+test("voice token with push credential allows incoming calls", () => {
+  const { token } = createVoiceToken({ accountSid: "AC1", apiKey: "SK1", apiSecret: "x", appSid: "AP1", identity: "owner", pushCredentialSid: "CR123" });
+  const voice = JSON.parse(Buffer.from(token.split(".")[1], "base64url")).grants.voice;
+  assert.deepEqual(voice.incoming, { allow: true });
+  assert.equal(voice.push_credential_sid, "CR123");
+});
+
+test("incoming with the app: app rings first (caller's number shown), then the mobile, then the assistant", async (t) => {
+  const app = await start(pushed);
+  t.after(() => app.close());
+  await app.post("/voice/incoming", { From: "+4930123456", CallSid: "CA_peer" });
+  assert.equal(app.created[0].to, "client:owner");
+  assert.equal(app.created[0].from, "+4930123456");
+  assert.equal(app.created[0].timeout, 20);
+
+  const status = (n) => new URL(app.created[n].statusCallback);
+  await app.post(status(0).pathname + status(0).search, { CallStatus: "no-answer" });
+  assert.equal(app.created[1].to, pushed.ownerNumber, "app did not answer -> mobile");
+  assert.equal(app.sessions.sessions.size, 1);
+
+  await app.post(status(1).pathname + status(1).search, { CallStatus: "no-answer" });
+  assert.match(app.updated[0].twiml, /<Number>\+4921411111<\/Number>/, "mobile neither -> assistant");
+  assert.equal(app.sessions.sessions.size, 0);
+});
+
+test("incoming declined in the app goes straight to the assistant, not to the mobile", async (t) => {
+  const app = await start(pushed);
+  t.after(() => app.close());
+  await app.post("/voice/incoming", { From: "+4930123456", CallSid: "CA_peer" });
+  const status = new URL(app.created[0].statusCallback);
+  await app.post(status.pathname + status.search, { CallStatus: "busy" });
+  assert.equal(app.created.length, 1, "mobile is not called");
+  assert.match(app.updated[0].twiml, /\+4921411111/);
 });

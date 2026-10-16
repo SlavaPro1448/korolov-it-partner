@@ -11,6 +11,7 @@ export function createVoiceToken({
   apiSecret,
   appSid,
   identity,
+  pushCredentialSid = "",
   ttlSeconds = 3600,
   now = Math.floor(Date.now() / 1000),
 }) {
@@ -24,8 +25,12 @@ export function createVoiceToken({
     exp: now + ttlSeconds,
     grants: {
       identity,
-      // Eingehend über die App ist (noch) nicht eingerichtet: dafür fehlt ein VoIP-Push-Zertifikat
-      voice: { outgoing: { application_sid: appSid }, incoming: { allow: false } },
+      // Eingehend nur mit Push Credential (VoIP-Push von Apple über Twilio)
+      voice: {
+        outgoing: { application_sid: appSid },
+        incoming: { allow: Boolean(pushCredentialSid) },
+        ...(pushCredentialSid ? { push_credential_sid: pushCredentialSid } : {}),
+      },
     },
   };
   const unsigned = `${base64url(header)}.${base64url(payload)}`;

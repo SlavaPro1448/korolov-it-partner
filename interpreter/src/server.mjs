@@ -71,6 +71,9 @@ export function loadConfig(env = process.env) {
     twimlAppSid: env.TWILIO_TWIML_APP_SID || "",
     clientIdentity: env.CLIENT_IDENTITY || "owner",
     clientRate: Number.parseFloat(env.CLIENT_RATE ?? "0.004") || 0.004,
+    // Eingehende Anrufe zuerst in die App (VoIP-Push über diese Twilio Push Credential); leer = nur Handy
+    pushCredentialSid: env.TWILIO_PUSH_CREDENTIAL_SID || "",
+    clientRingSeconds: Number.parseInt(env.CLIENT_RING_SECONDS ?? "20", 10) || 20,
   };
 }
 
@@ -155,21 +158,53 @@ export function buildServer(config, deps = {}) {
   const statusUrl = (session, role) =>
     `${config.publicUrl}/voice/status?session=${session.id}&role=${role}`;
 
-  async function dial(session, role, to) {
+  async function dial(session, role, to, { from = null, timeout = null } = {}) {
     const call = await twilio.createCall({
       to,
-      from: role === "peer" ? (config.peerCallerId ?? config.twilioNumber) : config.twilioNumber,
+      from: from ?? (role === "peer" ? (config.peerCallerId ?? config.twilioNumber) : config.twilioNumber),
       url: legUrl(session.tokens[role]),
       statusCallback: statusUrl(session, role),
-      timeout: role === "peer" ? 60 : 25,
+      timeout: timeout ?? (role === "peer" ? 60 : 25),
       timeLimit: config.maxCallSeconds,
     });
     session.callSids[role] = call.sid;
   }
 
+  const appIncoming = () => Boolean(config.pushCredentialSid && config.apiKey && config.twimlAppSid);
+  const clientAddress = () => `client:${config.clientIdentity}`;
+
+  // Eingehend: zuerst die App (Anzeige = Nummer des Anrufers), dann das Handy, dann der Assistent
+  async function ringOwner(session) {
+    while (session.ownerTargets.length > 0) {
+      const target = session.ownerTargets.shift();
+      try {
+        if (target === "app") {
+          await dial(session, "owner", clientAddress(), {
+            from: session.callerNumber || config.twilioNumber,
+            timeout: config.clientRingSeconds,
+          });
+        } else {
+          await dial(session, "owner", config.ownerNumber);
+        }
+        session.ringing = target;
+        return true;
+      } catch (error) {
+        log.error(`[incoming:${target}]`, error.message);
+      }
+    }
+    return false;
+  }
+
   // Der gewählte Teilnehmer wurde nicht erreicht oder hat aufgelegt
   async function onLegFinished(session, role, status) {
     if (role === "owner" && !session.paired && session.direction === "incoming") {
+      // App nicht angenommen (nicht erreichbar / keine Antwort): weiter aufs Handy.
+      // In der App abgelehnt ("busy") heißt: jetzt nicht – direkt zum Assistenten.
+      const declinedInApp = session.ringing === "app" && status === "busy";
+      if (!declinedInApp && session.ownerTargets.length > 0) {
+        log.info(`[session:${session.id}] ${session.ringing}: ${status}, weiter`);
+        if (await ringOwner(session)) return;
+      }
       // Inhaber hat den Rückruf nicht angenommen: Anrufer an den Telefonassistenten übergeben
       const peerCallSid = session.callSids.peer;
       session.callSids.peer = null;
@@ -198,12 +233,13 @@ export function buildServer(config, deps = {}) {
       }
       // Vom Handy des Inhabers weitergeleiteter Anruf: Anrufer wartet, Inhaber wird zurückgerufen
       if (sessions.isFull) return twiml.peerFallback(config.secretaryNumber);
-      const session = sessions.create({ direction: "incoming" });
+      const session = sessions.create({
+        direction: "incoming",
+        callerNumber: params.From,
+        ownerTargets: appIncoming() ? ["app", "mobile"] : ["mobile"],
+      });
       session.callSids.peer = params.CallSid;
-      try {
-        await dial(session, "owner", config.ownerNumber);
-      } catch (error) {
-        log.error("[incoming]", error.message);
+      if (!(await ringOwner(session))) {
         sessions.end(session.id, "Rückruf fehlgeschlagen");
         return twiml.peerFallback(config.secretaryNumber);
       }
@@ -388,13 +424,19 @@ export function buildServer(config, deps = {}) {
           return send(res, 404, "application/json", JSON.stringify({ ok: false, error: "voip-off" }));
         }
         const { token, expiresAt } = createVoiceToken({
+          pushCredentialSid: config.pushCredentialSid,
           accountSid: config.accountSid,
           apiKey: config.apiKey,
           apiSecret: config.apiSecret,
           appSid: config.twimlAppSid,
           identity: config.clientIdentity,
         });
-        return send(res, 200, "application/json", JSON.stringify({ token, expiresAt, identity: config.clientIdentity }));
+        return send(
+          res,
+          200,
+          "application/json",
+          JSON.stringify({ token, expiresAt, identity: config.clientIdentity, incoming: appIncoming() }),
+        );
       }
       if (req.method === "GET" && apiRoutes[url.pathname]) {
         const bearer = req.headers.authorization === `Bearer ${config.callKey}`;

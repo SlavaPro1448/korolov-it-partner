@@ -24,6 +24,12 @@ struct DolmetscherApp: App {
                 .onChange(of: scenePhase) { _, phase in
                     if phase == .active { Task { await model.refreshAccount() } }
                 }
+                .onAppear {
+                    // Входящие в приложение: регистрация VoIP-пуша при каждом запуске
+                    calls.nameForNumber = { [contacts] number in MainActor.assumeIsolated { contacts.name(for: number) } }
+                    calls.enableIncoming(api: model.api)
+                    Task { if !contacts.loaded { await contacts.load() } }
+                }
         }
     }
 }

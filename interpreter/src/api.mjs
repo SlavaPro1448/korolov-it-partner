@@ -119,7 +119,7 @@ export function groupCalls(
       unpriced: c.price == null && Number(c.duration) > 0,
     }))
     .sort((a, b) => b.at - a.at);
-  const isAppLeg = (c) => String(c.from ?? "").startsWith("client:");
+  const isAppLeg = (c) => String(c.from ?? "").startsWith("client:") || String(c.to ?? "").startsWith("client:");
   const ownerLegs = legs.filter(
     (c) => (sameNumber(c.to, ownerNumber) && sameNumber(c.from, twilioNumber)) || isAppLeg(c),
   );
@@ -310,7 +310,9 @@ export function createApiRoutes({ config, twilioApi, log = console }) {
       // Twilio rechnet je angefangene Minute
       const estimate = (leg) => {
         const minutes = Math.ceil((Number(leg.duration) || 0) / 60);
-        if (String(leg.from ?? "").startsWith("client:")) return minutes * appRate;
+        if (String(leg.from ?? "").startsWith("client:") || String(leg.to ?? "").startsWith("client:")) {
+          return minutes * appRate;
+        }
         if (leg.direction === "inbound") return minutes * inbound;
         if (sameNumber(leg.to, config.ownerNumber)) return minutes * owner;
         const pricing = digitsOf(leg.to).startsWith("420") ? cz : de;

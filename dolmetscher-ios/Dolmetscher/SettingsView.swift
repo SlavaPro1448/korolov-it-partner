@@ -2,6 +2,7 @@ import SwiftUI
 
 struct SettingsView: View {
     @EnvironmentObject private var model: AppModel
+    @EnvironmentObject private var calls: CallManager
     @Environment(\.dismiss) private var dismiss
     @State private var result = ""
 
@@ -19,6 +20,11 @@ struct SettingsView: View {
                     }
                     .pickerStyle(.inline)
                     .labelsHidden()
+                    LabeledContent("Входящие в приложение") {
+                        Text(calls.incomingReady ? "Включены" : (calls.incomingError ?? "Подключаю…"))
+                            .foregroundStyle(calls.incomingReady ? .green : .secondary)
+                            .multilineTextAlignment(.trailing)
+                    }
                 } header: {
                     Text("Звонок")
                 } footer: {

@@ -148,10 +148,12 @@ struct APIClient {
         try await send(try request("/api/countries"), as: CountriesBody.self).countries
     }
     func calls() async throws -> [CallEntry] { try await send(try request("/api/calls"), as: CallsBody.self).calls }
-    private struct TokenBody: Decodable { var token: String }
+    struct VoiceToken: Decodable { var token: String; var incoming: Bool? }
     /// Токен Twilio Voice SDK для звонка через интернет (живёт час, берётся перед каждым звонком).
-    func voiceToken() async throws -> String {
-        do { return try await send(try request("/api/voice-token"), as: TokenBody.self).token }
+    func voiceToken() async throws -> String { try await voiceTokenInfo().token }
+    /// То же плюс признак, принимает ли сервер входящие в приложение (настроен VoIP-пуш).
+    func voiceTokenInfo() async throws -> VoiceToken {
+        do { return try await send(try request("/api/voice-token"), as: VoiceToken.self) }
         catch APIError.server("voip-off") { throw APIError.server("Звонки через интернет на сервере не настроены.") }
     }
     func quote(number: String) async throws -> Quote {

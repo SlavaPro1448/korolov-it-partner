@@ -51,7 +51,7 @@ struct InCallView: View {
             TimelineView(.periodic(from: .now, by: 1)) { _ in
                 Text(statusText).font(.headline.monospacedDigit()).foregroundStyle(statusColor)
             }
-            Label(calls.mode.title + " · через интернет", systemImage: "wifi")
+            Label((calls.isIncoming ? "Входящий · " : "") + calls.mode.title + " · через интернет", systemImage: calls.isIncoming ? "phone.arrow.down.left" : "wifi")
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }
@@ -59,7 +59,9 @@ struct InCallView: View {
     }
 
     private var placeholder: String {
-        talkStartedAt == nil ? "Звоним собеседнику… Здесь появится текст разговора." : "Текст появится, когда кто-то заговорит."
+        talkStartedAt == nil
+            ? (calls.isIncoming ? "Соединяю с собеседником… Здесь появится текст разговора." : "Звоним собеседнику… Здесь появится текст разговора.")
+            : "Текст появится, когда кто-то заговорит."
     }
 
     private var statusText: String {

@@ -22,8 +22,11 @@
 (параметры `to`, `mode`, звонящий `client:owner`), сервер сразу набирает собеседника с вашим мобильным в
 определителе. Конец звонка приходит на `/voice/client-status`. Нужны переменные `TWILIO_API_KEY`,
 `TWILIO_API_SECRET`, `TWILIO_TWIML_APP_SID` (ключ и приложение созданы через REST API Twilio 16.10.2026),
-`CLIENT_IDENTITY`, `CLIENT_RATE`. Входящие через приложение не настроены: для них нужен ключ APNs
-(VoIP-пуш), который создаётся в Apple Developer.
+`CLIENT_IDENTITY`, `CLIENT_RATE`. **Входящие в приложение** (с 16.10.2026): переадресованный звонок сначала звонит в приложение
+(`client:owner`, VoIP-пуш через Twilio Push Credential `TWILIO_PUSH_CREDENTIAL_SID`, сертификат
+«VoIP Services» для `Viacheslav.Dolmetscher`, sandbox — для сборок из Xcode). Не ответило за
+`CLIENT_RING_SECONDS` (20 с) — звонок на мобильный, затем на ассистента. Отклонено в приложении —
+сразу ассистент. Для сборок через TestFlight/App Store нужна вторая Push Credential без sandbox.
 
 
 Нативный клиент — [dolmetscher-ios/](../dolmetscher-ios/README.md): клавиатура, контакты, история
