@@ -16,12 +16,19 @@ settings:
     TARGETED_DEVICE_FAMILY: "1"
     MARKETING_VERSION: "1.0"
     CURRENT_PROJECT_VERSION: "1"
+packages:
+  TwilioVoice:
+    url: https://github.com/twilio/twilio-voice-ios
+    exactVersion: 6.13.8
 targets:
   Dolmetscher:
     type: application
     platform: iOS
     sources:
       - path: Dolmetscher
+    dependencies:
+      - package: TwilioVoice
+        product: TwilioVoice
     info:
       path: Dolmetscher/Info.plist
       properties:
@@ -31,6 +38,9 @@ targets:
         UILaunchScreen: {}
         UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
         ITSAppUsesNonExemptEncryption: false
+        NSMicrophoneUsageDescription: Чтобы звонить через интернет прямо из приложения. Звук идёт только в разговор и не записывается.
+        UIBackgroundModes: [audio, voip]
+        NSUserActivityTypes: [INStartCallIntent]
         NSContactsUsageDescription: Чтобы выбирать номер из ваших контактов и показывать имена в истории звонков. Контакты никуда не отправляются.
         DolmetscherURL: $(DOLMETSCHER_URL)
         DolmetscherKey: $(DOLMETSCHER_KEY)

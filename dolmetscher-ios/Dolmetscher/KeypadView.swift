@@ -3,6 +3,8 @@ import UIKit
 
 struct KeypadView: View {
     @EnvironmentObject private var model: AppModel
+    @EnvironmentObject private var calls: CallManager
+    @EnvironmentObject private var contacts: ContactsStore
     @State private var status = ""
     @State private var calling = false
     @State private var showSettings = false
@@ -91,7 +93,7 @@ struct KeypadView: View {
         Link(destination: Self.twilioBilling) {
             HStack(spacing: 8) {
                 Image(systemName: "exclamationmark.triangle.fill")
-                Text("Осталось ≈\(account.minutesLeft ?? 0) мин · \(Money.amount(account.balance, account.currency))")
+                Text("Осталось ≈\(model.minutesLeft ?? 0) мин · \(Money.amount(account.balance, account.currency))")
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)
                 Spacer(minLength: 4)
@@ -115,9 +117,10 @@ struct KeypadView: View {
                     .foregroundStyle(quote.reason == "length" ? Color.secondary : Color.red)
             } else if let quote, quote.found, let unit = quote.unit {
                 let plain = model.mode == .plain
-                let rate = (plain ? quote.plainPerMinute : quote.perMinute) ?? 0
-                let minutes = plain ? quote.plainMinutes : quote.minutes
-                let kind = quote.mobile == true ? "Мобильный" : "Стационарный"
+                let app = model.usesInternet ? quote.app : nil
+                let rate = (plain ? app?.plainPerMinute ?? quote.plainPerMinute : app?.perMinute ?? quote.perMinute) ?? 0
+                let minutes = plain ? (app != nil ? app?.plainMinutes : quote.plainMinutes) : (app != nil ? app?.minutes : quote.minutes)
+                let kind = (quote.mobile == true ? "Мобильный" : "Стационарный") + (app != nil ? " · интернет" : "")
                 let ai = !plain ? String(format: " (+%.3f ИИ)", quote.openaiPerMinute ?? 0) : ""
                 Text("\(kind) · \(String(format: "%.3f", rate)) \(unit)/мин\(ai) · \(Money.minutes(minutes))")
                     .foregroundStyle(.secondary)
@@ -198,6 +201,7 @@ struct KeypadView: View {
         let number = model.number
         let mode = model.mode
         guard !number.isEmpty else { return }
+        if model.usesInternet { return callViaInternet(number: number, mode: mode) }
         calling = true
         status = "Сейчас зазвонит ваш телефон…"
         Task {
@@ -215,6 +219,21 @@ struct KeypadView: View {
                     status = Self.messages[result.error ?? ""] ?? "Не получилось: \(result.error ?? "ошибка")"
                     UINotificationFeedbackGenerator().notificationOccurred(.error)
                 }
+            } catch {
+                status = error.localizedDescription
+                UINotificationFeedbackGenerator().notificationOccurred(.error)
+            }
+        }
+    }
+
+    /// Звонок прямо из приложения: экран разговора открывается сам (CallManager.isActive).
+    private func callViaInternet(number: String, mode: CallMode) {
+        calling = true
+        status = ""
+        Task {
+            defer { calling = false }
+            do {
+                try await calls.start(number: number, name: contacts.name(for: number), mode: mode, api: model.api)
             } catch {
                 status = error.localizedDescription
                 UINotificationFeedbackGenerator().notificationOccurred(.error)

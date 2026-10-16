@@ -51,7 +51,7 @@ struct HistoryView: View {
 
     private func row(_ call: CallEntry) -> some View {
         HStack(spacing: 12) {
-            Image(systemName: call.isIncoming ? "arrow.down.left" : "arrow.up.right")
+            Image(systemName: call.viaApp == true ? "wifi" : call.isIncoming ? "arrow.down.left" : "arrow.up.right")
                 .foregroundStyle(call.failed ? .red : .secondary)
                 .frame(width: 22)
             VStack(alignment: .leading, spacing: 3) {

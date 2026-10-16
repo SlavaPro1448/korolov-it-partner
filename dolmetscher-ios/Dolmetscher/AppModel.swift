@@ -20,6 +20,13 @@ enum CallMode: String, CaseIterable, Identifiable {
     }
 }
 
+/// Как соединять вас: через интернет из приложения или перезвоном на ваш мобильный.
+enum CallRoute: String, CaseIterable, Identifiable {
+    case internet, callback
+    var id: String { rawValue }
+    var title: String { self == .internet ? "Через интернет" : "Перезвон на мобильный" }
+}
+
 /// Общее состояние: настройки сервера, набираемый номер, активная вкладка.
 @MainActor
 final class AppModel: ObservableObject {
@@ -32,6 +39,7 @@ final class AppModel: ObservableObject {
     @Published var account: Account?
     @Published var lowBalanceMinutes: Int { didSet { UserDefaults.standard.set(lowBalanceMinutes, forKey: "lowBalanceMinutes") } }
     @Published var showLive = false
+    @Published var route: CallRoute { didSet { UserDefaults.standard.set(route.rawValue, forKey: "route") } }
 
     init() {
         let info = Bundle.main.infoDictionary ?? [:]
@@ -39,13 +47,19 @@ final class AppModel: ObservableObject {
         let defaultKey = (info["DolmetscherKey"] as? String) ?? ""
         serverURL = UserDefaults.standard.string(forKey: "serverURL") ?? defaultURL
         key = Keychain.get("callKey") ?? defaultKey
+        route = CallRoute(rawValue: UserDefaults.standard.string(forKey: "route") ?? "") ?? .internet
         let threshold = UserDefaults.standard.integer(forKey: "lowBalanceMinutes")
         lowBalanceMinutes = threshold > 0 ? threshold : 30
         if let saved = UserDefaults.standard.string(forKey: "mode"), let m = CallMode(rawValue: saved) { mode = m }
     }
 
+    /// Через интернет — если выбрано и сервер это поддерживает.
+    var usesInternet: Bool { route == .internet && account?.voip != false }
+
+    var minutesLeft: Int? { usesInternet ? (account?.appMinutesLeft ?? account?.minutesLeft) : account?.minutesLeft }
+
     var balanceIsLow: Bool {
-        guard let left = account?.minutesLeft else { return false }
+        guard let left = minutesLeft else { return false }
         return left < lowBalanceMinutes
     }
 

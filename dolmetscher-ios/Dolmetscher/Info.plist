@@ -32,6 +32,17 @@
 	<false/>
 	<key>NSContactsUsageDescription</key>
 	<string>Чтобы выбирать номер из ваших контактов и показывать имена в истории звонков. Контакты никуда не отправляются.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Чтобы звонить через интернет прямо из приложения. Звук идёт только в разговор и не записывается.</string>
+	<key>NSUserActivityTypes</key>
+	<array>
+		<string>INStartCallIntent</string>
+	</array>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>audio</string>
+		<string>voip</string>
+	</array>
 	<key>UILaunchScreen</key>
 	<dict/>
 	<key>UISupportedInterfaceOrientations</key>

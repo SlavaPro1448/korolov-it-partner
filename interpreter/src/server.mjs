@@ -6,6 +6,7 @@ import dotenv from "dotenv";
 import { WebSocketServer } from "ws";
 import { CALL_PAGE } from "./callpage.mjs";
 import { createApiRoutes, createTwilioApi } from "./api.mjs";
+import { createVoiceToken } from "./voicetoken.mjs";
 import { LIVE_PAGE, createLiveFeed } from "./live.mjs";
 import { createSequentialTranslator } from "./sequential.mjs";
 import { realtimeToTwilio, twilioToRealtime } from "./audio.mjs";
@@ -63,6 +64,12 @@ export function loadConfig(env = process.env) {
     // Preise für die App: Media Streams je Leg und Minute (Twilio), OpenAI-Übersetzung je Minute (Schätzung, beide Richtungen)
     mediaStreamRate: Number.parseFloat(env.MEDIA_STREAM_RATE ?? "0.0044") || 0.0044,
     openaiRatePerMin: Number.parseFloat(env.OPENAI_RATE_PER_MIN ?? "0.068") || 0.068,
+    // Anrufe direkt aus der iOS-App über das Internet (Twilio Voice SDK); leer = aus
+    apiKey: env.TWILIO_API_KEY || "",
+    apiSecret: env.TWILIO_API_SECRET || "",
+    twimlAppSid: env.TWILIO_TWIML_APP_SID || "",
+    clientIdentity: env.CLIENT_IDENTITY || "owner",
+    clientRate: Number.parseFloat(env.CLIENT_RATE ?? "0.004") || 0.004,
   };
 }
 
@@ -221,6 +228,55 @@ export function buildServer(config, deps = {}) {
       return twiml.ownerStream(config.wsUrl, session.tokens.owner, TEXT.ownerConnecting);
     },
 
+    // Anruf aus der iOS-App (Twilio Voice SDK über die TwiML-App): der Inhaber ist schon
+    // verbunden, gewählt wird sofort die Zielnummer – mit Dolmetscher oder als normaler Anruf
+    "/voice/client": async ({ params }) => {
+      if (!config.twimlAppSid || params.From !== `client:${config.clientIdentity}`) {
+        return twiml.reject();
+      }
+      const raw = String(params.to ?? "").trim();
+      const target = raw.startsWith("+") ? "+" + raw.replace(/\D/g, "") : normalizeDialedNumber(raw);
+      if (!isDialAllowed(target, config.allowedPrefixes) || !hasPlausibleLength(target)) {
+        return twiml.ownerMessage(TEXT.ownerBadNumber);
+      }
+      if (sessions.isFull) return twiml.ownerMessage(TEXT.ownerBusy);
+      const plain = params.mode === "plain";
+      const session = sessions.create({
+        direction: "outgoing",
+        viaApp: true,
+        plain,
+        mode: params.mode === "seq" ? "seq" : "live",
+      });
+      session.callSids.owner = params.CallSid;
+      if (plain) {
+        return twiml.ownerDial(
+          target,
+          config.peerCallerId ?? config.twilioNumber,
+          statusUrl(session, "peer"),
+          config.maxCallSeconds,
+        );
+      }
+      try {
+        await dial(session, "peer", target);
+      } catch (error) {
+        log.error("[client]", error.message);
+        sessions.end(session.id, "Anwahl fehlgeschlagen");
+        return twiml.ownerMessage(TEXT.ownerBadNumber);
+      }
+      return twiml.ownerStream(config.wsUrl, session.tokens.owner, TEXT.ownerConnecting);
+    },
+
+    // Status des App-Anrufs (StatusCallback der TwiML-App): aufgelegt -> Gespräch beenden
+    "/voice/client-status": async ({ params }) => {
+      const status = params.CallStatus;
+      if (FAILED_STATUSES.has(status) || status === "completed") {
+        for (const session of sessions.sessions.values()) {
+          if (session.callSids.owner === params.CallSid) sessions.end(session.id, `App: ${status}`);
+        }
+      }
+      return "";
+    },
+
     // Ein von uns angerufener Teilnehmer hat abgehoben
     "/voice/leg": async ({ query }) => {
       const entry = sessions.byToken(query.get("token"));
@@ -329,6 +385,20 @@ export function buildServer(config, deps = {}) {
         return allowed
           ? send(res, 200, "text/html", CALL_PAGE)
           : send(res, 404, "text/plain", "Not found");
+      }
+      if (req.method === "GET" && url.pathname === "/api/voice-token") {
+        const allowed = config.callKey && req.headers.authorization === `Bearer ${config.callKey}`;
+        if (!allowed || !config.apiKey || !config.apiSecret || !config.twimlAppSid) {
+          return send(res, 404, "application/json", JSON.stringify({ ok: false, error: "voip-off" }));
+        }
+        const { token, expiresAt } = createVoiceToken({
+          accountSid: config.accountSid,
+          apiKey: config.apiKey,
+          apiSecret: config.apiSecret,
+          appSid: config.twimlAppSid,
+          identity: config.clientIdentity,
+        });
+        return send(res, 200, "application/json", JSON.stringify({ token, expiresAt, identity: config.clientIdentity }));
       }
       if (req.method === "GET" && apiRoutes[url.pathname]) {
         const bearer = req.headers.authorization === `Bearer ${config.callKey}`;

@@ -5,6 +5,7 @@ import { once } from "node:events";
 import { test } from "node:test";
 import WebSocket from "ws";
 import { createApiRoutes, groupCalls, rateForNumber, toE164 } from "../src/api.mjs";
+import { createVoiceToken } from "../src/voicetoken.mjs";
 import { createLiveFeed } from "../src/live.mjs";
 import { buildServer } from "../src/server.mjs";
 
@@ -125,7 +126,7 @@ function sign(path, params) {
   return crypto.createHmac("sha1", config.authToken).update(data).digest("base64");
 }
 
-async function start() {
+async function start(cfg = config) {
   const created = [];
   const twilio = {
     createCall: async (args) => (created.push(args), { sid: `CA_${created.length}` }),
@@ -139,7 +140,7 @@ async function start() {
     return t;
   };
   const clips = { warmup: async () => true, get: (key) => (key === "peerWait" ? Buffer.alloc(800, 0x7f).toString("base64") : null) };
-  const { server } = buildServer(config, { twilio, createTranslator, clips, twilioApi: fakeTwilioApi, log: quiet });
+  const { server, sessions } = buildServer(cfg, { twilio, createTranslator, clips, twilioApi: fakeTwilioApi, log: quiet });
   server.listen(0);
   await once(server, "listening");
   const base = `127.0.0.1:${server.address().port}`;
@@ -159,7 +160,7 @@ async function start() {
     ws.send(JSON.stringify({ event: "start", start: { streamSid, customParameters: { token } } }));
     return ws;
   };
-  return { base, created, translators, post, stream, close: () => server.close() };
+  return { base, created, translators, sessions, post, stream, close: () => server.close() };
 }
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const tokenFrom = (twimlText) => /name="token" value="([0-9a-f]+)"/.exec(twimlText)[1];
@@ -225,4 +226,90 @@ test("live text: a client opened mid-call gets the conversation so far, nothing 
   const afterEnd = client();
   feed.attach(afterEnd);
   assert.deepEqual(afterEnd.got, [], "text is dropped when the call ends");
+});
+
+const voip = { ...config, apiKey: "SK123", apiSecret: "topsecret", twimlAppSid: "AP123", clientIdentity: "owner", clientRate: 0.004 };
+
+test("voice token: signed HS256 JWT with the outgoing grant for the TwiML app", () => {
+  const { token, expiresAt } = createVoiceToken({
+    accountSid: "AC1", apiKey: "SK123", apiSecret: "topsecret", appSid: "AP123", identity: "owner", now: 1000,
+  });
+  const [h, p, sig] = token.split(".");
+  const header = JSON.parse(Buffer.from(h, "base64url"));
+  const payload = JSON.parse(Buffer.from(p, "base64url"));
+  assert.deepEqual(header, { alg: "HS256", typ: "JWT", cty: "twilio-fpa;v=1" });
+  assert.equal(payload.iss, "SK123");
+  assert.equal(payload.sub, "AC1");
+  assert.equal(payload.grants.identity, "owner");
+  assert.equal(payload.grants.voice.outgoing.application_sid, "AP123");
+  assert.equal(expiresAt, 1000 + 3600);
+  const expected = crypto.createHmac("sha256", "topsecret").update(`${h}.${p}`).digest("base64url");
+  assert.equal(sig, expected);
+});
+
+test("voice token endpoint: only with the app key and only when VoIP is configured", async (t) => {
+  const off = await start();
+  t.after(() => off.close());
+  const none = await fetch(`http://${off.base}/api/voice-token`, { headers: { Authorization: "Bearer app-key" } });
+  assert.equal(none.status, 404);
+
+  const on = await start(voip);
+  t.after(() => on.close());
+  const denied = await fetch(`http://${on.base}/api/voice-token`, { headers: { Authorization: "Bearer nope" } });
+  assert.equal(denied.status, 404);
+  const ok = await fetch(`http://${on.base}/api/voice-token`, { headers: { Authorization: "Bearer app-key" } });
+  assert.equal(ok.status, 200);
+  const body = await ok.json();
+  assert.equal(body.identity, "owner");
+  assert.equal(body.token.split(".").length, 3);
+});
+
+test("app call: translated call dials the peer, plain call bridges directly, strangers are rejected", async (t) => {
+  const app = await start(voip);
+  t.after(() => app.close());
+  const stranger = await app.post("/voice/client", { From: "client:someone", CallSid: "CA_x", to: "02141234567" });
+  assert.match(stranger, /<Reject/);
+  const premium = await app.post("/voice/client", { From: "client:owner", CallSid: "CA_x", to: "0900123456" });
+  assert.match(premium, /нельзя/);
+
+  const translated = await app.post("/voice/client", { From: "client:owner", CallSid: "CA_app", to: "0214 1234567", mode: "translate" });
+  assert.match(translated, /<Stream/);
+  assert.equal(app.created[0].to, "+492141234567");
+  assert.equal(app.created[0].from, voip.peerCallerId, "the peer sees the owner's mobile number");
+  const session = [...app.sessions.sessions.values()][0];
+  assert.equal(session.callSids.owner, "CA_app");
+  assert.equal(session.viaApp, true);
+
+  // App legt auf -> Gespräch endet
+  await app.post("/voice/client-status", { CallSid: "CA_app", CallStatus: "completed" });
+  assert.equal(app.sessions.sessions.size, 0);
+
+  const plain = await app.post("/voice/client", { From: "client:owner", CallSid: "CA_plain", to: "+4921412345678", mode: "plain" });
+  assert.match(plain, /<Dial callerId="\+491630000000"[^>]*><Number>\+4921412345678<\/Number><\/Dial>/);
+  assert.equal(app.created.length, 1, "plain call is bridged by TwiML, no extra REST call");
+  await app.post("/voice/client-status", { CallSid: "CA_plain", CallStatus: "completed" });
+  assert.equal(app.sessions.sessions.size, 0);
+});
+
+test("pricing via the app: the owner leg costs the client rate instead of a mobile call", async () => {
+  const routes = createApiRoutes({ config: voip, twilioApi: fakeTwilioApi, log: quiet });
+  const quote = await routes["/api/quote"](new URLSearchParams({ number: "0163 1234567" }));
+  // 0.004 (App) + 0.042 (Gegenseite) + 2 × 0.0044
+  assert.equal(quote.app.perMinute, 0.0548);
+  assert.equal(quote.app.plainPerMinute, 0.046);
+  const account = await routes["/api/account"](new URLSearchParams());
+  assert.equal(account.voip, true);
+  assert.equal(account.appPerMinute, 0.0548);
+
+  const at = (sec) => new Date(Date.UTC(2026, 9, 17, 9, 0, sec)).toUTCString();
+  const [call] = groupCalls(
+    [
+      { sid: "APP", from: "client:owner", to: "", direction: "inbound", date_created: at(0), duration: "40", price: "-0.004", status: "completed" },
+      { sid: "PEER", from: voip.peerCallerId, to: "+4921412345", direction: "outbound-api", date_created: at(2), duration: "35", price: "-0.0283", status: "completed" },
+    ],
+    voip,
+  );
+  assert.equal(call.viaApp, true);
+  assert.equal(call.price, 0.0323);
+  assert.equal(call.translated, true);
 });

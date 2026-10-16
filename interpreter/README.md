@@ -17,6 +17,15 @@
 
 ## iOS-приложение
 
+**Звонок через интернет.** Приложение звонит через Twilio Voice SDK: токен берёт с `GET /api/voice-token`
+(ключ `CALL_KEY`), Twilio передаёт звонок TwiML-приложению «Dolmetscher iOS-App» на `POST /voice/client`
+(параметры `to`, `mode`, звонящий `client:owner`), сервер сразу набирает собеседника с вашим мобильным в
+определителе. Конец звонка приходит на `/voice/client-status`. Нужны переменные `TWILIO_API_KEY`,
+`TWILIO_API_SECRET`, `TWILIO_TWIML_APP_SID` (ключ и приложение созданы через REST API Twilio 16.10.2026),
+`CLIENT_IDENTITY`, `CLIENT_RATE`. Входящие через приложение не настроены: для них нужен ключ APNs
+(VoIP-пуш), который создаётся в Apple Developer.
+
+
 Нативный клиент — [dolmetscher-ios/](../dolmetscher-ios/README.md): клавиатура, контакты, история
 звонков, тарифы и живой текст разговора. Его JSON-маршруты описаны там же, код — `src/api.mjs`.
 

@@ -106,13 +106,12 @@ final class LiveFeed: ObservableObject {
     }
 }
 
-struct LiveView: View {
-    @EnvironmentObject private var model: AppModel
+/// Лента реплик (оригинал + перевод); используется в листе «Текст разговора» и на экране звонка.
+struct LiveTranscript: View {
     @EnvironmentObject private var feed: LiveFeed
-    @Environment(\.dismiss) private var dismiss
+    var placeholder: String
 
     var body: some View {
-        NavigationStack {
             ScrollViewReader { proxy in
                 ScrollView {
                     LazyVStack(alignment: .leading, spacing: 14) {
@@ -132,6 +131,17 @@ struct LiveView: View {
                 .onChange(of: feed.turns.last?.translation) { proxy.scrollTo("bottom", anchor: .bottom) }
                 .onChange(of: feed.turns.last?.original) { proxy.scrollTo("bottom", anchor: .bottom) }
             }
+    }
+}
+
+struct LiveView: View {
+    @EnvironmentObject private var model: AppModel
+    @EnvironmentObject private var feed: LiveFeed
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        NavigationStack {
+            LiveTranscript(placeholder: placeholder)
             .navigationTitle("Текст разговора")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

@@ -14,6 +14,17 @@ struct SettingsView: View {
                     SecureField("Ключ доступа (CALL_KEY)", text: $model.key)
                 }
                 Section {
+                    Picker("Как соединять вас", selection: $model.route) {
+                        ForEach(CallRoute.allCases) { Text($0.title).tag($0) }
+                    }
+                    .pickerStyle(.inline)
+                    .labelsHidden()
+                } header: {
+                    Text("Звонок")
+                } footer: {
+                    Text("Через интернет: звонок идёт прямо из приложения, ваше плечо стоит ≈0.004 $/мин вместо 0.042 $, звонок сразу без ожидания перезвона. Собеседник всё равно видит ваш мобильный номер. «Перезвон» нужен, если интернет плохой.")
+                }
+                Section {
                     Stepper(value: $model.lowBalanceMinutes, in: 5...300, step: 5) {
                         Text("Предупреждать, когда меньше \(model.lowBalanceMinutes) мин")
                     }

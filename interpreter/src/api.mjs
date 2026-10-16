@@ -113,7 +113,10 @@ export function groupCalls(
       unpriced: c.price == null && Number(c.duration) > 0,
     }))
     .sort((a, b) => b.at - a.at);
-  const ownerLegs = legs.filter((c) => sameNumber(c.to, ownerNumber) && sameNumber(c.from, twilioNumber));
+  const isAppLeg = (c) => String(c.from ?? "").startsWith("client:");
+  const ownerLegs = legs.filter(
+    (c) => (sameNumber(c.to, ownerNumber) && sameNumber(c.from, twilioNumber)) || isAppLeg(c),
+  );
   const used = new Set();
   const result = [];
   for (const leg of legs) {
@@ -135,12 +138,14 @@ export function groupCalls(
     let price = leg.price;
     let ownerSeconds = null;
     let pricePending = leg.unpriced;
+    let viaApp = false;
     for (const owner of ownerLegs) {
       if (used.has(owner.sid) || Math.abs(owner.at - leg.at) > GROUP_WINDOW_MS) continue;
       used.add(owner.sid);
       price += owner.price;
       ownerSeconds = Number(owner.duration) || 0;
       pricePending ||= owner.unpriced;
+      viaApp = isAppLeg(owner);
       break;
     }
     const peerSeconds = Number(leg.duration) || 0;
@@ -169,6 +174,7 @@ export function groupCalls(
       openaiPrice: round4(openai),
       totalPrice: round4(price + media + openai),
       pricePending,
+      viaApp,
     });
   }
   return result;
@@ -186,6 +192,8 @@ export function createApiRoutes({ config, twilioApi, log = console }) {
     return rateForNumber(owner, config.ownerNumber, originPrefix)?.price ?? 0.042;
   };
   // Minutenpreis eines übersetzten Gesprächs auf der Twilio-Seite: beide Legs + zwei Media Streams
+  // Inhaber-Leg über die App (Twilio Voice SDK) statt Rückruf aufs Handy
+  const appRate = config.clientRate ?? 0.004;
   const perMinute = (peerRate, owner, translated = true) =>
     Math.round((owner + peerRate + (translated ? 2 * mediaRate : 0)) * 10000) / 10000;
   const minutes = (balance, rate) => (rate > 0 ? Math.floor(balance / rate) : null);
@@ -197,11 +205,16 @@ export function createApiRoutes({ config, twilioApi, log = console }) {
         ownerRate(),
         twilioApi.country("DE"),
       ]);
-      const typical = perMinute(summarizeCountry(de, originPrefix).mobile ?? 0.042, owner);
+      const deMobile = summarizeCountry(de, originPrefix).mobile ?? 0.042;
+      const typical = perMinute(deMobile, owner);
+      const typicalApp = perMinute(deMobile, appRate);
       return {
         balance: Number(balance),
         minutesLeft: minutes(Number(balance), typical),
         typicalPerMinute: typical,
+        appMinutesLeft: minutes(Number(balance), typicalApp),
+        appPerMinute: typicalApp,
+        voip: Boolean(config.apiKey && config.apiSecret && config.twimlAppSid),
         currency,
         ownerLegPerMinute: owner,
         mediaStreamPerMinute: mediaRate,
@@ -256,7 +269,15 @@ export function createApiRoutes({ config, twilioApi, log = console }) {
       if (!match) return { number, allowed: allowed && !reason, reason, found: false };
       const rate = perMinute(match.price, owner);
       const plain = perMinute(match.price, owner, false);
+      const viaApp = perMinute(match.price, appRate);
+      const viaAppPlain = perMinute(match.price, appRate, false);
       return {
+        app: {
+          perMinute: viaApp,
+          minutes: minutes(Number(balance), viaApp),
+          plainPerMinute: viaAppPlain,
+          plainMinutes: minutes(Number(balance), viaAppPlain),
+        },
         number,
         iso: PREFIX_COUNTRY[prefix],
         allowed: allowed && !reason,

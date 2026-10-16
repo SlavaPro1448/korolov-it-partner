@@ -1,3 +1,4 @@
+import Intents
 import SwiftUI
 
 @main
@@ -5,6 +6,7 @@ struct DolmetscherApp: App {
     @StateObject private var model = AppModel()
     @StateObject private var contacts = ContactsStore()
     @StateObject private var live = LiveFeed()
+    @StateObject private var calls = CallManager()
     @Environment(\.scenePhase) private var scenePhase
 
     var body: some Scene {
@@ -13,6 +15,12 @@ struct DolmetscherApp: App {
                 .environmentObject(model)
                 .environmentObject(contacts)
                 .environmentObject(live)
+                .environmentObject(calls)
+                // Нажатие на этот звонок в «Недавних» системного «Телефона»: номер — в клавиатуру
+                .onContinueUserActivity(NSStringFromClass(INStartCallIntent.self)) { activity in
+                    let intent = activity.interaction?.intent as? INStartCallIntent
+                    if let value = intent?.contacts?.first?.personHandle?.value { model.dial(value) }
+                }
                 .onChange(of: scenePhase) { _, phase in
                     if phase == .active { Task { await model.refreshAccount() } }
                 }
@@ -24,10 +32,14 @@ enum Tab: Hashable { case history, contacts, keypad, rates }
 
 struct RootView: View {
     @EnvironmentObject private var model: AppModel
+    @EnvironmentObject private var calls: CallManager
 
     var body: some View {
         tabs.sheet(isPresented: $model.showLive) {
             LiveView().presentationDetents([.medium, .large]).presentationDragIndicator(.visible)
+        }
+        .fullScreenCover(isPresented: Binding(get: { calls.isActive }, set: { if !$0 { calls.dismiss() } })) {
+            InCallView()
         }
     }
 

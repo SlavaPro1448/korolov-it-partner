@@ -4,6 +4,9 @@ struct Account: Decodable {
     var balance: Double
     var minutesLeft: Int?
     var typicalPerMinute: Double?
+    var appMinutesLeft: Int?
+    var appPerMinute: Double?
+    var voip: Bool?
     var currency: String
     var ownerLegPerMinute: Double
     var mediaStreamPerMinute: Double
@@ -54,12 +57,15 @@ struct CallEntry: Decodable, Identifiable {
     var openaiPrice: Double?
     var totalPrice: Double?
     var pricePending: Bool?
+    var viaApp: Bool?
     var isIncoming: Bool { direction == "in" }
     var failed: Bool { ["busy", "no-answer", "failed", "canceled"].contains(status) }
 }
 
 /// Цена звонка на конкретный номер до набора.
 struct Quote: Decodable {
+    struct Route: Decodable { var perMinute: Double; var minutes: Int?; var plainPerMinute: Double; var plainMinutes: Int? }
+    var app: Route?
     var number: String?
     var iso: String?
     var allowed: Bool
@@ -142,6 +148,12 @@ struct APIClient {
         try await send(try request("/api/countries"), as: CountriesBody.self).countries
     }
     func calls() async throws -> [CallEntry] { try await send(try request("/api/calls"), as: CallsBody.self).calls }
+    private struct TokenBody: Decodable { var token: String }
+    /// Токен Twilio Voice SDK для звонка через интернет (живёт час, берётся перед каждым звонком).
+    func voiceToken() async throws -> String {
+        do { return try await send(try request("/api/voice-token"), as: TokenBody.self).token }
+        catch APIError.server("voip-off") { throw APIError.server("Звонки через интернет на сервере не настроены.") }
+    }
     func quote(number: String) async throws -> Quote {
         try await send(try request("/api/quote", query: ["number": number]), as: Quote.self)
     }
