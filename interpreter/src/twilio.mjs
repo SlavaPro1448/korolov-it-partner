@@ -142,9 +142,8 @@ export const TEXT = {
   peerIncoming:
     "Guten Tag. Einen Moment bitte, ich verbinde Sie mit Herrn Korolov. " +
     "Das Gespräch wird von einem KI-Dolmetscher live übersetzt und nicht aufgezeichnet.",
-  peerOutgoing:
-    "Guten Tag. Dieser Anruf wird von einem KI-Dolmetscher live übersetzt und nicht " +
-    "aufgezeichnet. Einen Moment bitte.",
+  // Ersatz per <Say>, falls die Sprachausgabe beim Start nicht erzeugt werden konnte
+  peerOutgoing: "Hallo, hier übersetzt eine KI, ohne Aufzeichnung. Bitte nach jedem Satz kurz warten.",
   peerUnavailable:
     "Herr Korolov ist gerade nicht erreichbar. Bitte versuchen Sie es später noch einmal. " +
     "Auf Wiederhören.",

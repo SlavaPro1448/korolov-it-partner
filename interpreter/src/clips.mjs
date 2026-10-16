@@ -9,10 +9,32 @@ export const CLIP_TEXT = {
   modeLive: "Синхронный перевод.",
   modeSeq: "Перевод по фразам.",
   modeDirect: "Ваш голос напрямую, без перевода.",
-  peerNotice:
-    "Guten Tag. Hinweis: Dieses Gespräch wird live von einem KI-Dolmetscher übersetzt und " +
-    "nicht aufgezeichnet. Bitte warten Sie nach jedem Satz einen Moment auf die Übersetzung.",
+  // Kurz halten: der Inhaber wartet, bis die Ansage vorbei ist (~5 s statt früher ~11 s).
+  // Pflichtangaben: KI übersetzt (AI Act Art. 50), keine Aufzeichnung, nach jedem Satz warten.
+  peerNotice: "Hallo, hier übersetzt eine KI, ohne Aufzeichnung. Bitte nach jedem Satz kurz warten.",
 };
+
+// Lange Pausen der Sprachausgabe (PCM16 24 kHz) auf höchstens maxPauseMs kürzen; Sprache bleibt
+// unverändert. Spart bei der Ansage rund eine Sekunde.
+export function compressPauses(pcm, { maxPauseMs = 200, threshold = 300 } = {}) {
+  const samples = Math.floor(pcm.length / 2);
+  const window = 240; // 10 ms
+  const maxQuiet = (24000 * maxPauseMs) / 1000;
+  const parts = [];
+  let quiet = 0;
+  for (let i = 0; i < samples; i += window) {
+    const end = Math.min(samples, i + window);
+    let sum = 0;
+    for (let j = i; j < end; j += 1) {
+      const v = pcm.readInt16LE(j * 2);
+      sum += v * v;
+    }
+    const loud = Math.sqrt(sum / (end - i)) > threshold;
+    quiet = loud ? 0 : quiet + (end - i);
+    if (loud || quiet <= maxQuiet) parts.push(pcm.subarray(i * 2, end * 2));
+  }
+  return Buffer.concat(parts);
+}
 
 export function createClips({
   apiKey,
@@ -30,7 +52,7 @@ export function createClips({
       body: JSON.stringify({ model, voice, input: text, response_format: "pcm" }),
     });
     if (!res.ok) throw new Error(`TTS ${res.status}`);
-    const pcm = Buffer.from(await res.arrayBuffer());
+    const pcm = compressPauses(Buffer.from(await res.arrayBuffer()));
     // 300 ms Stille davor, damit der Anfang nicht verschluckt wird
     return realtimeToTwilio(Buffer.concat([Buffer.alloc(24000 * 2 * 0.3), pcm]).toString("base64"));
   }
@@ -40,7 +62,9 @@ export function createClips({
     async warmup() {
       for (const [key, text] of Object.entries(CLIP_TEXT)) {
         try {
-          cache.set(key, await synthesize(text));
+          const clip = await synthesize(text);
+          cache.set(key, clip);
+          log.info?.(`[clips] ${key}: ${(Buffer.from(clip, "base64").length / 8000).toFixed(1)} s`);
         } catch (error) {
           log.error(`[clips] ${key}: ${error.message}`);
         }

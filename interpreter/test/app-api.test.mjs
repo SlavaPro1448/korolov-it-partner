@@ -6,6 +6,7 @@ import { test } from "node:test";
 import WebSocket from "ws";
 import { createApiRoutes, groupCalls, rateForNumber, toE164 } from "../src/api.mjs";
 import { createVoiceToken } from "../src/voicetoken.mjs";
+import { compressPauses } from "../src/clips.mjs";
 import { createLiveFeed } from "../src/live.mjs";
 import { buildServer } from "../src/server.mjs";
 
@@ -382,4 +383,17 @@ test("history: legs Twilio has not priced yet get a tariff estimate", async () =
   // 1 Minute App (0.004) + 1 Minute Mobilfunk (0.042)
   assert.equal(call.price, 0.046);
   assert.ok(call.totalPrice > call.price, "media streams and OpenAI are added");
+});
+
+test("clips: long pauses are cut to 200 ms, speech stays untouched", () => {
+  const tone = (ms) => {
+    const b = Buffer.alloc((24000 * ms / 1000) * 2);
+    for (let i = 0; i < b.length / 2; i += 1) b.writeInt16LE(Math.round(Math.sin(i / 3) * 8000), i * 2);
+    return b;
+  };
+  const silence = (ms) => Buffer.alloc((24000 * ms / 1000) * 2);
+  const out = compressPauses(Buffer.concat([tone(500), silence(900), tone(500), silence(100)]));
+  const ms = out.length / 48;
+  // 500 + 200 (gekürzt) + 500 + 100 (kurz, bleibt)
+  assert.ok(Math.abs(ms - 1300) <= 20, `expected ~1300 ms, got ${ms}`);
 });

@@ -145,7 +145,7 @@ test("outgoing: owner dials, both streams are bridged in the right languages", a
   const legPath =
     new URL(app.calls.created[0].url).pathname + new URL(app.calls.created[0].url).search;
   const leg = await app.post(legPath, { CallSid: "CA_out_1" });
-  assert.match(leg.body, /KI-Dolmetscher/);
+  assert.match(leg.body, /übersetzt eine KI, ohne Aufzeichnung/);
   const peerToken = tokenFrom(leg.body);
   assert.notEqual(ownerToken, peerToken);
 
