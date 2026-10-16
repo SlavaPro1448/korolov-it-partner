@@ -15,6 +15,7 @@ struct InCallView: View {
             if calls.mode == .plain {
                 Spacer()
             } else {
+                SpeakCue()
                 LiveTranscript(placeholder: placeholder)
                     .background(RoundedRectangle(cornerRadius: 18).fill(Color(.secondarySystemBackground).opacity(0.5)))
             }

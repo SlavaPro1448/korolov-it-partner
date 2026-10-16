@@ -94,6 +94,7 @@ export function buildServer(config, deps = {}) {
     );
   });
   const sessions = new SessionStore({
+    onCue: (session, name, extra) => live.event(name, extra),
     languages: config.languages,
     maxSessions: config.maxSessions,
     maxCallSeconds: config.maxCallSeconds,

@@ -23,9 +23,12 @@ export function createLiveFeed() {
       if (backlog.length > 0 && backlog.length < BACKLOG_LIMIT) backlog.push(payload);
       broadcast(payload);
     },
-    event(name) {
-      const payload = JSON.stringify({ event: name, at: Date.now() });
-      backlog = name === "start" ? [payload] : [];
+    // "start" beginnt den Puffer neu, "end" verwirft ihn; andere Ereignisse (notice, ready) kommen dazu
+    event(name, extra = {}) {
+      const payload = JSON.stringify({ event: name, ...extra, at: Date.now() });
+      if (name === "start") backlog = [payload];
+      else if (name === "end") backlog = [];
+      else if (backlog.length > 0 && backlog.length < BACKLOG_LIMIT) backlog.push(payload);
       broadcast(payload);
     },
   };

@@ -5,6 +5,7 @@ import { realtimeToTwilio } from "./audio.mjs";
 export const CLIP_TEXT = {
   ownerNoAnswer: "Собеседник не ответил.",
   peerWait: "Einen Moment bitte, Sie werden gleich verbunden.",
+  ownerReady: "Можно говорить.",
   modeLive: "Синхронный перевод.",
   modeSeq: "Перевод по фразам.",
   modeDirect: "Ваш голос напрямую, без перевода.",

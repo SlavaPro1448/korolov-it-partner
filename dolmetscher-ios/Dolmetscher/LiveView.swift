@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 /// Реплика в живом тексте: оригинал и перевод одного говорящего подряд.
 struct LiveTurn: Identifiable {
@@ -15,6 +16,10 @@ final class LiveFeed: ObservableObject {
     enum State { case idle, connecting, waiting, talking, ended, offline }
     @Published var turns: [LiveTurn] = []
     @Published var state: State = .idle
+    /// Собеседнику читается предупреждение про ИИ-переводчика — до этого момента; nil = не читается
+    @Published var noticeUntil: Date?
+    /// Предупреждение закончилось, можно говорить
+    @Published var readyAt: Date?
 
     private var task: URLSessionWebSocketTask?
     private var wanted = false
@@ -75,13 +80,29 @@ final class LiveFeed: ObservableObject {
         }
     }
 
-    private struct Message: Decodable { var event: String?; var role: String?; var dir: String?; var text: String? }
+    private struct Message: Decodable {
+        var event: String?; var role: String?; var dir: String?; var text: String?; var ms: Double?; var at: Double?
+    }
 
     private func handle(_ raw: String) {
         guard let message = try? JSONDecoder().decode(Message.self, from: Data(raw.utf8)) else { return }
         switch message.event {
-        case "start": turns = []; state = .talking; return
-        case "end": state = .ended; return
+        case "start":
+            turns = []; state = .talking; noticeUntil = nil; readyAt = nil
+            return
+        case "notice":
+            // Время отсчитываем от момента на сервере: при переподключении отсчёт не сбивается
+            let sent = message.at.map { Date(timeIntervalSince1970: $0 / 1000) } ?? Date()
+            noticeUntil = sent.addingTimeInterval((message.ms ?? 0) / 1000)
+            readyAt = nil
+            return
+        case "ready":
+            let fresh = readyAt == nil
+            readyAt = message.at.map { Date(timeIntervalSince1970: $0 / 1000) } ?? Date()
+            noticeUntil = nil
+            if fresh, Date().timeIntervalSince(readyAt!) < 5 { UINotificationFeedbackGenerator().notificationOccurred(.success) }
+            return
+        case "end": state = .ended; noticeUntil = nil; return
         default: break
         }
         guard let role = message.role, let dir = message.dir, let text = message.text else { return }
@@ -103,6 +124,36 @@ final class LiveFeed: ObservableObject {
         } else {
             turns[i].translation += text
         }
+    }
+}
+
+/// Подсказка, когда можно говорить: пока собеседнику читается предупреждение — отсчёт,
+/// затем на несколько секунд зелёное «Говорите».
+struct SpeakCue: View {
+    @EnvironmentObject private var feed: LiveFeed
+
+    var body: some View {
+        TimelineView(.periodic(from: .now, by: 0.5)) { context in
+            if let until = feed.noticeUntil, until > context.date {
+                cue(icon: "hand.raised.fill",
+                    text: "Подождите: собеседнику читается предупреждение · \(Int(until.timeIntervalSince(context.date).rounded(.up))) с",
+                    color: .orange)
+            } else if let ready = feed.readyAt, context.date.timeIntervalSince(ready) < 5 {
+                cue(icon: "mic.fill", text: "Говорите", color: .green)
+            }
+        }
+        .animation(.easeInOut(duration: 0.25), value: feed.readyAt)
+    }
+
+    private func cue(icon: String, text: String, color: Color) -> some View {
+        Label(text, systemImage: icon)
+            .font(.subheadline.weight(.semibold))
+            .foregroundStyle(.white)
+            .padding(.horizontal, 14)
+            .padding(.vertical, 9)
+            .frame(maxWidth: .infinity)
+            .background(Capsule().fill(color))
+            .transition(.opacity)
     }
 }
 
@@ -141,7 +192,10 @@ struct LiveView: View {
 
     var body: some View {
         NavigationStack {
-            LiveTranscript(placeholder: placeholder)
+            VStack(spacing: 8) {
+                SpeakCue().padding(.horizontal)
+                LiveTranscript(placeholder: placeholder)
+            }
             .navigationTitle("Текст разговора")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

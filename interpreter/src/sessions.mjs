@@ -53,11 +53,14 @@ export class SessionStore {
     maxCallSeconds = 1800,
     onEnd = () => {},
     onDtmf = null,
+    // Hinweise für die App (Live-Text): "notice" (Ansage an die Gegenseite läuft, ms) und "ready"
+    onCue = () => {},
     clips = null,
     log = console,
   }) {
     this.clips = clips;
     this.onDtmf = onDtmf;
+    this.onCue = onCue;
     this.createTranslator = createTranslator;
     this.languages = languages; // { owner: "ru", peer: "de" } – Sprache, die der jeweilige Teilnehmer hört
     this.maxSessions = maxSessions;
@@ -144,8 +147,7 @@ export class SessionStore {
     } else if (role === "peer" && session.direction === "incoming") {
       this.#startHold(session);
     }
-    if (role === "peer" && session.direction === "outgoing")
-      this.#play(session, "peer", "peerNotice");
+    if (role === "peer" && session.direction === "outgoing") this.#announce(session);
     return entry;
   }
 
@@ -252,7 +254,7 @@ export class SessionStore {
       const twice = now - session.lastHashAt < 1500;
       session.lastHashAt = twice ? 0 : now;
       if (twice && session.paired) {
-        this.#play(session, "peer", "peerNotice");
+        this.#announce(session);
         this.log.info(`[session:${session.id}] Hinweis an Gegenseite wiederholt`);
         return;
       }
@@ -274,6 +276,28 @@ export class SessionStore {
     this.log.info(`[session:${session.id}] ${f("owner")} | ${f("peer")}`);
   }
 
+  // Ansage an die Gegenseite (KI-Dolmetscher, keine Aufzeichnung). Der Inhaber hört sie nicht –
+  // damit er weiß, wann er anfangen kann, bekommt er danach "Можно говорить" ins Ohr und die App
+  // einen Hinweis mit der Dauer.
+  #announce(session) {
+    const payload = this.clips?.get("peerNotice");
+    clearTimeout(session.noticeTimer);
+    if (!payload) return this.#ready(session); // Ansage lief schon per <Say> vor dem Stream
+    this.#playback(session, "peer", payload);
+    const ms = mulawMs(payload);
+    this.onCue(session, "notice", { ms });
+    session.noticeTimer = setTimeout(() => this.#ready(session), ms + 200);
+    session.noticeTimer.unref?.();
+  }
+
+  #ready(session) {
+    if (!this.sessions.has(session.id)) return;
+    const clip = this.clips?.get("ownerReady");
+    this.#playback(session, "owner", clip ?? CONNECTED);
+    this.onCue(session, "ready", {});
+    this.log.info(`[session:${session.id}] Ansage beendet, Inhaber kann sprechen`);
+  }
+
   #play(session, listener, clipKey) {
     const payload = this.clips?.get(clipKey);
     if (payload) this.#playback(session, listener, payload);
@@ -288,6 +312,7 @@ export class SessionStore {
     clearTimeout(session.timer);
     clearInterval(session.ringTimer);
     clearInterval(session.holdTimer);
+    clearTimeout(session.noticeTimer);
     clearInterval(session.statsTimer);
     this.#logStats(session);
     session.translators?.owner.close();

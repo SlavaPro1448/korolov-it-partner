@@ -126,6 +126,13 @@ function sign(path, params) {
   return crypto.createHmac("sha1", config.authToken).update(data).digest("base64");
 }
 
+// Testklänge: Ansage 100 ms (800 Byte μ-law), "Можно говорить" 50 ms
+const CLIPS = {
+  peerWait: Buffer.alloc(800, 0x7f).toString("base64"),
+  peerNotice: Buffer.alloc(800, 0x7d).toString("base64"),
+  ownerReady: Buffer.alloc(400, 0x7e).toString("base64"),
+};
+
 async function start(cfg = config) {
   const created = [];
   const twilio = {
@@ -139,7 +146,7 @@ async function start(cfg = config) {
     translators.push(t);
     return t;
   };
-  const clips = { warmup: async () => true, get: (key) => (key === "peerWait" ? Buffer.alloc(800, 0x7f).toString("base64") : null) };
+  const clips = { warmup: async () => true, get: (key) => CLIPS[key] ?? null };
   const { server, sessions } = buildServer(cfg, { twilio, createTranslator, clips, twilioApi: fakeTwilioApi, log: quiet });
   server.listen(0);
   await once(server, "listening");
@@ -312,4 +319,38 @@ test("pricing via the app: the owner leg costs the client rate instead of a mobi
   assert.equal(call.viaApp, true);
   assert.equal(call.price, 0.0323);
   assert.equal(call.translated, true);
+});
+
+test("outgoing: after the notice for the callee the owner hears 'you can speak', the app gets notice/ready", async (t) => {
+  const app = await start();
+  t.after(() => app.close());
+  const live = new WebSocket(`ws://${app.base}/live-ws`, { headers: { Authorization: "Bearer app-key" } });
+  const events = [];
+  live.on("message", (raw) => {
+    const m = JSON.parse(raw.toString());
+    if (m.event) events.push(m);
+  });
+  await once(live, "open");
+  t.after(() => live.close());
+
+  const call = await fetch(`http://${app.base}/call`, {
+    method: "POST",
+    headers: { Authorization: "Bearer app-key", "Content-Type": "application/json" },
+    body: JSON.stringify({ to: "02141234567", mode: "translate" }),
+  });
+  assert.equal(call.status, 200);
+  const ownerLeg = new URL(app.created[0].url);
+  const owner = await app.stream(tokenFrom(await app.post(ownerLeg.pathname + ownerLeg.search, {})), "MZ_owner");
+  const peerLeg = new URL(app.created[1].url);
+  const peer = await app.stream(tokenFrom(await app.post(peerLeg.pathname + peerLeg.search, {})), "MZ_peer");
+  t.after(() => { owner.close(); peer.close(); });
+
+  await wait(80);
+  assert.ok(peer.received.some((m) => m.media?.payload === CLIPS.peerNotice), "callee hears the notice");
+  assert.ok(!owner.received.some((m) => m.media?.payload === CLIPS.ownerReady), "not yet: notice still playing");
+  assert.deepEqual(events.find((e) => e.event === "notice")?.ms, 100);
+
+  await wait(350);
+  assert.ok(owner.received.some((m) => m.media?.payload === CLIPS.ownerReady), "owner hears 'Можно говорить'");
+  assert.ok(events.some((e) => e.event === "ready"), "app is told it can speak");
 });
