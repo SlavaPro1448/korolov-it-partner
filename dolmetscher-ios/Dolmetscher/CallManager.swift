@@ -69,6 +69,11 @@ final class CallManager: NSObject, ObservableObject {
     /// Входящие в приложение: PushKit выдаёт VoIP-токен устройства, мы регистрируем его в Twilio.
     /// Вызывать при каждом запуске — так регистрация не устаревает.
     func enableIncoming(api: APIClient) {
+        #if targetEnvironment(simulator)
+        // Симулятор не регистрируем: Twilio держит одну регистрацию на учётку, и он забрал бы входящие у iPhone
+        incomingError = "В симуляторе входящие отключены."
+        return
+        #endif
         self.api = api
         pushRegistry.delegate = self
         pushRegistry.desiredPushTypes = [.voIP]

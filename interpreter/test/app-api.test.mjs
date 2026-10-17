@@ -158,7 +158,7 @@ async function start(cfg = config, extraDeps = {}) {
   };
   const translators = [];
   const createTranslator = (options) => {
-    const t = { ...options, send() {}, close() {} };
+    const t = { ...options, closed: false, send() {}, close() { t.closed = true; } };
     translators.push(t);
     return t;
   };
@@ -307,9 +307,13 @@ test("app call: translated call dials the peer, plain call bridges directly, str
   await app.post("/voice/client-status", { CallSid: "CA_app", CallStatus: "completed" });
   assert.equal(app.sessions.sessions.size, 0);
 
+  // "Без перевода" aus der App: über Streams ohne Übersetzung, damit sie sich zuschalten lässt
   const plain = await app.post("/voice/client", { From: "client:owner", CallSid: "CA_plain", to: "+4921412345678", mode: "plain" });
-  assert.match(plain, /<Dial callerId="\+491630000000"[^>]*><Number>\+4921412345678<\/Number><\/Dial>/);
-  assert.equal(app.created.length, 1, "plain call is bridged by TwiML, no extra REST call");
+  assert.match(plain, /<Stream/);
+  assert.equal(app.created[1].to, "+4921412345678");
+  assert.equal([...app.sessions.sessions.values()][0].mode, "off");
+  const peerLeg = await app.post(new URL(app.created[1].url).pathname + new URL(app.created[1].url).search, {});
+  assert.doesNotMatch(peerLeg, /<Say/, "no AI notice while translation is off");
   await app.post("/voice/client-status", { CallSid: "CA_plain", CallStatus: "completed" });
   assert.equal(app.sessions.sessions.size, 0);
 });
@@ -545,4 +549,65 @@ test("hold watcher: recorded announcements are ignored, a human greeting trigger
   segment();
   await wait(20);
   assert.equal(humans, 1, "stops after the first human");
+});
+
+test("all calls to the app: plain call with ringback, translation switched on and off in the call", async (t) => {
+  const app = await start(pushed);
+  t.after(() => app.close());
+  const settings = await api(app, "/api/settings", { directToApp: true });
+  assert.equal((await settings.json()).directToApp, true);
+
+  const incoming = await app.post("/voice/incoming", { From: "+4930123456", CallSid: "CA_peer" });
+  assert.doesNotMatch(incoming, /<Say/, "caller hears no announcement");
+  assert.equal(app.created[0].to, "client:owner");
+  const peer = await app.stream(tokenFrom(incoming), "MZ_peer");
+  await wait(30);
+  assert.ok(peer.received.some((m) => m.event === "media"), "caller hears a ringback tone");
+  assert.ok(!peer.received.some((m) => m.media?.payload === CLIPS.peerWait), "no 'Einen Moment bitte'");
+
+  const ownerLeg = new URL(app.created[0].url);
+  const owner = await app.stream(tokenFrom(await app.post(ownerLeg.pathname + ownerLeg.search, {})), "MZ_owner");
+  t.after(() => { owner.close(); peer.close(); });
+  await wait(30);
+  assert.equal(app.translators.length, 0, "plain call, no translation");
+  const voice = Buffer.alloc(160, 0x33).toString("base64");
+  peer.send(JSON.stringify({ event: "media", media: { payload: voice } }));
+  await wait(30);
+  assert.ok(owner.received.some((m) => m.media?.payload === voice), "caller's voice reaches the owner unchanged");
+
+  const on = await api(app, "/api/translate", { on: true });
+  assert.equal((await on.json()).on, true);
+  await wait(20);
+  assert.equal(app.translators.length, 2);
+  assert.ok(peer.received.some((m) => m.media?.payload === CLIPS.peerNotice), "AI notice when switched on");
+
+  const off = await api(app, "/api/translate", { on: false });
+  assert.equal((await off.json()).on, false);
+  assert.ok(app.translators.every((tr) => tr.closed), "translation stopped");
+});
+
+test("all calls to the app: unanswered goes to the assistant, never back to the forwarding mobile", async (t) => {
+  const app = await start(pushed);
+  t.after(() => app.close());
+  await api(app, "/api/settings", { directToApp: true });
+  await app.post("/voice/incoming", { From: "+4930123456", CallSid: "CA_peer" });
+  const status = new URL(app.created[0].statusCallback);
+  await app.post(status.pathname + status.search, { CallStatus: "no-answer" });
+  assert.equal(app.created.length, 1, "mobile is not called (it forwards here)");
+  assert.match(app.updated[0].twiml, /\+4921411111/);
+});
+
+test("history: recorded translation time decides OpenAI cost, plain stream calls cost only media", () => {
+  const at = (sec) => new Date(Date.UTC(2026, 9, 17, 9, 0, sec)).toUTCString();
+  const legs = [
+    { sid: "APP", from: "client:owner", to: "", direction: "inbound", date_created: at(0), duration: "120", price: "-0.008", status: "completed" },
+    { sid: "PEER", from: voip.peerCallerId, to: "+4921412345", direction: "outbound-api", date_created: at(2), duration: "118", price: "-0.0566", status: "completed" },
+  ];
+  const plain = groupCalls(legs, { ...voip, callInfo: () => ({ streams: true, translatedSeconds: 0 }) })[0];
+  assert.equal(plain.translated, false);
+  assert.equal(plain.openaiPrice, 0);
+  assert.ok(plain.mediaPrice > 0);
+  const partly = groupCalls(legs, { ...voip, callInfo: () => ({ streams: true, translatedSeconds: 60 }) })[0];
+  assert.equal(partly.translated, true);
+  assert.equal(partly.openaiPrice, 0.068, "one translated minute");
 });

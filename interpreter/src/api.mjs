@@ -108,6 +108,8 @@ export function groupCalls(
     openaiRatePerMin = 0.068,
     // Vorläufiger Preis eines Legs, das Twilio noch nicht abgerechnet hat (null = 0)
     estimate = null,
+    // Was der Server über das Gespräch weiß: { streams, translatedSeconds } je CallSid der Gegenseite
+    callInfo = null,
   },
 ) {
   const legs = calls
@@ -157,14 +159,18 @@ export function groupCalls(
     const peerSeconds = Number(leg.duration) || 0;
     // Übersetzt: ausgehend per REST angerufen (outbound-api); "Без перевода" läuft über <Dial>
     // (outbound-dial). Eingehend nur, wenn der Inhaber den Rückruf angenommen hat.
-    const translated =
-      direction === "out" ? leg.direction === "outbound-api" : (ownerSeconds ?? 0) > 0;
+    // Weiß der Server, wie lange wirklich übersetzt wurde, zählt das; sonst Schätzung am Leg-Typ
+    const info = callInfo?.(leg.sid) ?? null;
+    const guessed = direction === "out" ? leg.direction === "outbound-api" : (ownerSeconds ?? 0) > 0;
+    const translated = info ? info.translatedSeconds > 0 : guessed;
+    const streams = info ? Boolean(info.streams) : guessed;
     const talkSeconds = ownerSeconds == null ? peerSeconds : Math.min(peerSeconds, ownerSeconds);
-    // Twilio rechnet Media Streams je angefangene Minute und Stream; OpenAI nach Sprechzeit
-    const media = translated
+    // Twilio rechnet Media Streams je angefangene Minute und Stream; OpenAI nach übersetzter Zeit
+    const media = streams
       ? (Math.ceil(peerSeconds / 60) + Math.ceil((ownerSeconds ?? 0) / 60)) * mediaStreamRate
       : 0;
-    const openai = translated ? (talkSeconds / 60) * openaiRatePerMin : 0;
+    const openaiSeconds = info ? info.translatedSeconds : translated ? talkSeconds : 0;
+    const openai = (openaiSeconds / 60) * openaiRatePerMin;
     result.push({
       id: leg.sid,
       direction,
@@ -186,7 +192,7 @@ export function groupCalls(
   return result;
 }
 
-export function createApiRoutes({ config, twilioApi, log = console }) {
+export function createApiRoutes({ config, twilioApi, store = null, log = console }) {
   const originPrefix = digitsOf(config.twilioNumber).slice(0, 2); // "49"
   const mediaRate = config.mediaStreamRate;
   const allowedCountries = config.allowedPrefixes
@@ -324,6 +330,7 @@ export function createApiRoutes({ config, twilioApi, log = console }) {
           mediaStreamRate: mediaRate,
           openaiRatePerMin: config.openaiRatePerMin,
           estimate,
+          callInfo: (sid) => store?.call(sid) ?? null,
         }),
       };
     },

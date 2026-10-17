@@ -179,6 +179,21 @@ struct APIClient {
     /// Собеседник услышит это по-немецки: свой текст (переводится, номера — по цифрам) или готовая фраза.
     func say(text: String) async throws -> AssistResult { try await post("/api/say", ["text": text]) }
     func say(phrase: String) async throws -> AssistResult { try await post("/api/say", ["phrase": phrase]) }
+    /// Переводчик в разговоре: включить (собеседнику скажут про ИИ) или выключить (обычный разговор).
+    func translate(_ on: Bool, phrases: Bool = false) async throws -> AssistResult {
+        try await post("/api/translate", ["on": on, "mode": phrases ? "seq" : "live"])
+    }
+
+    struct ServerSettings: Decodable { var ok: Bool?; var directToApp: Bool; var incomingApp: Bool?; var translatorNumber: String? }
+    func settings() async throws -> ServerSettings { try await send(try request("/api/settings"), as: ServerSettings.self) }
+    func setDirectToApp(_ on: Bool) async throws -> ServerSettings {
+        var req = try request("/api/settings")
+        req.httpMethod = "POST"
+        req.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        req.httpBody = try JSONSerialization.data(withJSONObject: ["directToApp": on])
+        return try await send(req, as: ServerSettings.self)
+    }
+
     /// Ждать в очереди за вас: перевод выключается, сервер позовёт, когда ответит человек.
     func wait(_ on: Bool) async throws -> AssistResult { try await post("/api/wait", ["on": on]) }
 

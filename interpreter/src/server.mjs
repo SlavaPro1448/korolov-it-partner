@@ -14,6 +14,7 @@ import { SessionStore } from "./sessions.mjs";
 import { createClips } from "./clips.mjs";
 import { createAssist, createHoldWatcher } from "./assist.mjs";
 import { PHRASES, phraseClipKey } from "./phrases.mjs";
+import { createStore } from "./store.mjs";
 import { createTranslator } from "./translation.mjs";
 import { TEST_PAGE, attachTestSocket } from "./webtest.mjs";
 import {
@@ -76,6 +77,10 @@ export function loadConfig(env = process.env) {
     // Eingehende Anrufe zuerst in die App (VoIP-Push über diese Twilio Push Credential); leer = nur Handy
     pushCredentialSid: env.TWILIO_PUSH_CREDENTIAL_SID || "",
     clientRingSeconds: Number.parseInt(env.CLIENT_RING_SECONDS ?? "20", 10) || 20,
+    // Einstellungen der App und Kennzahlen je Gespräch (Volume); leer = nur im Speicher
+    dataFile: env.DATA_FILE ?? "/app/data/state.json",
+    // Alle Anrufe sofort in die App (O2 leitet immer weiter), Übersetzung erst auf Knopfdruck
+    directToApp: env.DIRECT_TO_APP === "1",
   };
 }
 
@@ -85,10 +90,13 @@ export function buildServer(config, deps = {}) {
     deps.twilio ??
     createTwilioClient({ accountSid: config.accountSid, authToken: config.authToken });
   const live = createLiveFeed();
+  const store =
+    deps.store ?? createStore(config.dataFile, { defaults: { directToApp: config.directToApp }, log });
   let liveSessionId = null; // "start" nur einmal je Gespräch, nicht bei jedem Moduswechsel
   const apiRoutes = createApiRoutes({
     config,
     twilioApi: deps.twilioApi ?? createTwilioApi({ accountSid: config.accountSid, authToken: config.authToken }),
+    store,
     log,
   });
   const clips = deps.clips ?? createClips({ apiKey: config.openaiApiKey, log });
@@ -129,6 +137,12 @@ export function buildServer(config, deps = {}) {
         }),
     // Beide Anrufe sicher beenden (läutet noch, Zeitlimit, Gegenseite hat aufgelegt)
     onEnd: (session) => {
+      // Nur Zahlen für die Kostenanzeige: lief ein Media Stream, wie lange wurde übersetzt
+      store.recordCall(session.callSids.peer, {
+        streams: !session.plainDial,
+        translatedSeconds: Math.round((session.translatedMs ?? 0) / 1000),
+        viaApp: Boolean(session.viaApp),
+      });
       for (const callSid of Object.values(session.callSids)) {
         if (callSid) twilio.hangup(callSid).catch(() => {});
       }
@@ -245,16 +259,21 @@ export function buildServer(config, deps = {}) {
       }
       // Vom Handy des Inhabers weitergeleiteter Anruf: Anrufer wartet, Inhaber wird zurückgerufen
       if (sessions.isFull) return twiml.peerFallback(config.secretaryNumber);
+      // Alle Anrufe direkt in die App: normales Telefonat ohne Ansage, Übersetzung erst auf Knopfdruck.
+      // Kein Rückruf aufs Handy – das leitet ja selbst wieder hierher um.
+      const direct = Boolean(store.settings.directToApp) && appIncoming();
       const session = sessions.create({
         direction: "incoming",
         callerNumber: params.From,
-        ownerTargets: appIncoming() ? ["app", "mobile"] : ["mobile"],
+        ownerTargets: direct ? ["app"] : appIncoming() ? ["app", "mobile"] : ["mobile"],
+        ...(direct ? { mode: "off", quietHold: true, viaApp: true } : {}),
       });
       session.callSids.peer = params.CallSid;
       if (!(await ringOwner(session))) {
         sessions.end(session.id, "Rückruf fehlgeschlagen");
         return twiml.peerFallback(config.secretaryNumber);
       }
+      if (direct) return twiml.peerStreamFirst(config.wsUrl, session.tokens.peer);
       return twiml.peerStream(config.wsUrl, session.tokens.peer, TEXT.peerIncoming);
     },
 
@@ -287,22 +306,14 @@ export function buildServer(config, deps = {}) {
       const target = toE164(params.to);
       if (dialProblem(target, config.allowedPrefixes)) return twiml.ownerMessage(TEXT.ownerBadNumber);
       if (sessions.isFull) return twiml.ownerMessage(TEXT.ownerBusy);
-      const plain = params.mode === "plain";
+      // "Без перевода" läuft ebenfalls über Media Streams (Modus "off"): so lässt sich die
+      // Übersetzung im Gespräch per Knopf zuschalten
       const session = sessions.create({
         direction: "outgoing",
         viaApp: true,
-        plain,
-        mode: params.mode === "seq" ? "seq" : "live",
+        mode: params.mode === "plain" ? "off" : params.mode === "seq" ? "seq" : "live",
       });
       session.callSids.owner = params.CallSid;
-      if (plain) {
-        return twiml.ownerDial(
-          target,
-          config.peerCallerId ?? config.twilioNumber,
-          statusUrl(session, "peer"),
-          config.maxCallSeconds,
-        );
-      }
       try {
         await dial(session, "peer", target);
       } catch (error) {
@@ -330,6 +341,8 @@ export function buildServer(config, deps = {}) {
       if (!entry) return twiml.reject();
       const { session, role } = entry;
       if (role === "peer") {
+        // Ohne Übersetzung: keine KI-Ansage (die kommt erst beim Einschalten)
+        if (session.mode === "off") return twiml.peerStreamFirst(config.wsUrl, session.tokens.peer);
         return clipsReady
           ? twiml.peerStreamFirst(config.wsUrl, session.tokens.peer)
           : twiml.peerStream(config.wsUrl, session.tokens.peer, TEXT.peerOutgoing);
@@ -386,9 +399,18 @@ export function buildServer(config, deps = {}) {
     } catch {
       return reply(400, { ok: false, error: "json" });
     }
+    if (url.pathname === "/api/settings") {
+      if (typeof body.directToApp === "boolean") store.set("directToApp", body.directToApp);
+      return reply(200, { ok: true, directToApp: Boolean(store.settings.directToApp), incomingApp: appIncoming() });
+    }
     const session = activeSession();
     if (!session) return reply(409, { ok: false, error: "no-call" });
     if (session.plain || !session.legs.peer) return reply(409, { ok: false, error: "plain" });
+
+    if (url.pathname === "/api/translate") {
+      const changed = sessions.setTranslation(session, Boolean(body.on), body.mode === "seq" ? "seq" : "live");
+      return reply(200, { ok: true, on: session.mode !== "off", changed });
+    }
 
     if (url.pathname === "/api/wait") {
       const ok = body.on ? sessions.startWait(session) : sessions.stopWait(session);
@@ -444,6 +466,7 @@ export function buildServer(config, deps = {}) {
       direction: "outgoing",
       pendingTarget: target,
       plain: body.mode === "plain",
+      plainDial: body.mode === "plain", // Rückruf-Weg ohne Übersetzung: <Dial>, kein Media Stream
       mode: body.mode === "seq" ? "seq" : "live",
     });
     try {
@@ -498,8 +521,21 @@ export function buildServer(config, deps = {}) {
           JSON.stringify({ token, expiresAt, identity: config.clientIdentity, incoming: appIncoming() }),
         );
       }
-      if (req.method === "POST" && (url.pathname === "/api/say" || url.pathname === "/api/wait")) {
+      if (
+        req.method === "POST" &&
+        ["/api/say", "/api/wait", "/api/translate", "/api/settings"].includes(url.pathname)
+      ) {
         return await handleAssist(req, res, url);
+      }
+      if (req.method === "GET" && url.pathname === "/api/settings") {
+        const allowed = config.callKey && req.headers.authorization === `Bearer ${config.callKey}`;
+        if (!allowed) return send(res, 404, "text/plain", "Not found");
+        return send(res, 200, "application/json", JSON.stringify({
+          ok: true,
+          directToApp: Boolean(store.settings.directToApp),
+          incomingApp: appIncoming(),
+          translatorNumber: config.twilioNumber,
+        }));
       }
       if (req.method === "GET" && url.pathname === "/api/phrases") {
         const allowed = config.callKey && req.headers.authorization === `Bearer ${config.callKey}`;

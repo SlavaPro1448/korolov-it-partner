@@ -12,18 +12,18 @@ struct InCallView: View {
     var body: some View {
         VStack(spacing: 14) {
             header
-            if calls.mode == .plain {
-                Spacer()
-            } else {
-                SpeakCue()
+            SpeakCue()
+            if translationOn || !feed.turns.isEmpty {
                 LiveTranscript(placeholder: placeholder)
                     .background(RoundedRectangle(cornerRadius: 18).fill(Color(.secondarySystemBackground).opacity(0.5)))
+            } else {
+                Spacer()
             }
             if showKeys {
                 dtmfPad
             } else {
                 controls
-                if calls.mode != .plain && calls.phase == .connected { AssistButtons() }
+                if calls.phase == .connected { AssistButtons(translationOn: translationOn) }
             }
             endButton
         }
@@ -32,15 +32,16 @@ struct InCallView: View {
         .background(Color(.systemBackground).ignoresSafeArea())
         .onAppear {
             talkStartedAt = nil
-            if calls.mode != .plain { feed.start { try model.api.liveRequest() } }
+            // Живой текст и события разговора — всегда: перевод можно включить посреди разговора
+            feed.start { try model.api.liveRequest() }
         }
         .onDisappear {
             feed.stop()
             Task { await model.refreshAccount() }
         }
         // Собеседник ответил: сервер запускает перевод и шлёт «start»
-        .onChange(of: feed.state) { _, state in
-            if state == .talking, talkStartedAt == nil { talkStartedAt = Date() }
+        .onChange(of: feed.pairedAt) { _, paired in
+            if let paired, talkStartedAt == nil { talkStartedAt = paired }
         }
     }
 
@@ -56,12 +57,16 @@ struct InCallView: View {
             TimelineView(.periodic(from: .now, by: 1)) { _ in
                 Text(statusText).font(.headline.monospacedDigit()).foregroundStyle(statusColor)
             }
-            Label((calls.isIncoming ? "Входящий · " : "") + calls.mode.title + " · через интернет", systemImage: calls.isIncoming ? "phone.arrow.down.left" : "wifi")
+            Label((calls.isIncoming ? "Входящий · " : "") + (translationOn ? (calls.mode == .seq ? "По фразам" : "С переводом") : "Без перевода") + " · через интернет",
+                  systemImage: calls.isIncoming ? "phone.arrow.down.left" : "wifi")
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }
         .padding(.top, 24)
     }
+
+    /// Перевод включён: по событиям сервера, а до них — по режиму, выбранному при звонке
+    private var translationOn: Bool { feed.translatorOn ?? (calls.mode != .plain && !calls.isIncoming) }
 
     private var placeholder: String {
         talkStartedAt == nil
@@ -77,7 +82,7 @@ struct InCallView: View {
         case .ended: return calls.endReason ?? "Разговор завершён"
         case .connected:
             // С переводом: время с ответа собеседника; без перевода — с соединения
-            let since = calls.mode == .plain ? calls.connectedAt : talkStartedAt
+            let since = talkStartedAt
             guard let since else { return "Вызов собеседника…" }
             let seconds = Int(Date().timeIntervalSince(since))
             return String(format: "%d:%02d", seconds / 60, seconds % 60)

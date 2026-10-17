@@ -25,6 +25,10 @@ final class LiveFeed: ObservableObject {
     @Published var waitingSince: Date?
     /// В очереди ответил человек
     @Published var humanAt: Date?
+    /// Собеседник на связи (обе стороны соединены) — с этого момента идёт время разговора
+    @Published var pairedAt: Date?
+    /// Переводчик включён в этом разговоре; nil — сервер ещё не сообщил
+    @Published var translatorOn: Bool?
 
     private var task: URLSessionWebSocketTask?
     private var wanted = false
@@ -98,14 +102,26 @@ final class LiveFeed: ObservableObject {
 
     private struct Message: Decodable {
         var event: String?; var role: String?; var dir: String?; var text: String?; var ms: Double?; var at: Double?
-        var on: Bool?; var de: String?
+        var on: Bool?; var de: String?; var mode: String?
     }
 
     private func handle(_ raw: String) {
         guard let message = try? JSONDecoder().decode(Message.self, from: Data(raw.utf8)) else { return }
         switch message.event {
-        case "start":
+        case "paired":
+            // Новый разговор: всё с начала
             turns = []; state = .talking; noticeUntil = nil; readyAt = nil; waitingSince = nil; humanAt = nil
+            pairedAt = message.at.map { Date(timeIntervalSince1970: $0 / 1000) } ?? Date()
+            translatorOn = nil
+            return
+        case "start":
+            state = .talking
+            translatorOn = true
+            if pairedAt == nil { pairedAt = message.at.map { Date(timeIntervalSince1970: $0 / 1000) } ?? Date() }
+            return
+        case "translator":
+            translatorOn = message.on ?? false
+            if message.on != true { noticeUntil = nil }
             return
         case "said":
             // Сказано текстом или кнопкой: отдельной репликой
@@ -135,7 +151,7 @@ final class LiveFeed: ObservableObject {
             noticeUntil = nil
             if fresh, Date().timeIntervalSince(readyAt!) < 5 { UINotificationFeedbackGenerator().notificationOccurred(.success) }
             return
-        case "end": state = .ended; noticeUntil = nil; return
+        case "end": state = .ended; noticeUntil = nil; waitingSince = nil; return
         default: break
         }
         guard let role = message.role, let dir = message.dir, let text = message.text else { return }
@@ -233,7 +249,7 @@ struct LiveView: View {
                 SpeakCue().padding(.horizontal)
                 LiveTranscript(placeholder: placeholder)
                 // Звонок перезвоном на мобильный: помощь в разговоре — здесь
-                if feed.state == .talking { AssistButtons().padding(.bottom, 8) }
+                if feed.state == .talking { AssistButtons(translationOn: feed.translatorOn ?? true).padding(.bottom, 8) }
             }
             .navigationTitle("Текст разговора")
             .navigationBarTitleDisplayMode(.inline)

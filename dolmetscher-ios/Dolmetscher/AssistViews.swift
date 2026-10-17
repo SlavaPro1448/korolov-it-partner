@@ -7,10 +7,16 @@ struct AssistButtons: View {
     @EnvironmentObject private var feed: LiveFeed
     @State private var showSay = false
     @State private var busy = false
+    @State private var switching = false
     @State private var error: String?
+    /// Перевод сейчас включён (по событиям сервера; до них — как выбрано при звонке)
+    var translationOn: Bool
 
     var body: some View {
-        HStack(spacing: 28) {
+        HStack(spacing: 22) {
+            AssistButton(icon: "translate", title: translationOn ? "Перевод вкл" : "Переводчик",
+                         on: translationOn, busy: switching) { toggleTranslation() }
+                .disabled(feed.waitingSince != nil)
             AssistButton(icon: "text.bubble.fill", title: "Сказать", on: false) { showSay = true }
             AssistButton(icon: "hourglass", title: feed.waitingSince == nil ? "Ждать за меня" : "Хватит ждать",
                          on: feed.waitingSince != nil, busy: busy) { toggleWait() }
@@ -19,6 +25,15 @@ struct AssistButtons: View {
         .alert("Не получилось", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) {
             Button("OK", role: .cancel) {}
         } message: { Text(error ?? "") }
+    }
+
+    private func toggleTranslation() {
+        let on = !translationOn
+        switching = true
+        Task {
+            defer { switching = false }
+            do { _ = try await model.api.translate(on, phrases: model.mode == .seq) } catch { self.error = error.localizedDescription }
+        }
     }
 
     private func toggleWait() {

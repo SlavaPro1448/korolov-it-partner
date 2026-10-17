@@ -153,7 +153,8 @@ export class SessionStore {
     } else if (role === "peer" && session.direction === "incoming") {
       this.#startHold(session);
     }
-    if (role === "peer" && session.direction === "outgoing") this.#announce(session);
+    // Ohne Übersetzung ("off") kein KI-Hinweis – der kommt erst, wenn der Inhaber sie einschaltet
+    if (role === "peer" && session.direction === "outgoing" && session.mode !== "off") this.#announce(session);
     return entry;
   }
 
@@ -168,6 +169,12 @@ export class SessionStore {
         session.watcher?.push(payload);
         if (now >= session.playingUntil.owner) session.legs.owner?.send(attenuateMulaw(payload, WAIT_GAIN));
       }
+      return;
+    }
+    if (session.mode === "off") {
+      // Ohne Übersetzung: normales Telefonat, Stimme unverändert zur anderen Seite
+      const other = OTHER[role];
+      if (now >= session.playingUntil[other]) session.legs[other]?.send(payload);
       return;
     }
     if (!session.translators) return;
@@ -252,9 +259,7 @@ export class SessionStore {
     if (!session.paired || session.waiting || !this.createWatcher) return false;
     session.waiting = true;
     session.waitStartedAt = Date.now();
-    session.translators?.owner.close();
-    session.translators?.peer.close();
-    session.translators = null;
+    this.#stopTranslators(session);
     session.watcher = this.createWatcher(session, () => this.stopWait(session, { human: true }));
     this.stopPlayback(session, "owner");
     this.#play(session, "owner", "ownerWait");
@@ -269,13 +274,13 @@ export class SessionStore {
     session.waiting = false;
     session.watcher?.close();
     session.watcher = null;
-    this.#startTranslators(session);
+    if (session.mode !== "off") this.#startTranslators(session);
     this.onCue(session, "wait", { on: false });
     if (human) {
       this.stopPlayback(session, "owner");
       this.#play(session, "owner", "ownerHuman");
       this.onCue(session, "human", {});
-      this.#announce(session);
+      if (session.mode !== "off") this.#announce(session);
       const waited = Math.round((Date.now() - session.waitStartedAt) / 1000);
       this.log.info(`[session:${session.id}] Mensch erkannt nach ${waited} s`);
     }
@@ -283,16 +288,40 @@ export class SessionStore {
   }
 
   // Übersetzungsmodus im Gespräch wechseln: live -> seq -> direct -> live
+  // Übersetzung im Gespräch ein-/ausschalten (Knopf "Переводчик" in der App, * am Telefon aus "off")
+  setTranslation(session, on, mode = "live") {
+    if (!session.paired || session.waiting) return false;
+    if (on) {
+      if (session.mode !== "off") return false;
+      session.mode = mode === "seq" ? "seq" : "live";
+      this.stopPlayback(session, "owner");
+      this.stopPlayback(session, "peer");
+      this.#startTranslators(session);
+      this.onCue(session, "translator", { on: true, mode: session.mode });
+      this.#announce(session);
+    } else {
+      if (session.mode === "off") return false;
+      this.#stopTranslators(session);
+      session.mode = "off";
+      this.stopPlayback(session, "owner");
+      this.stopPlayback(session, "peer");
+      clearTimeout(session.noticeTimer);
+      this.onCue(session, "translator", { on: false });
+    }
+    this.log.info(`[session:${session.id}] Übersetzung ${on ? "an" : "aus"}`);
+    return true;
+  }
+
   switchMode(session) {
     if (!session.paired || session.waiting) return;
+    if (session.mode === "off") return this.setTranslation(session, true);
     const order = ["live", "seq", "direct"];
     const previous = session.mode ?? "live";
     session.mode = order[(order.indexOf(previous) + 1) % order.length];
     // Übersetzer nur neu aufbauen, wenn sich die Übersetzungsart ändert (direct nutzt die laufenden)
     const engine = (m) => (m === "seq" ? "seq" : "live");
     if (engine(previous) !== engine(session.mode)) {
-      session.translators.owner.close();
-      session.translators.peer.close();
+      this.#stopTranslators(session);
       this.#startTranslators(session);
     }
     this.stopPlayback(session, "owner");
@@ -374,8 +403,7 @@ export class SessionStore {
     clearInterval(session.statsTimer);
     session.watcher?.close();
     this.#logStats(session);
-    session.translators?.owner.close();
-    session.translators?.peer.close();
+    this.#stopTranslators(session);
     session.legs.owner?.close();
     session.legs.peer?.close();
     this.onEnd(session);
@@ -395,6 +423,13 @@ export class SessionStore {
   }
 
   #startHold(session) {
+    if (session.quietHold) {
+      // Alle Anrufe gehen direkt in die App: Anrufer hört ein normales Freizeichen, keine Ansage
+      this.#playback(session, "peer", RINGBACK);
+      session.holdTimer = setInterval(() => this.#playback(session, "peer", RINGBACK), RINGBACK_INTERVAL_MS);
+      session.holdTimer.unref?.();
+      return;
+    }
     let tick = 0;
     const play = () => {
       tick += 1;
@@ -413,12 +448,27 @@ export class SessionStore {
       clearInterval(session.holdTimer);
       this.stopPlayback(session, "peer");
     }
-    this.#startTranslators(session);
+    // Beide Seiten verbunden – für die App (Zeit läuft, Live-Text dieses Gesprächs beginnt)
+    this.onCue(session, "paired", { direction: session.direction });
+    if (session.mode === "off") this.onCue(session, "translator", { on: false });
+    else this.#startTranslators(session);
     if (session.direction === "outgoing") this.#playback(session, "owner", CONNECTED);
-    this.log.info(`[session:${session.id}] beide Teilnehmer verbunden`);
+    this.log.info(`[session:${session.id}] beide Teilnehmer verbunden${session.mode === "off" ? " (ohne Übersetzung)" : ""}`);
+  }
+
+  // Übersetzer schließen und die übersetzte Zeit aufaddieren (für die Kostenanzeige)
+  #stopTranslators(session) {
+    session.translators?.owner.close();
+    session.translators?.peer.close();
+    session.translators = null;
+    if (session.translatingSince) {
+      session.translatedMs = (session.translatedMs ?? 0) + (Date.now() - session.translatingSince);
+      session.translatingSince = null;
+    }
   }
 
   #startTranslators(session) {
+    session.translatingSince = Date.now();
     const translator = (role) =>
       this.createTranslator({
         sourceLanguage: this.languages[role],
