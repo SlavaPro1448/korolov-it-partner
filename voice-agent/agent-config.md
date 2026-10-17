@@ -116,7 +116,7 @@ oder Королов.
 | `urgent` | string | Genau true oder false. true, wenn Website/E-Mail ausgefallen, gehackt, Datenverlust oder Betrieb steht still |
 | `best_time` | string | Wann der Anrufer erreichbar ist, immer auf Russisch formuliert |
 | `language` | string | Sprache des Gesprächs: de, ru oder uk |
-| `summary_ru` | string | Краткое резюме звонка на русском: кто звонил, что нужно, что обещано; владелец по-русски — Королёв |
+| `summary_ru` | string | Краткое резюме звонка на русском, 1–3 предложения: кто звонил, что нужно, что обещано. Фамилию владельца писать «Королёв». Только суть звонка, без служебных пометок. |
 
 ## Этап 2 — живой переводчик DE↔RU (заложено, не реализовано)
 
