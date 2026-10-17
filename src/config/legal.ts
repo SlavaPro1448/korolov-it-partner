@@ -24,8 +24,10 @@ export const COMPANY = {
   countryCode: "DE",
 
   email: "info@korolov-it-service.de",
-  phoneDisplay: "+49 163 825 1736",
-  phoneHref: "tel:+491638251736",
+  // Рабочий номер — Festnetz, на нём отвечает KI-Telefonassistent (Twilio + ElevenLabs).
+  // WhatsApp остаётся на мобильном.
+  phoneDisplay: "+49 214 83263442",
+  phoneHref: "tel:+4921483263442",
   whatsappHref: "https://wa.me/491638251736",
 
   // Налоговые данные (Kleinunternehmer — без USt-IdNr.)
@@ -42,9 +44,9 @@ export const COMPANY = {
 
   // Хостинг и инфраструктура
   hosting: {
-    provider: "IONOS SE",
-    address: "Elgendorfer Straße 57, 56410 Montabaur, Deutschland",
-    privacyUrl: "https://www.ionos.de/terms-gtc/datenschutzerklaerung",
+    provider: "Vercel Inc.",
+    address: "440 N Barranca Ave #4133, Covina, CA 91723, USA",
+    privacyUrl: "https://vercel.com/legal/privacy-policy",
   },
 
   mailProvider: {

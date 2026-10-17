@@ -123,13 +123,16 @@ export default function DatenschutzPage() {
                 Diese Daten werden zum Zweck der technischen Bereitstellung, Sicherheit und
                 Stabilität der Website verarbeitet. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO
                 (berechtigtes Interesse an einer fehlerfreien und sicheren Bereitstellung der
-                Website). Die Server-Logs werden in der Regel nach 14 Tagen automatisch gelöscht,
-                sofern keine sicherheitsrelevanten Vorfälle eine längere Speicherung erfordern.
+                Website). Die Server-Logs werden nach kurzer Zeit automatisch gelöscht, sofern keine
+                sicherheitsrelevanten Vorfälle eine längere Speicherung erfordern.
               </p>
               <p className="mt-3">
                 Mit dem Hosting-Anbieter wurde ein Vertrag zur Auftragsverarbeitung gemäß Art. 28
-                DSGVO geschlossen. Weitere Informationen finden Sie in der Datenschutzerklärung von
-                IONOS:{" "}
+                DSGVO geschlossen. Dabei können Daten in die USA übermittelt werden; dies erfolgt
+                auf Grundlage der Zertifizierung von Vercel unter dem EU-US Data Privacy Framework
+                (Art. 45 DSGVO) sowie ergänzend der Standardvertragsklauseln der EU-Kommission (Art.
+                46 Abs. 2 lit. c DSGVO). Weitere Informationen finden Sie in der
+                Datenschutzerklärung von Vercel:{" "}
                 <a
                   href={COMPANY.hosting.privacyUrl}
                   target="_blank"
@@ -166,9 +169,11 @@ export default function DatenschutzPage() {
               <p className="mt-3">
                 Die Übermittlung der Formulardaten erfolgt an eine serverseitige API auf dieser
                 Website (`/api/contact.php`). Die anschließende Zustellung der Nachricht erfolgt
-                über die SMTP-Infrastruktur von <strong>{COMPANY.mailProvider.provider}</strong>.
-                Dabei werden technisch notwendige Metadaten (insbesondere IP-Adresse und User-Agent)
-                zur Missbrauchsprävention und Fehleranalyse verarbeitet.
+                über den E-Mail-Versanddienst <strong>Resend</strong> (USA, Auftragsverarbeiter
+                gemäß Art. 28 DSGVO; Übermittlung auf Grundlage der Standardvertragsklauseln der
+                EU-Kommission bzw. des EU-US Data Privacy Framework). Dabei werden technisch
+                notwendige Metadaten (insbesondere IP-Adresse und User-Agent) zur
+                Missbrauchsprävention und Fehleranalyse verarbeitet.
               </p>
               <p className="mt-3">
                 Rechtsgrundlage der Verarbeitung ist Art. 6 Abs. 1 lit. b DSGVO (Durchführung
@@ -210,8 +215,9 @@ export default function DatenschutzPage() {
                 Stimme, soweit dies zur Umwandlung in Text und zur Sprachausgabe erforderlich ist,
                 der Gesprächsinhalt als Textprotokoll sowie die von Ihnen genannten Angaben (z. B.
                 Name, Firma, Rückrufnummer, Anliegen). Aus dem Protokoll wird automatisch eine
-                Zusammenfassung erstellt und mir per E-Mail zugestellt. Eine Tonaufzeichnung des
-                Gesprächs wird nicht gespeichert.
+                Zusammenfassung erstellt und mir per E-Mail zugestellt (über den Hosting-Anbieter
+                dieser Website und den oben genannten Versanddienst Resend). Eine Tonaufzeichnung
+                des Gesprächs wird nicht gespeichert.
               </p>
               <p className="mt-3">
                 Die Verarbeitung dient der Annahme und Bearbeitung Ihrer Anfrage und erfolgt auf
@@ -285,8 +291,8 @@ export default function DatenschutzPage() {
                 Kommunikation im Zusammenhang mit Ihrer Anfrage. Rechtsgrundlage ist Art. 6 Abs. 1
                 lit. b DSGVO (Durchführung vorvertraglicher Maßnahmen, die auf Anfrage der
                 betroffenen Person erfolgen). Darüber hinaus holt der Bot <strong>vor</strong> der
-                Erhebung Ihrer Daten Ihre ausdrückliche Einwilligung ein; insoweit ist Art. 6
-                Abs. 1 lit. a DSGVO Rechtsgrundlage.
+                Erhebung Ihrer Daten Ihre ausdrückliche Einwilligung ein; insoweit ist Art. 6 Abs. 1
+                lit. a DSGVO Rechtsgrundlage.
               </p>
               <p className="mt-3">
                 Es erfolgt keine werbliche Ansprache und keine Weitergabe Ihrer Daten an Dritte zu
@@ -298,9 +304,9 @@ export default function DatenschutzPage() {
                 Ihre Daten werden bis zur Bearbeitung Ihrer Anfrage gespeichert, längstens jedoch{" "}
                 <strong>180 Tage</strong>; danach werden sie automatisch gelöscht. Sie können Ihre
                 Einwilligung jederzeit mit Wirkung für die Zukunft direkt im Bot widerrufen — in
-                Telegram über den Befehl <em>/datenschutz</em>, in WhatsApp durch eine Nachricht
-                mit dem Wort <em>&quot;datenschutz&quot;</em>. In diesem Fall werden sämtliche zu
-                Ihnen gespeicherten Daten vollständig und unwiderruflich gelöscht (Art. 17 DSGVO).
+                Telegram über den Befehl <em>/datenschutz</em>, in WhatsApp durch eine Nachricht mit
+                dem Wort <em>&quot;datenschutz&quot;</em>. In diesem Fall werden sämtliche zu Ihnen
+                gespeicherten Daten vollständig und unwiderruflich gelöscht (Art. 17 DSGVO).
               </p>
 
               <h3 className="font-semibold text-brand mt-5 mb-2">
@@ -315,9 +321,9 @@ export default function DatenschutzPage() {
                   <strong>Railway Corp., USA</strong> (Hosting des Bots, Auftragsverarbeiter gemäß
                   Art. 28 DSGVO). Die Server befinden sich in der EU-Region (Amsterdam,
                   Niederlande). Eine Übermittlung in die USA ist im Rahmen der technischen Wartung
-                  möglich; sie erfolgt auf Grundlage der Zertifizierung von Railway unter dem
-                  EU-US Data Privacy Framework (Angemessenheitsbeschluss der EU-Kommission gemäß
-                  Art. 45 DSGVO) sowie ergänzend auf Grundlage der Standardvertragsklauseln der
+                  möglich; sie erfolgt auf Grundlage der Zertifizierung von Railway unter dem EU-US
+                  Data Privacy Framework (Angemessenheitsbeschluss der EU-Kommission gemäß Art. 45
+                  DSGVO) sowie ergänzend auf Grundlage der Standardvertragsklauseln der
                   EU-Kommission (Art. 46 Abs. 2 lit. c DSGVO).
                 </li>
                 <li>
@@ -364,16 +370,15 @@ export default function DatenschutzPage() {
               <p>
                 Ihnen stehen die unter Ziffer 9 dieser Datenschutzerklärung aufgeführten
                 Betroffenenrechte zu (Auskunft, Berichtigung, Löschung, Einschränkung der
-                Verarbeitung, Datenübertragbarkeit und Widerspruch, Art. 15–21 DSGVO). Eine
-                erteilte Einwilligung können Sie jederzeit mit Wirkung für die Zukunft widerrufen
-                (Art. 7 Abs. 3 DSGVO). Ferner haben Sie das Recht auf Beschwerde bei einer
-                Aufsichtsbehörde (Art. 77 DSGVO); die zuständige Aufsichtsbehörde finden Sie unter
-                Ziffer 10.
+                Verarbeitung, Datenübertragbarkeit und Widerspruch, Art. 15–21 DSGVO). Eine erteilte
+                Einwilligung können Sie jederzeit mit Wirkung für die Zukunft widerrufen (Art. 7
+                Abs. 3 DSGVO). Ferner haben Sie das Recht auf Beschwerde bei einer Aufsichtsbehörde
+                (Art. 77 DSGVO); die zuständige Aufsichtsbehörde finden Sie unter Ziffer 10.
               </p>
               <p className="mt-3">
-                Die Bereitstellung Ihrer Daten ist weder gesetzlich noch vertraglich
-                vorgeschrieben; Sie sind nicht verpflichtet, die Daten bereitzustellen. Ohne diese
-                Angaben kann ich die Demo-Version jedoch nicht erstellen.
+                Die Bereitstellung Ihrer Daten ist weder gesetzlich noch vertraglich vorgeschrieben;
+                Sie sind nicht verpflichtet, die Daten bereitzustellen. Ohne diese Angaben kann ich
+                die Demo-Version jedoch nicht erstellen.
               </p>
             </section>
 
