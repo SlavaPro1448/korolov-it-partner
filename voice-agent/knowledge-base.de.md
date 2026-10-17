@@ -58,7 +58,9 @@ Immobilienservice, Kanzleien, Praxen, Büros und Beratungsstellen, mehrsprachige
 | Start Website | ab 890 € einmalig | 1–3 Seiten, responsives Design, Kontaktformular, SSL, Domain-Anbindung, Basis-SEO |
 | Business Website | ab 1.500 € einmalig | 4–7 Seiten, individuelle Struktur, Leistungsseiten, E-Mail-Anbindung, SEO-Grundstruktur |
 | Digital Setup | ab 390 € einmalig | Domain, Hosting, geschäftliche E-Mail, SPF/DKIM/DMARC, Signatur, Google-Business-Profil-Grundsetup |
-| Monatliche Betreuung | ab 79 € pro Monat | Updates, Backups, technische Prüfung, kleine Änderungen, technischer Ansprechpartner |
+| Website-Wartung | Basis 40 € / Comfort 90 € pro Monat | Updates, Backups, technische Prüfung; Comfort zusätzlich kleine Änderungen und schnellere Reaktion |
+| IT-Betreuung für Büros | ab 79 € pro Monat | Fester Ansprechpartner, Updates, Backups, schnelle Hilfe |
+| KI-Telefonassistent, KI-Automatisierung, Bots, Apps | Festpreis nach Erstgespräch | Einrichtung einmalig, laufende KI-/Telefonie-Kosten transparent nach Verbrauch |
 | IT-Support einzeln | nach Aufwand | wird vorab transparent besprochen |
 
 - Das Erstgespräch ist kostenlos und unverbindlich.

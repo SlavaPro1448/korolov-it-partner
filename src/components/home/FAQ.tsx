@@ -27,7 +27,7 @@ export function FAQ({ locale }: { locale: Locale }) {
             const panelId = `faq-panel-${i}`;
             const buttonId = `faq-button-${i}`;
             return (
-              <div key={f.q} className="card-soft overflow-hidden">
+              <div key={f.q} className="card-bento overflow-hidden">
                 <h3 className="m-0">
                   <button
                     id={buttonId}

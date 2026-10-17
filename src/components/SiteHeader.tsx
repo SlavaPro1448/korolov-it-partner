@@ -14,67 +14,97 @@ import {
 type Locale = "de" | "ru" | "uk";
 
 // Leistungs-Seiten für das "Leistungen"-Dropdown (nur DE — die Landing-Pages sind deutschsprachig).
-const serviceMenuItems: Array<{ label: string; to: string; description: string }> = [
+type MenuItem = { label: string; to: string; description: string };
+const serviceMenuGroups: Array<{ label: string; items: MenuItem[] }> = [
   {
-    label: "IT-Service in Leverkusen",
-    to: "/it-service-leverkusen",
-    description: "Alle Leistungen im Überblick",
+    label: "Websites & IT",
+    items: [
+      {
+        label: "Webdesign Leverkusen",
+        to: "/webdesign-leverkusen",
+        description: "Websites ab 890 € Festpreis",
+      },
+      {
+        label: "Website-Wartung & Pflege",
+        to: "/website-wartung-leverkusen",
+        description: "Ab 40 € im Monat",
+      },
+      {
+        label: "IT-Support Leverkusen",
+        to: "/it-support-leverkusen",
+        description: "Schnelle Hilfe bei Störungen",
+      },
+      {
+        label: "IT-Betreuung für kleine Unternehmen",
+        to: "/it-betreuung-kleine-unternehmen",
+        description: "Fester Ansprechpartner fürs Büro",
+      },
+      {
+        label: "IT-Beratung Leverkusen",
+        to: "/it-beratung-leverkusen",
+        description: "Unabhängige Entscheidungshilfe",
+      },
+      {
+        label: "IT-Service im Überblick",
+        to: "/it-service-leverkusen",
+        description: "Alle IT-Leistungen",
+      },
+    ],
   },
   {
-    label: "IT-Betreuung für kleine Unternehmen",
-    to: "/it-betreuung-kleine-unternehmen",
-    description: "Laufende Betreuung ab 79 €/Monat",
-  },
-  {
-    label: "IT-Support Leverkusen",
-    to: "/it-support-leverkusen",
-    description: "Schnelle Hilfe bei Störungen",
-  },
-  {
-    label: "IT-Beratung Leverkusen",
-    to: "/it-beratung-leverkusen",
-    description: "Unabhängige Entscheidungshilfe",
-  },
-  {
-    label: "IT-Wartungsvertrag",
-    to: "/wartungsvertrag-it",
-    description: "Feste Reaktionszeiten, planbare Kosten",
-  },
-  {
-    label: "Webdesign Leverkusen",
-    to: "/webdesign-leverkusen",
-    description: "Websites ab 890 € Festpreis",
-  },
-  {
-    label: "Website-Wartung & Pflege",
-    to: "/website-wartung-leverkusen",
-    description: "Updates, Backups & Monitoring",
+    label: "KI & Apps",
+    items: [
+      {
+        label: "KI-Telefonassistent",
+        to: "/ki-telefonassistent-leverkusen",
+        description: "Kein Anruf geht mehr verloren",
+      },
+      {
+        label: "KI-Automatisierung",
+        to: "/ki-automatisierung-kleine-unternehmen",
+        description: "KI bereitet vor, Sie geben frei",
+      },
+      {
+        label: "KI-Chatbot für die Website",
+        to: "/chatbot-fuer-unternehmen",
+        description: "Antworten aus Ihren Inhalten",
+      },
+      {
+        label: "Telegram- & WhatsApp-Bots",
+        to: "/telegram-bot-erstellen-lassen",
+        description: "Anfragen und Abläufe im Messenger",
+      },
+      {
+        label: "App-Entwicklung",
+        to: "/app-entwicklung-leverkusen",
+        description: "iPhone- und Android-Apps",
+      },
+    ],
   },
 ];
 
 const navItemsByLocale: Record<Locale, Array<{ label: string; href: string }>> = {
   de: [
-    { label: "Für wen", href: "#fuer-wen" },
+    { label: "Projekte", href: "/projekte" },
     { label: "Preise", href: "#preise" },
-    { label: "Ablauf", href: "#ablauf" },
     { label: "Referenzen", href: "/referenzen" },
     { label: "Über mich", href: "#ueber-mich" },
     { label: "Kontakt", href: "#kontakt" },
   ],
   ru: [
     { label: "Услуги", href: "#leistungen" },
-    { label: "Для кого", href: "#fuer-wen" },
+    { label: "ИИ", href: "#ki" },
+    { label: "Проекты", href: "/projekte" },
     { label: "Цены", href: "#preise" },
-    { label: "Этапы", href: "#ablauf" },
     { label: "Кейсы", href: "#referenzen" },
     { label: "Обо мне", href: "#ueber-mich" },
     { label: "Контакты", href: "#kontakt" },
   ],
   uk: [
     { label: "Послуги", href: "#leistungen" },
-    { label: "Для кого", href: "#fuer-wen" },
+    { label: "ШІ", href: "#ki" },
+    { label: "Проєкти", href: "/projekte" },
     { label: "Ціни", href: "#preise" },
-    { label: "Етапи", href: "#ablauf" },
     { label: "Кейси", href: "#referenzen" },
     { label: "Про мене", href: "#ueber-mich" },
     { label: "Контакти", href: "#kontakt" },
@@ -188,12 +218,13 @@ export function SiteHeader({
           aria-label={homeAriaLabelByLocale[locale]}
         >
           <div
-            className="h-9 w-9 rounded-lg bg-brand flex items-center justify-center text-brand-foreground font-bold"
+            className="relative flex h-9 w-9 items-center justify-center overflow-hidden rounded-xl bg-brand font-bold text-brand-foreground"
             aria-hidden="true"
           >
-            K
+            <span className="absolute inset-0 bg-ai-gradient opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+            <span className="relative">K</span>
           </div>
-          <div className="leading-tight">
+          <div className="whitespace-nowrap leading-tight">
             <div className="font-semibold text-brand">Korolov</div>
             <div className="text-[11px] uppercase tracking-wider text-muted-foreground">
               IT-Service
@@ -202,7 +233,7 @@ export function SiteHeader({
         </a>
 
         <nav
-          className="hidden lg:flex items-center gap-7"
+          className="hidden lg:flex items-center gap-4 xl:gap-6"
           aria-label={
             locale === "de"
               ? "Hauptnavigation"
@@ -219,25 +250,38 @@ export function SiteHeader({
                     Leistungen
                   </NavigationMenuTrigger>
                   <NavigationMenuContent>
-                    <ul className="grid w-[340px] gap-1 p-3">
-                      {serviceMenuItems.map((s) => (
-                        <li key={s.to}>
-                          <NavigationMenuLink asChild>
-                            <Link
-                              to={s.to}
-                              className="block rounded-md px-3 py-2.5 hover:bg-section transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-blue"
-                            >
-                              <span className="block text-sm font-medium text-brand">
-                                {s.label}
-                              </span>
-                              <span className="mt-0.5 block text-xs text-muted-foreground">
-                                {s.description}
-                              </span>
-                            </Link>
-                          </NavigationMenuLink>
-                        </li>
+                    <div className="grid w-[640px] grid-cols-2 gap-2 p-3">
+                      {serviceMenuGroups.map((g, gi) => (
+                        <div key={g.label}>
+                          <div className="flex items-center gap-2 px-3 pb-1 pt-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                            <span
+                              className={`h-2 w-2 rounded-full ${gi === 1 ? "bg-ai-gradient" : "bg-brand"}`}
+                              aria-hidden="true"
+                            />
+                            {g.label}
+                          </div>
+                          <ul className="grid gap-0.5">
+                            {g.items.map((s) => (
+                              <li key={s.to}>
+                                <NavigationMenuLink asChild>
+                                  <Link
+                                    to={s.to}
+                                    className="block rounded-lg px-3 py-2 transition-colors hover:bg-section focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-blue"
+                                  >
+                                    <span className="block text-sm font-medium text-brand">
+                                      {s.label}
+                                    </span>
+                                    <span className="mt-0.5 block text-xs text-muted-foreground">
+                                      {s.description}
+                                    </span>
+                                  </Link>
+                                </NavigationMenuLink>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
                       ))}
-                    </ul>
+                    </div>
                   </NavigationMenuContent>
                 </NavigationMenuItem>
               </NavigationMenuList>
@@ -247,20 +291,20 @@ export function SiteHeader({
             <a
               key={it.href}
               href={it.href.startsWith("#") ? `${basePath}${it.href}` : it.href}
-              className="text-sm text-foreground/80 hover:text-accent-blue transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-blue rounded-sm px-1"
+              className="whitespace-nowrap text-sm text-foreground/80 hover:text-accent-blue transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-blue rounded-sm px-1"
             >
               {it.label}
             </a>
           ))}
         </nav>
 
-        <div className="hidden lg:flex items-center gap-3">
+        <div className="hidden lg:flex items-center gap-2 xl:gap-3">
           <div
-            className="hidden xl:inline-flex items-center gap-1.5 rounded-full border border-border bg-background px-2 py-1"
+            className="inline-flex items-center gap-1 rounded-full border border-border bg-background px-1.5 py-1"
             role="group"
             aria-label={langCopy.group}
           >
-            <Languages className="h-3.5 w-3.5" aria-hidden="true" />
+            <Languages className="hidden h-3.5 w-3.5 xl:block" aria-hidden="true" />
             <a
               href="/"
               hrefLang="de"
@@ -343,18 +387,22 @@ export function SiteHeader({
           <div className="container-page py-4 flex flex-col gap-1">
             {locale === "de" && (
               <>
-                <div className="px-2 pt-1 pb-0.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                  Leistungen
-                </div>
-                {serviceMenuItems.map((s) => (
-                  <Link
-                    key={s.to}
-                    to={s.to}
-                    onClick={() => setOpen(false)}
-                    className="px-4 py-2.5 rounded-md text-sm hover:bg-section focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-blue"
-                  >
-                    {s.label}
-                  </Link>
+                {serviceMenuGroups.map((g) => (
+                  <div key={g.label} className="flex flex-col">
+                    <div className="px-2 pt-2 pb-0.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                      {g.label}
+                    </div>
+                    {g.items.map((s) => (
+                      <Link
+                        key={s.to}
+                        to={s.to}
+                        onClick={() => setOpen(false)}
+                        className="px-4 py-2.5 rounded-md text-sm hover:bg-section focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-blue"
+                      >
+                        {s.label}
+                      </Link>
+                    ))}
+                  </div>
                 ))}
                 <div className="my-1 border-t border-border" aria-hidden="true" />
               </>

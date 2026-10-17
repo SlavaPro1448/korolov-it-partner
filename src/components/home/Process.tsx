@@ -5,7 +5,11 @@ import { SectionHeading } from "./SectionHeading";
 export function Process({ locale }: { locale: Locale }) {
   const t = getDict(locale).process;
   return (
-    <section id="ablauf" className="py-20 md:py-28 scroll-mt-20" aria-labelledby="process-heading">
+    <section
+      id="ablauf"
+      className="scroll-mt-20 bg-section py-20 md:py-28"
+      aria-labelledby="process-heading"
+    >
       <div className="container-page">
         <SectionHeading
           headingId="process-heading"
@@ -13,17 +17,19 @@ export function Process({ locale }: { locale: Locale }) {
           title={t.title}
           subtitle={t.subtitle}
         />
-        <ol className="mt-12 grid gap-5 lg:grid-cols-5 md:grid-cols-2">
+        <ol className="relative mt-14 grid gap-8 md:grid-cols-2 lg:grid-cols-5 lg:gap-6">
+          <div
+            className="absolute left-0 right-0 top-5 hidden h-px bg-gradient-to-r from-accent-blue/40 via-accent-violet/40 to-transparent lg:block"
+            aria-hidden="true"
+          />
           {t.steps.map((s, i) => (
-            <li key={s.title} className="card-soft p-6 relative">
-              <div className="text-xs uppercase tracking-wider text-muted-foreground">
-                {t.stepLabel} {i + 1}
-              </div>
-              <div className="mt-2 h-9 w-9 rounded-lg bg-brand text-brand-foreground flex items-center justify-center font-semibold">
+            <li key={s.title} className="relative">
+              <div className="relative flex h-10 w-10 items-center justify-center rounded-full border border-border bg-white text-sm font-bold text-brand shadow-sm">
+                <span className="sr-only">{t.stepLabel} </span>
                 {i + 1}
               </div>
-              <h3 className="mt-4 font-semibold text-brand">{s.title}</h3>
-              <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{s.text}</p>
+              <h3 className="mt-5 font-semibold text-brand">{s.title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{s.text}</p>
             </li>
           ))}
         </ol>

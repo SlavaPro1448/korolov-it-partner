@@ -10,11 +10,7 @@ const RECOMMENDED_INDEX = 1;
 export function Pricing({ locale }: { locale: Locale }) {
   const t = getDict(locale).pricing;
   return (
-    <section
-      id="preise"
-      className="py-20 md:py-28 bg-section scroll-mt-20"
-      aria-labelledby="pricing-heading"
-    >
+    <section id="preise" className="py-20 md:py-28 scroll-mt-20" aria-labelledby="pricing-heading">
       <div className="container-page">
         <SectionHeading
           headingId="pricing-heading"
@@ -28,8 +24,10 @@ export function Pricing({ locale }: { locale: Locale }) {
             return (
               <div
                 key={p.name}
-                className={`relative card-soft p-6 flex flex-col ${
-                  recommended ? "ring-2 ring-accent-blue border-accent-blue" : ""
+                className={`relative card-bento p-6 flex flex-col ${
+                  recommended
+                    ? "ring-2 ring-accent-blue border-accent-blue shadow-[0_24px_48px_-24px_rgb(37_99_235/0.45)]"
+                    : ""
                 }`}
               >
                 {recommended && (

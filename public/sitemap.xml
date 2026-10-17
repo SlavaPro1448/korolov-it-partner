@@ -8,7 +8,7 @@
   <!-- German pages -->
   <url>
     <loc>https://korolov-it-service.de/</loc>
-    <lastmod>2026-07-21</lastmod>
+    <lastmod>2026-10-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>1.0</priority>
     <xhtml:link rel="alternate" hreflang="de" href="https://korolov-it-service.de/"/>
@@ -56,13 +56,13 @@
   </url>
   <url>
     <loc>https://korolov-it-service.de/it-service-leverkusen</loc>
-    <lastmod>2026-07-21</lastmod>
+    <lastmod>2026-10-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://korolov-it-service.de/it-betreuung-kleine-unternehmen</loc>
-    <lastmod>2026-07-21</lastmod>
+    <lastmod>2026-10-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -147,4 +147,84 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://korolov-it-service.de/"/>
   </url>
 
+
+  <!-- KI, Apps & Projekte (10/2026) -->
+  <url>
+    <loc>https://korolov-it-service.de/ki-telefonassistent-leverkusen</loc>
+    <lastmod>2026-10-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://korolov-it-service.de/ki-automatisierung-kleine-unternehmen</loc>
+    <lastmod>2026-10-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://korolov-it-service.de/app-entwicklung-leverkusen</loc>
+    <lastmod>2026-10-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://korolov-it-service.de/telegram-bot-erstellen-lassen</loc>
+    <lastmod>2026-10-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://korolov-it-service.de/chatbot-fuer-unternehmen</loc>
+    <lastmod>2026-10-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://korolov-it-service.de/projekte</loc>
+    <lastmod>2026-10-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://korolov-it-service.de/projekte/jarvis</loc>
+    <lastmod>2026-10-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://korolov-it-service.de/projekte/ki-dolmetscher</loc>
+    <lastmod>2026-10-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://korolov-it-service.de/projekte/live-uebersetzer</loc>
+    <lastmod>2026-10-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://korolov-it-service.de/projekte/ki-telefonassistent</loc>
+    <lastmod>2026-10-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://korolov-it-service.de/projekte/grosch</loc>
+    <lastmod>2026-10-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://korolov-it-service.de/projekte/website-check</loc>
+    <lastmod>2026-10-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://korolov-it-service.de/projekte/anfrage-bot</loc>
+    <lastmod>2026-10-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
 </urlset>

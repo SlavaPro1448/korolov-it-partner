@@ -18,18 +18,25 @@ import { Route as WebdesignLeverkusenRouteImport } from './routes/webdesign-leve
 import { Route as WartungsvertragItRouteImport } from './routes/wartungsvertrag-it'
 import { Route as UkRouteImport } from './routes/uk'
 import { Route as UaRouteImport } from './routes/ua'
+import { Route as TelegramBotErstellenLassenRouteImport } from './routes/telegram-bot-erstellen-lassen'
 import { Route as RuRouteImport } from './routes/ru'
 import { Route as ReferenzenRouteImport } from './routes/referenzen'
+import { Route as ProjekteRouteImport } from './routes/projekte'
+import { Route as KiTelefonassistentLeverkusenRouteImport } from './routes/ki-telefonassistent-leverkusen'
+import { Route as KiAutomatisierungKleineUnternehmenRouteImport } from './routes/ki-automatisierung-kleine-unternehmen'
 import { Route as ItSupportLeverkusenRouteImport } from './routes/it-support-leverkusen'
 import { Route as ItServiceLeverkusenRouteImport } from './routes/it-service-leverkusen'
 import { Route as ItBetreuungKleineUnternehmenRouteImport } from './routes/it-betreuung-kleine-unternehmen'
 import { Route as ItBeratungLeverkusenRouteImport } from './routes/it-beratung-leverkusen'
 import { Route as ImpressumRouteImport } from './routes/impressum'
 import { Route as DatenschutzRouteImport } from './routes/datenschutz'
+import { Route as ChatbotFuerUnternehmenRouteImport } from './routes/chatbot-fuer-unternehmen'
+import { Route as AppEntwicklungLeverkusenRouteImport } from './routes/app-entwicklung-leverkusen'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ReferenzenWupperstahlRouteImport } from './routes/referenzen_.wupperstahl'
 import { Route as ReferenzenHausverwaltungFrankRouteImport } from './routes/referenzen_.hausverwaltung-frank'
 import { Route as ReferenzenErbrechtLeverkusenRouteImport } from './routes/referenzen_.erbrecht-leverkusen'
+import { Route as ProjekteSlugRouteImport } from './routes/projekte_.$slug'
 
 const WiderrufRoute = WiderrufRouteImport.update({
   id: '/widerruf',
@@ -80,6 +87,12 @@ const UaRoute = UaRouteImport.update({
   path: '/ua',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TelegramBotErstellenLassenRoute =
+  TelegramBotErstellenLassenRouteImport.update({
+    id: '/telegram-bot-erstellen-lassen',
+    path: '/telegram-bot-erstellen-lassen',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const RuRoute = RuRouteImport.update({
   id: '/ru',
   path: '/ru',
@@ -90,6 +103,23 @@ const ReferenzenRoute = ReferenzenRouteImport.update({
   path: '/referenzen',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProjekteRoute = ProjekteRouteImport.update({
+  id: '/projekte',
+  path: '/projekte',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const KiTelefonassistentLeverkusenRoute =
+  KiTelefonassistentLeverkusenRouteImport.update({
+    id: '/ki-telefonassistent-leverkusen',
+    path: '/ki-telefonassistent-leverkusen',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const KiAutomatisierungKleineUnternehmenRoute =
+  KiAutomatisierungKleineUnternehmenRouteImport.update({
+    id: '/ki-automatisierung-kleine-unternehmen',
+    path: '/ki-automatisierung-kleine-unternehmen',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ItSupportLeverkusenRoute = ItSupportLeverkusenRouteImport.update({
   id: '/it-support-leverkusen',
   path: '/it-support-leverkusen',
@@ -121,6 +151,17 @@ const DatenschutzRoute = DatenschutzRouteImport.update({
   path: '/datenschutz',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ChatbotFuerUnternehmenRoute = ChatbotFuerUnternehmenRouteImport.update({
+  id: '/chatbot-fuer-unternehmen',
+  path: '/chatbot-fuer-unternehmen',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppEntwicklungLeverkusenRoute =
+  AppEntwicklungLeverkusenRouteImport.update({
+    id: '/app-entwicklung-leverkusen',
+    path: '/app-entwicklung-leverkusen',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -143,17 +184,28 @@ const ReferenzenErbrechtLeverkusenRoute =
     path: '/referenzen/erbrecht-leverkusen',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ProjekteSlugRoute = ProjekteSlugRouteImport.update({
+  id: '/projekte_/$slug',
+  path: '/projekte/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/app-entwicklung-leverkusen': typeof AppEntwicklungLeverkusenRoute
+  '/chatbot-fuer-unternehmen': typeof ChatbotFuerUnternehmenRoute
   '/datenschutz': typeof DatenschutzRoute
   '/impressum': typeof ImpressumRoute
   '/it-beratung-leverkusen': typeof ItBeratungLeverkusenRoute
   '/it-betreuung-kleine-unternehmen': typeof ItBetreuungKleineUnternehmenRoute
   '/it-service-leverkusen': typeof ItServiceLeverkusenRoute
   '/it-support-leverkusen': typeof ItSupportLeverkusenRoute
+  '/ki-automatisierung-kleine-unternehmen': typeof KiAutomatisierungKleineUnternehmenRoute
+  '/ki-telefonassistent-leverkusen': typeof KiTelefonassistentLeverkusenRoute
+  '/projekte': typeof ProjekteRoute
   '/referenzen': typeof ReferenzenRoute
   '/ru': typeof RuRoute
+  '/telegram-bot-erstellen-lassen': typeof TelegramBotErstellenLassenRoute
   '/ua': typeof UaRoute
   '/uk': typeof UkRoute
   '/wartungsvertrag-it': typeof WartungsvertragItRoute
@@ -163,20 +215,27 @@ export interface FileRoutesByFullPath {
   '/website-fuer-hausverwaltung-leverkusen': typeof WebsiteFuerHausverwaltungLeverkusenRoute
   '/website-wartung-leverkusen': typeof WebsiteWartungLeverkusenRoute
   '/widerruf': typeof WiderrufRoute
+  '/projekte/$slug': typeof ProjekteSlugRoute
   '/referenzen/erbrecht-leverkusen': typeof ReferenzenErbrechtLeverkusenRoute
   '/referenzen/hausverwaltung-frank': typeof ReferenzenHausverwaltungFrankRoute
   '/referenzen/wupperstahl': typeof ReferenzenWupperstahlRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/app-entwicklung-leverkusen': typeof AppEntwicklungLeverkusenRoute
+  '/chatbot-fuer-unternehmen': typeof ChatbotFuerUnternehmenRoute
   '/datenschutz': typeof DatenschutzRoute
   '/impressum': typeof ImpressumRoute
   '/it-beratung-leverkusen': typeof ItBeratungLeverkusenRoute
   '/it-betreuung-kleine-unternehmen': typeof ItBetreuungKleineUnternehmenRoute
   '/it-service-leverkusen': typeof ItServiceLeverkusenRoute
   '/it-support-leverkusen': typeof ItSupportLeverkusenRoute
+  '/ki-automatisierung-kleine-unternehmen': typeof KiAutomatisierungKleineUnternehmenRoute
+  '/ki-telefonassistent-leverkusen': typeof KiTelefonassistentLeverkusenRoute
+  '/projekte': typeof ProjekteRoute
   '/referenzen': typeof ReferenzenRoute
   '/ru': typeof RuRoute
+  '/telegram-bot-erstellen-lassen': typeof TelegramBotErstellenLassenRoute
   '/ua': typeof UaRoute
   '/uk': typeof UkRoute
   '/wartungsvertrag-it': typeof WartungsvertragItRoute
@@ -186,6 +245,7 @@ export interface FileRoutesByTo {
   '/website-fuer-hausverwaltung-leverkusen': typeof WebsiteFuerHausverwaltungLeverkusenRoute
   '/website-wartung-leverkusen': typeof WebsiteWartungLeverkusenRoute
   '/widerruf': typeof WiderrufRoute
+  '/projekte/$slug': typeof ProjekteSlugRoute
   '/referenzen/erbrecht-leverkusen': typeof ReferenzenErbrechtLeverkusenRoute
   '/referenzen/hausverwaltung-frank': typeof ReferenzenHausverwaltungFrankRoute
   '/referenzen/wupperstahl': typeof ReferenzenWupperstahlRoute
@@ -193,14 +253,20 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/app-entwicklung-leverkusen': typeof AppEntwicklungLeverkusenRoute
+  '/chatbot-fuer-unternehmen': typeof ChatbotFuerUnternehmenRoute
   '/datenschutz': typeof DatenschutzRoute
   '/impressum': typeof ImpressumRoute
   '/it-beratung-leverkusen': typeof ItBeratungLeverkusenRoute
   '/it-betreuung-kleine-unternehmen': typeof ItBetreuungKleineUnternehmenRoute
   '/it-service-leverkusen': typeof ItServiceLeverkusenRoute
   '/it-support-leverkusen': typeof ItSupportLeverkusenRoute
+  '/ki-automatisierung-kleine-unternehmen': typeof KiAutomatisierungKleineUnternehmenRoute
+  '/ki-telefonassistent-leverkusen': typeof KiTelefonassistentLeverkusenRoute
+  '/projekte': typeof ProjekteRoute
   '/referenzen': typeof ReferenzenRoute
   '/ru': typeof RuRoute
+  '/telegram-bot-erstellen-lassen': typeof TelegramBotErstellenLassenRoute
   '/ua': typeof UaRoute
   '/uk': typeof UkRoute
   '/wartungsvertrag-it': typeof WartungsvertragItRoute
@@ -210,6 +276,7 @@ export interface FileRoutesById {
   '/website-fuer-hausverwaltung-leverkusen': typeof WebsiteFuerHausverwaltungLeverkusenRoute
   '/website-wartung-leverkusen': typeof WebsiteWartungLeverkusenRoute
   '/widerruf': typeof WiderrufRoute
+  '/projekte_/$slug': typeof ProjekteSlugRoute
   '/referenzen_/erbrecht-leverkusen': typeof ReferenzenErbrechtLeverkusenRoute
   '/referenzen_/hausverwaltung-frank': typeof ReferenzenHausverwaltungFrankRoute
   '/referenzen_/wupperstahl': typeof ReferenzenWupperstahlRoute
@@ -218,14 +285,20 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/app-entwicklung-leverkusen'
+    | '/chatbot-fuer-unternehmen'
     | '/datenschutz'
     | '/impressum'
     | '/it-beratung-leverkusen'
     | '/it-betreuung-kleine-unternehmen'
     | '/it-service-leverkusen'
     | '/it-support-leverkusen'
+    | '/ki-automatisierung-kleine-unternehmen'
+    | '/ki-telefonassistent-leverkusen'
+    | '/projekte'
     | '/referenzen'
     | '/ru'
+    | '/telegram-bot-erstellen-lassen'
     | '/ua'
     | '/uk'
     | '/wartungsvertrag-it'
@@ -235,20 +308,27 @@ export interface FileRouteTypes {
     | '/website-fuer-hausverwaltung-leverkusen'
     | '/website-wartung-leverkusen'
     | '/widerruf'
+    | '/projekte/$slug'
     | '/referenzen/erbrecht-leverkusen'
     | '/referenzen/hausverwaltung-frank'
     | '/referenzen/wupperstahl'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/app-entwicklung-leverkusen'
+    | '/chatbot-fuer-unternehmen'
     | '/datenschutz'
     | '/impressum'
     | '/it-beratung-leverkusen'
     | '/it-betreuung-kleine-unternehmen'
     | '/it-service-leverkusen'
     | '/it-support-leverkusen'
+    | '/ki-automatisierung-kleine-unternehmen'
+    | '/ki-telefonassistent-leverkusen'
+    | '/projekte'
     | '/referenzen'
     | '/ru'
+    | '/telegram-bot-erstellen-lassen'
     | '/ua'
     | '/uk'
     | '/wartungsvertrag-it'
@@ -258,20 +338,27 @@ export interface FileRouteTypes {
     | '/website-fuer-hausverwaltung-leverkusen'
     | '/website-wartung-leverkusen'
     | '/widerruf'
+    | '/projekte/$slug'
     | '/referenzen/erbrecht-leverkusen'
     | '/referenzen/hausverwaltung-frank'
     | '/referenzen/wupperstahl'
   id:
     | '__root__'
     | '/'
+    | '/app-entwicklung-leverkusen'
+    | '/chatbot-fuer-unternehmen'
     | '/datenschutz'
     | '/impressum'
     | '/it-beratung-leverkusen'
     | '/it-betreuung-kleine-unternehmen'
     | '/it-service-leverkusen'
     | '/it-support-leverkusen'
+    | '/ki-automatisierung-kleine-unternehmen'
+    | '/ki-telefonassistent-leverkusen'
+    | '/projekte'
     | '/referenzen'
     | '/ru'
+    | '/telegram-bot-erstellen-lassen'
     | '/ua'
     | '/uk'
     | '/wartungsvertrag-it'
@@ -281,6 +368,7 @@ export interface FileRouteTypes {
     | '/website-fuer-hausverwaltung-leverkusen'
     | '/website-wartung-leverkusen'
     | '/widerruf'
+    | '/projekte_/$slug'
     | '/referenzen_/erbrecht-leverkusen'
     | '/referenzen_/hausverwaltung-frank'
     | '/referenzen_/wupperstahl'
@@ -288,14 +376,20 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AppEntwicklungLeverkusenRoute: typeof AppEntwicklungLeverkusenRoute
+  ChatbotFuerUnternehmenRoute: typeof ChatbotFuerUnternehmenRoute
   DatenschutzRoute: typeof DatenschutzRoute
   ImpressumRoute: typeof ImpressumRoute
   ItBeratungLeverkusenRoute: typeof ItBeratungLeverkusenRoute
   ItBetreuungKleineUnternehmenRoute: typeof ItBetreuungKleineUnternehmenRoute
   ItServiceLeverkusenRoute: typeof ItServiceLeverkusenRoute
   ItSupportLeverkusenRoute: typeof ItSupportLeverkusenRoute
+  KiAutomatisierungKleineUnternehmenRoute: typeof KiAutomatisierungKleineUnternehmenRoute
+  KiTelefonassistentLeverkusenRoute: typeof KiTelefonassistentLeverkusenRoute
+  ProjekteRoute: typeof ProjekteRoute
   ReferenzenRoute: typeof ReferenzenRoute
   RuRoute: typeof RuRoute
+  TelegramBotErstellenLassenRoute: typeof TelegramBotErstellenLassenRoute
   UaRoute: typeof UaRoute
   UkRoute: typeof UkRoute
   WartungsvertragItRoute: typeof WartungsvertragItRoute
@@ -305,6 +399,7 @@ export interface RootRouteChildren {
   WebsiteFuerHausverwaltungLeverkusenRoute: typeof WebsiteFuerHausverwaltungLeverkusenRoute
   WebsiteWartungLeverkusenRoute: typeof WebsiteWartungLeverkusenRoute
   WiderrufRoute: typeof WiderrufRoute
+  ProjekteSlugRoute: typeof ProjekteSlugRoute
   ReferenzenErbrechtLeverkusenRoute: typeof ReferenzenErbrechtLeverkusenRoute
   ReferenzenHausverwaltungFrankRoute: typeof ReferenzenHausverwaltungFrankRoute
   ReferenzenWupperstahlRoute: typeof ReferenzenWupperstahlRoute
@@ -375,6 +470,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UaRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/telegram-bot-erstellen-lassen': {
+      id: '/telegram-bot-erstellen-lassen'
+      path: '/telegram-bot-erstellen-lassen'
+      fullPath: '/telegram-bot-erstellen-lassen'
+      preLoaderRoute: typeof TelegramBotErstellenLassenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/ru': {
       id: '/ru'
       path: '/ru'
@@ -387,6 +489,27 @@ declare module '@tanstack/react-router' {
       path: '/referenzen'
       fullPath: '/referenzen'
       preLoaderRoute: typeof ReferenzenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/projekte': {
+      id: '/projekte'
+      path: '/projekte'
+      fullPath: '/projekte'
+      preLoaderRoute: typeof ProjekteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ki-telefonassistent-leverkusen': {
+      id: '/ki-telefonassistent-leverkusen'
+      path: '/ki-telefonassistent-leverkusen'
+      fullPath: '/ki-telefonassistent-leverkusen'
+      preLoaderRoute: typeof KiTelefonassistentLeverkusenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ki-automatisierung-kleine-unternehmen': {
+      id: '/ki-automatisierung-kleine-unternehmen'
+      path: '/ki-automatisierung-kleine-unternehmen'
+      fullPath: '/ki-automatisierung-kleine-unternehmen'
+      preLoaderRoute: typeof KiAutomatisierungKleineUnternehmenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/it-support-leverkusen': {
@@ -431,6 +554,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DatenschutzRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/chatbot-fuer-unternehmen': {
+      id: '/chatbot-fuer-unternehmen'
+      path: '/chatbot-fuer-unternehmen'
+      fullPath: '/chatbot-fuer-unternehmen'
+      preLoaderRoute: typeof ChatbotFuerUnternehmenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app-entwicklung-leverkusen': {
+      id: '/app-entwicklung-leverkusen'
+      path: '/app-entwicklung-leverkusen'
+      fullPath: '/app-entwicklung-leverkusen'
+      preLoaderRoute: typeof AppEntwicklungLeverkusenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -459,19 +596,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ReferenzenErbrechtLeverkusenRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/projekte_/$slug': {
+      id: '/projekte_/$slug'
+      path: '/projekte/$slug'
+      fullPath: '/projekte/$slug'
+      preLoaderRoute: typeof ProjekteSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AppEntwicklungLeverkusenRoute: AppEntwicklungLeverkusenRoute,
+  ChatbotFuerUnternehmenRoute: ChatbotFuerUnternehmenRoute,
   DatenschutzRoute: DatenschutzRoute,
   ImpressumRoute: ImpressumRoute,
   ItBeratungLeverkusenRoute: ItBeratungLeverkusenRoute,
   ItBetreuungKleineUnternehmenRoute: ItBetreuungKleineUnternehmenRoute,
   ItServiceLeverkusenRoute: ItServiceLeverkusenRoute,
   ItSupportLeverkusenRoute: ItSupportLeverkusenRoute,
+  KiAutomatisierungKleineUnternehmenRoute:
+    KiAutomatisierungKleineUnternehmenRoute,
+  KiTelefonassistentLeverkusenRoute: KiTelefonassistentLeverkusenRoute,
+  ProjekteRoute: ProjekteRoute,
   ReferenzenRoute: ReferenzenRoute,
   RuRoute: RuRoute,
+  TelegramBotErstellenLassenRoute: TelegramBotErstellenLassenRoute,
   UaRoute: UaRoute,
   UkRoute: UkRoute,
   WartungsvertragItRoute: WartungsvertragItRoute,
@@ -483,6 +634,7 @@ const rootRouteChildren: RootRouteChildren = {
     WebsiteFuerHausverwaltungLeverkusenRoute,
   WebsiteWartungLeverkusenRoute: WebsiteWartungLeverkusenRoute,
   WiderrufRoute: WiderrufRoute,
+  ProjekteSlugRoute: ProjekteSlugRoute,
   ReferenzenErbrechtLeverkusenRoute: ReferenzenErbrechtLeverkusenRoute,
   ReferenzenHausverwaltungFrankRoute: ReferenzenHausverwaltungFrankRoute,
   ReferenzenWupperstahlRoute: ReferenzenWupperstahlRoute,

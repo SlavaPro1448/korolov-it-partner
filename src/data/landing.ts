@@ -80,7 +80,7 @@ export const webdesignLeverkusen: LandingContent = {
   price: {
     label: "Website-Erstellung",
     value: "ab 890 €",
-    suffix: "netto, einmalig",
+    suffix: "einmalig",
     note: "1–3 Seiten inklusive Design, Kontaktformular, SSL und Basis-SEO. Größere Projekte mit individueller Struktur ab 1.500 € — Details unter Pakete & Preise.",
   },
   stepsTitle: "So entsteht Ihre Website",
@@ -107,7 +107,7 @@ export const webdesignLeverkusen: LandingContent = {
     {
       question: "Was kostet eine Website in Leverkusen?",
       answer:
-        "Eine kompakte Unternehmenswebsite mit 1–3 Seiten beginnt bei 890 € netto, größere Auftritte mit individueller Seitenstruktur bei 1.500 € netto. Nach dem kostenlosen Erstgespräch erhalten Sie ein verbindliches Festpreis-Angebot.",
+        "Eine kompakte Unternehmenswebsite mit 1–3 Seiten beginnt bei 890 €, größere Auftritte mit individueller Seitenstruktur bei 1.500 €. Nach dem kostenlosen Erstgespräch erhalten Sie ein verbindliches Festpreis-Angebot.",
     },
     {
       question: "Wie lange dauert die Erstellung?",
@@ -127,7 +127,7 @@ export const webdesignLeverkusen: LandingContent = {
     {
       question: "Kann ich die Website später erweitern lassen?",
       answer:
-        "Ja. Neue Seiten, zusätzliche Leistungen oder Änderungen setze ich auch nach dem Launch um — punktuell nach Aufwand oder im Rahmen der monatlichen Betreuung ab 79 €.",
+        "Ja. Neue Seiten, zusätzliche Leistungen oder Änderungen setze ich auch nach dem Launch um — punktuell nach Aufwand oder im Rahmen der monatlichen Website-Wartung ab 40 € im Monat.",
     },
   ],
   ctaTitle: "Website-Projekt in Leverkusen starten?",
@@ -210,7 +210,7 @@ export const itSupportLeverkusen: LandingContent = {
     label: "IT-Support",
     value: "nach Aufwand",
     suffix: "oder monatliche Betreuung ab 79 €",
-    note: "Einzelne Einsätze werden transparent nach Aufwand abgerechnet. Für laufende Betreuung mit Updates, Backups und Prioritäts-Erreichbarkeit gibt es monatliche Pakete ab 79 € netto.",
+    note: "Einzelne Einsätze werden transparent nach Aufwand abgerechnet. Für laufende Betreuung mit Updates, Backups und Prioritäts-Erreichbarkeit gibt es monatliche Pakete ab 79 €.",
   },
   stepsTitle: "So funktioniert die Zusammenarbeit",
   steps: [
@@ -284,7 +284,7 @@ export const websiteWartungLeverkusen: LandingContent = {
   path: "/website-wartung-leverkusen",
   eyebrow: "Website-Wartung & Pflege",
   h1: "Website-Wartung: damit Ihre Seite sicher, aktuell und erreichbar bleibt",
-  lede: "Updates, Backups, technische Prüfung und kleine Änderungen — laufende Betreuung ab 79 € im Monat. Für Unternehmen in Leverkusen, Köln und ganz NRW.",
+  lede: "Updates, Backups, technische Prüfung und kleine Änderungen — laufende Betreuung ab 40 € im Monat. Für Unternehmen in Leverkusen, Köln und ganz NRW.",
   intro: [
     "Eine Website ist kein einmaliges Projekt. Ohne regelmäßige Updates entstehen Sicherheitslücken, Formulare gehen unbemerkt kaputt, Inhalte veralten — und im schlimmsten Fall ist die Seite tagelang offline, ohne dass es jemand merkt.",
     "Mit der laufenden Wartung übernehme ich genau diese Verantwortung: Ihre Website wird regelmäßig geprüft, gesichert und aktualisiert. Kleine Änderungen — neue Öffnungszeiten, ein zusätzliches Teammitglied, aktualisierte Preise — sind schnell umgesetzt, ohne dass Sie einen neuen Dienstleister suchen müssen.",
@@ -333,10 +333,10 @@ export const websiteWartungLeverkusen: LandingContent = {
     },
   ],
   price: {
-    label: "Monatliche Betreuung",
-    value: "ab 79 €",
-    suffix: "netto / Monat",
-    note: "Auch für Websites, die nicht von mir erstellt wurden — nach einer kurzen technischen Bestandsaufnahme. Monatlich, fair und ohne lange Vertragsbindung.",
+    label: "Website-Wartung",
+    value: "ab 40 €",
+    suffix: "/ Monat",
+    note: "Basis 40 €/Monat (Updates, Backups, Formular- und SSL-Prüfung), Comfort 90 €/Monat (zusätzlich kleine Änderungen und schnellere Reaktion). Auch für Websites, die nicht von mir erstellt wurden — monatlich, ohne lange Vertragsbindung.",
   },
   stepsTitle: "So starten wir",
   steps: [
@@ -393,9 +393,9 @@ export const websiteWartungLeverkusen: LandingContent = {
   serviceType: "Website-Wartung",
   formTopic: "Website-Wartung & Pflege",
   seo: {
-    title: "Website-Wartung & Pflege ab 79 €/Monat | Korolov IT-Service Leverkusen",
+    title: "Website-Wartung & Pflege ab 40 €/Monat | Korolov IT-Service Leverkusen",
     description:
-      "Website-Wartung in Leverkusen: Updates, Backups, Monitoring und kleine Änderungen ab 79 €/Monat. Auch für bestehende Websites — mit festem technischen Ansprechpartner.",
+      "Website-Wartung in Leverkusen: Updates, Backups, Monitoring und kleine Änderungen ab 40 €/Monat. Auch für bestehende Websites — mit festem technischen Ansprechpartner.",
     keywords:
       "Website Wartung Leverkusen, Website Pflege, Homepage Wartung, Website Betreuung, Website Updates Backups",
   },
@@ -457,7 +457,7 @@ export const itServiceLeverkusen: LandingContent = {
     label: "Was kostet der IT-Service?",
     value: "Festpreis nach Erstgespräch",
     suffix: "einmalig oder monatlich",
-    note: "Einzelne Einsätze rechne ich transparent nach Aufwand ab, laufende Betreuung gibt es ab 79 € netto im Monat, Websites ab 890 € netto zum Festpreis. Nach dem kostenlosen Erstgespräch erhalten Sie ein klares Angebot ohne versteckte Kosten.",
+    note: "Einzelne Einsätze rechne ich transparent nach Aufwand ab, laufende Betreuung gibt es ab 79 € im Monat, Websites ab 890 € zum Festpreis. Nach dem kostenlosen Erstgespräch erhalten Sie ein klares Angebot ohne versteckte Kosten.",
   },
   stepsTitle: "So starten wir",
   steps: [
@@ -498,7 +498,7 @@ export const itServiceLeverkusen: LandingContent = {
     {
       question: "Was kostet der IT-Service?",
       answer:
-        "Das hängt vom Umfang ab: Einzeleinsätze nach Aufwand, laufende Betreuung ab 79 € netto monatlich, Websites ab 890 € netto einmalig. Im kostenlosen Erstgespräch klären wir den Bedarf — danach erhalten Sie ein Festpreis-Angebot.",
+        "Das hängt vom Umfang ab: Einzeleinsätze nach Aufwand, laufende Betreuung ab 79 € monatlich, Websites ab 890 € einmalig. Im kostenlosen Erstgespräch klären wir den Bedarf — danach erhalten Sie ein Festpreis-Angebot.",
     },
     {
       question: "In welchen Sprachen arbeiten Sie?",
@@ -582,7 +582,7 @@ export const itBetreuungKleineUnternehmen: LandingContent = {
   price: {
     label: "Was kostet die IT-Betreuung?",
     value: "ab 79 €",
-    suffix: "netto pro Monat",
+    suffix: "pro Monat",
     note: "Der Preis richtet sich nach Zahl der Arbeitsplätze und dem vereinbarten Umfang. Nach dem kostenlosen Erstgespräch erhalten Sie ein festes Monatsangebot — ohne Mindestlaufzeit, monatlich kündbar.",
   },
   stepsTitle: "So beginnt die Betreuung",
@@ -835,7 +835,7 @@ export const wartungsvertragIt: LandingContent = {
   price: {
     label: "Was kostet ein IT-Wartungsvertrag?",
     value: "ab 79 €",
-    suffix: "netto pro Monat",
+    suffix: "pro Monat",
     note: "Der Monatspreis richtet sich nach Anzahl der Geräte und dem vereinbarten Umfang — vom Website-und-E-Mail-Paket bis zur kompletten Büro-IT. Nach dem kostenlosen Erstgespräch erhalten Sie ein schriftliches Festpreis-Angebot.",
   },
   stepsTitle: "So kommt der Vertrag zustande",
@@ -961,7 +961,7 @@ export const websiteFuerHandwerker: LandingContent = {
   price: {
     label: "Website-Erstellung",
     value: "ab 890 €",
-    suffix: "netto, einmalig",
+    suffix: "einmalig",
     note: "1–3 Seiten inklusive Design, Anruf-Button, Kontaktformular, SSL und Basis-SEO. Umfangreichere Auftritte mit eigener Galerie und mehreren Gewerkeseiten ab 1.500 €.",
   },
   stepsTitle: "So läuft es ab",
@@ -998,7 +998,7 @@ export const websiteFuerHandwerker: LandingContent = {
     {
       question: "Kann ich Referenzfotos später selbst hochladen?",
       answer:
-        "Ja. Die Galerie wird so eingerichtet, dass Sie neue Bilder ohne technische Kenntnisse ergänzen können. Wenn Sie das lieber abgeben, übernehme ich es im Rahmen der Wartung ab 79 € monatlich.",
+        "Ja. Die Galerie wird so eingerichtet, dass Sie neue Bilder ohne technische Kenntnisse ergänzen können. Wenn Sie das lieber abgeben, übernehme ich es im Rahmen der Wartung ab 40 € monatlich.",
     },
     {
       question: "Was ist mit Notdienst-Anfragen am Wochenende?",
@@ -1008,7 +1008,7 @@ export const websiteFuerHandwerker: LandingContent = {
     {
       question: "Was kostet die Website im laufenden Betrieb?",
       answer:
-        "Für Domain und Hosting fallen geringe laufende Kosten an, die ich Ihnen vorab transparent nenne. Pflege und Updates sind optional ab 79 € monatlich — es gibt keine versteckte Pflichtgebühr.",
+        "Für Domain und Hosting fallen geringe laufende Kosten an, die ich Ihnen vorab transparent nenne. Pflege und Updates sind optional ab 40 € monatlich — es gibt keine versteckte Pflichtgebühr.",
     },
   ],
   ctaTitle: "Website für Ihren Betrieb in Leverkusen?",
@@ -1087,7 +1087,7 @@ export const websiteFuerHausverwaltung: LandingContent = {
   price: {
     label: "Website-Erstellung",
     value: "ab 890 €",
-    suffix: "netto, einmalig",
+    suffix: "einmalig",
     note: "Kompakter Auftritt mit Leistungen, Kontakt und Schadensmeldung. Umfangreichere Strukturen mit Downloadbereich und mehreren Zielgruppenpfaden ab 1.500 €.",
   },
   stepsTitle: "So entsteht Ihr Auftritt",
@@ -1129,7 +1129,7 @@ export const websiteFuerHausverwaltung: LandingContent = {
     {
       question: "Können wir Objekte oder Dokumente selbst ergänzen?",
       answer:
-        "Ja, der Downloadbereich ist so aufgebaut, dass Sie Dokumente ohne technische Kenntnisse austauschen können. Alternativ übernehme ich Aktualisierungen im Rahmen der Wartung ab 79 € monatlich.",
+        "Ja, der Downloadbereich ist so aufgebaut, dass Sie Dokumente ohne technische Kenntnisse austauschen können. Alternativ übernehme ich Aktualisierungen im Rahmen der Wartung ab 40 € monatlich.",
     },
     {
       question: "Haben Sie damit schon gearbeitet?",
@@ -1213,7 +1213,7 @@ export const websiteFuerAnwaltskanzlei: LandingContent = {
   price: {
     label: "Website-Erstellung",
     value: "ab 890 €",
-    suffix: "netto, einmalig",
+    suffix: "einmalig",
     note: "Kompakter Kanzleiauftritt mit Rechtsgebieten, Profil und Terminanfrage. Umfangreichere Auftritte mit eigener Seite je Rechtsgebiet und mehreren Berufsträgern ab 1.500 €.",
   },
   stepsTitle: "So entsteht Ihr Kanzleiauftritt",

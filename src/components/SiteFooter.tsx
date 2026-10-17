@@ -40,34 +40,69 @@ const aria = {
   },
 } satisfies Record<Locale, Record<string, string>>;
 
-const serviceLinks: Array<{ label: string; to: string }> = [
-  { label: "IT-Service Leverkusen", to: "/it-service-leverkusen" },
-  { label: "IT-Betreuung für kleine Unternehmen", to: "/it-betreuung-kleine-unternehmen" },
-  { label: "IT-Support Leverkusen", to: "/it-support-leverkusen" },
-  { label: "IT-Beratung Leverkusen", to: "/it-beratung-leverkusen" },
-  { label: "IT-Wartungsvertrag", to: "/wartungsvertrag-it" },
+const webLinks: Array<{ label: string; to: string }> = [
   { label: "Webdesign Leverkusen", to: "/webdesign-leverkusen" },
   { label: "Website-Wartung & Pflege", to: "/website-wartung-leverkusen" },
+  { label: "IT-Service Leverkusen", to: "/it-service-leverkusen" },
+  { label: "IT-Support Leverkusen", to: "/it-support-leverkusen" },
+  { label: "IT-Betreuung für kleine Unternehmen", to: "/it-betreuung-kleine-unternehmen" },
+  { label: "IT-Beratung Leverkusen", to: "/it-beratung-leverkusen" },
+  { label: "IT-Wartungsvertrag", to: "/wartungsvertrag-it" },
+  { label: "Website für Handwerker", to: "/website-fuer-handwerker-leverkusen" },
+  { label: "Website für Hausverwaltungen", to: "/website-fuer-hausverwaltung-leverkusen" },
+  { label: "Website für Kanzleien", to: "/website-fuer-anwaltskanzlei-leverkusen" },
+];
+
+const kiLinks: Array<{ label: string; to: string }> = [
+  { label: "KI-Telefonassistent", to: "/ki-telefonassistent-leverkusen" },
+  { label: "KI-Automatisierung", to: "/ki-automatisierung-kleine-unternehmen" },
+  { label: "KI-Chatbot für Unternehmen", to: "/chatbot-fuer-unternehmen" },
+  { label: "Telegram-Bot erstellen lassen", to: "/telegram-bot-erstellen-lassen" },
+  { label: "App-Entwicklung Leverkusen", to: "/app-entwicklung-leverkusen" },
+  { label: "Projekte", to: "/projekte" },
   { label: "Referenzen", to: "/referenzen" },
 ];
 
-const servicesHeadingByLocale: Record<Locale, string> = {
-  de: "Leistungen",
-  ru: "Услуги (DE)",
-  uk: "Послуги (DE)",
+const webHeadingByLocale: Record<Locale, string> = {
+  de: "Websites & IT",
+  ru: "Сайты и IT (DE)",
+  uk: "Сайти та IT (DE)",
 };
+
+const kiHeadingByLocale: Record<Locale, string> = {
+  de: "KI & Apps",
+  ru: "ИИ и приложения (DE)",
+  uk: "ШІ та застосунки (DE)",
+};
+
+function LinkList({ links }: { links: Array<{ label: string; to: string }> }) {
+  return (
+    <ul className="space-y-2 text-sm text-white/75">
+      {links.map((s) => (
+        <li key={s.to}>
+          <Link
+            to={s.to}
+            className="hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-blue rounded-sm"
+          >
+            {s.label}
+          </Link>
+        </li>
+      ))}
+    </ul>
+  );
+}
 
 export function SiteFooter({ locale = "de" }: { locale?: Locale }) {
   const year = new Date().getFullYear();
   const t = aria[locale];
 
   return (
-    <footer className="bg-brand text-brand-foreground mt-24" aria-label={t.landmark}>
-      <div className="container-page py-14 grid gap-10 md:grid-cols-4">
-        <div className="md:col-span-2">
+    <footer className="section-dark text-white" aria-label={t.landmark}>
+      <div className="container-page py-16 grid gap-10 md:grid-cols-2 lg:grid-cols-4">
+        <div>
           <div className="flex items-center gap-2">
             <div
-              className="h-9 w-9 rounded-lg bg-white/10 flex items-center justify-center font-bold"
+              className="h-9 w-9 rounded-xl bg-ai-gradient flex items-center justify-center font-bold"
               aria-hidden="true"
             >
               K
@@ -79,15 +114,13 @@ export function SiteFooter({ locale = "de" }: { locale?: Locale }) {
           </div>
           <p className="mt-4 text-sm text-white/85 max-w-md">
             {locale === "de"
-              ? "Websites, IT-Support und digitale Lösungen für kleine Unternehmen."
+              ? "Websites, IT-Support, KI-Assistenten, Bots und Apps für kleine Unternehmen – aus Leverkusen."
               : locale === "ru"
-                ? "Сайты, IT-поддержка и цифровые решения для малого бизнеса."
-                : "Сайти, IT-підтримка та цифрові рішення для малого бізнесу."}
+                ? "Сайты, IT-поддержка, ИИ-ассистенты, боты и приложения для малого бизнеса — из Леверкузена."
+                : "Сайти, IT-підтримка, ШІ-асистенти, боти й застосунки для малого бізнесу — з Леверкузена."}
           </p>
-        </div>
 
-        <div>
-          <h2 className="text-sm font-semibold mb-3">{t.contactHeading}</h2>
+          <h2 className="text-sm font-semibold mb-3 mt-8">{t.contactHeading}</h2>
           <ul className="space-y-2 text-sm text-white/85">
             <li className="flex items-center gap-2">
               <Mail className="h-4 w-4" aria-hidden="true" />
@@ -135,19 +168,13 @@ export function SiteFooter({ locale = "de" }: { locale?: Locale }) {
         </div>
 
         <div>
-          <h2 className="text-sm font-semibold mb-3">{servicesHeadingByLocale[locale]}</h2>
-          <ul className="space-y-2 text-sm text-white/85">
-            {serviceLinks.map((s) => (
-              <li key={s.to}>
-                <Link
-                  to={s.to}
-                  className="hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-blue rounded-sm"
-                >
-                  {s.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
+          <h2 className="text-sm font-semibold mb-3">{webHeadingByLocale[locale]}</h2>
+          <LinkList links={webLinks} />
+        </div>
+
+        <div>
+          <h2 className="text-sm font-semibold mb-3">{kiHeadingByLocale[locale]}</h2>
+          <LinkList links={kiLinks} />
 
           <h2 className="text-sm font-semibold mb-3 mt-8">{t.legalHeading}</h2>
           <ul className="space-y-2 text-sm text-white/85">

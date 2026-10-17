@@ -40,6 +40,19 @@ const ROUTES = [
   "/referenzen/wupperstahl",
   "/referenzen/erbrecht-leverkusen",
   "/referenzen/hausverwaltung-frank",
+  "/ki-telefonassistent-leverkusen",
+  "/ki-automatisierung-kleine-unternehmen",
+  "/app-entwicklung-leverkusen",
+  "/telegram-bot-erstellen-lassen",
+  "/chatbot-fuer-unternehmen",
+  "/projekte",
+  "/projekte/jarvis",
+  "/projekte/ki-dolmetscher",
+  "/projekte/live-uebersetzer",
+  "/projekte/ki-telefonassistent",
+  "/projekte/grosch",
+  "/projekte/website-check",
+  "/projekte/anfrage-bot",
 ];
 
 const MIME = {

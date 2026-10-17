@@ -12,25 +12,37 @@ export type AboutDict = {
   cardContactNote: string;
 };
 
-export type ProblemDict = {
-  headingPrefix: string;
-  headingHighlight: string;
-  headingSuffix: string;
-  description: string;
-  items: { title: string; text: string }[];
-};
-
 export type SectionListItem = {
   title: string;
   text: string;
   tags?: string[];
 };
 
+export type ServiceItem = SectionListItem & { to?: string };
+
 export type ServicesDict = {
   eyebrow: string;
   title: string;
   subtitle: string;
-  items: SectionListItem[];
+  moreLabel: string;
+  groups: Array<{ label: string; description: string; items: ServiceItem[] }>;
+};
+
+export type StatsDict = {
+  items: Array<{ value: string; label: string }>;
+};
+
+export type KiDict = {
+  eyebrow: string;
+  titleLead: string;
+  titleAccent: string;
+  subtitle: string;
+  principles: Array<{ title: string; text: string }>;
+  detailsLabel: string;
+  allProjects: string;
+  ctaTitle: string;
+  ctaText: string;
+  ctaButton: string;
 };
 
 export type ForWhomDict = {
@@ -68,19 +80,18 @@ export type ProcessDict = {
 
 export type HeroDict = {
   badge: string;
-  heading: string;
+  headingLead: string;
+  headingAccent: string;
+  headingTail: string;
   description: string;
   ctaPrimary: string;
   ctaSecondary: string;
   highlights: string[];
-  card: {
-    site: { label: string; value: string };
-    mail: { label: string; value: string };
-    security: { label: string; value: string };
-    support: { label: string; value: string };
-    consultLabel: string;
-    consultText: string;
-    consultLanguages: { de: string; ru: string; uk: string };
+  floating: {
+    request: string;
+    requestSub: string;
+    invoice: string;
+    invoiceSub: string;
   };
 };
 
@@ -97,6 +108,8 @@ export type ContactTopic =
   | "email-domain"
   | "it-support"
   | "digital-setup"
+  | "ki"
+  | "app"
   | "sonstiges";
 
 export type ContactDict = {
@@ -154,9 +167,10 @@ export type ContactDict = {
 
 export type Dict = {
   hero: HeroDict;
+  stats: StatsDict;
   about: AboutDict;
-  problem: ProblemDict;
   services: ServicesDict;
+  ki: KiDict;
   forWhom: ForWhomDict;
   pricing: PricingDict;
   process: ProcessDict;

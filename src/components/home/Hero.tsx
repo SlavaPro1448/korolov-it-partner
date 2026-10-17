@@ -1,107 +1,37 @@
-import {
-  ArrowRight,
-  CheckCircle2,
-  Globe,
-  Languages,
-  LifeBuoy,
-  Mail,
-  ShieldCheck,
-  Sparkles,
-} from "lucide-react";
-import { Fragment, type ReactNode } from "react";
+import { ArrowRight, CheckCircle2, FileText, Inbox, Sparkles } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 
 import { Button } from "@/components/ui/button";
+import { CallScreen } from "@/components/visuals/ProjectVisual";
 import { getDict, type Locale } from "@/i18n";
 
-function MiniRow({
+function FloatingCard({
   icon,
-  label,
-  value,
+  title,
+  sub,
+  className,
   tone,
 }: {
-  icon: ReactNode;
-  label: string;
-  value: string;
-  tone: "blue" | "teal";
+  icon: React.ReactNode;
+  title: string;
+  sub: string;
+  className: string;
+  tone: "blue" | "violet";
 }) {
   return (
-    <div className="flex items-center justify-between rounded-lg border border-border px-3.5 py-2.5">
-      <div className="flex items-center gap-2.5 text-sm text-foreground/80">
-        <span className={tone === "blue" ? "text-accent-blue" : "text-accent-teal"}>{icon}</span>
-        {label}
+    <div
+      className={`absolute z-10 flex w-[230px] items-start gap-3 rounded-2xl border border-white/70 bg-white/90 p-3.5 shadow-[0_20px_40px_-18px_rgb(15_39_66/0.35)] backdrop-blur ${className}`}
+    >
+      <div
+        className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-white ${
+          tone === "blue" ? "bg-accent-blue" : "bg-accent-violet"
+        }`}
+      >
+        {icon}
       </div>
-      <span className="text-xs font-medium text-foreground/70">{value}</span>
-    </div>
-  );
-}
-
-function ConsultText({
-  template,
-  langs,
-}: {
-  template: string;
-  langs: { de: string; ru: string; uk: string };
-}) {
-  const parts = template.split(/(\{de\}|\{ru\}|\{uk\})/g);
-  return (
-    <>
-      {parts.map((part, i) => {
-        if (part === "{de}") return <span key={i} className="font-medium">{langs.de}</span>;
-        if (part === "{ru}") return <span key={i} className="font-medium">{langs.ru}</span>;
-        if (part === "{uk}") return <span key={i} className="font-medium">{langs.uk}</span>;
-        return <Fragment key={i}>{part}</Fragment>;
-      })}
-    </>
-  );
-}
-
-function HeroCard({ card }: { card: ReturnType<typeof getDict>["hero"]["card"] }) {
-  return (
-    <div className="relative" aria-hidden="true">
-      <div className="absolute -inset-4 bg-gradient-to-tr from-accent-blue/10 to-transparent rounded-3xl blur-2xl" />
-      <div className="relative card-soft p-6 md:p-7">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="h-2.5 w-2.5 rounded-full bg-red-400" />
-            <div className="h-2.5 w-2.5 rounded-full bg-yellow-400" />
-            <div className="h-2.5 w-2.5 rounded-full bg-green-400" />
-          </div>
-          <div className="text-xs text-muted-foreground">korolov-it-service.de</div>
-        </div>
-        <div className="mt-5 space-y-3">
-          <MiniRow
-            icon={<Globe className="h-4 w-4" />}
-            label={card.site.label}
-            value={card.site.value}
-            tone="teal"
-          />
-          <MiniRow
-            icon={<Mail className="h-4 w-4" />}
-            label={card.mail.label}
-            value={card.mail.value}
-            tone="blue"
-          />
-          <MiniRow
-            icon={<ShieldCheck className="h-4 w-4" />}
-            label={card.security.label}
-            value={card.security.value}
-            tone="teal"
-          />
-          <MiniRow
-            icon={<LifeBuoy className="h-4 w-4" />}
-            label={card.support.label}
-            value={card.support.value}
-            tone="blue"
-          />
-        </div>
-        <div className="mt-6 p-4 rounded-xl bg-section">
-          <div className="flex items-center gap-2 text-xs uppercase tracking-wider text-muted-foreground">
-            <Languages className="h-3.5 w-3.5" /> {card.consultLabel}
-          </div>
-          <div className="mt-1 text-sm text-foreground">
-            <ConsultText template={card.consultText} langs={card.consultLanguages} />
-          </div>
-        </div>
+      <div className="min-w-0">
+        <div className="text-[13px] font-semibold leading-snug text-brand">{title}</div>
+        <div className="mt-0.5 text-[11.5px] leading-snug text-muted-foreground">{sub}</div>
       </div>
     </div>
   );
@@ -110,42 +40,48 @@ function HeroCard({ card }: { card: ReturnType<typeof getDict>["hero"]["card"] }
 export function Hero({ locale }: { locale: Locale }) {
   const t = getDict(locale).hero;
   return (
-    <section className="hero-grid-bg relative overflow-hidden" aria-labelledby="hero-heading">
-      <div className="container-page py-20 md:py-28 lg:py-32 grid lg:grid-cols-12 gap-12 items-center">
-        <div className="lg:col-span-7 fade-in-up">
-          <div className="inline-flex items-center gap-2 rounded-full border border-border bg-white/70 backdrop-blur px-3 py-1 text-xs text-muted-foreground">
-            <Sparkles className="h-3.5 w-3.5 text-accent-blue" aria-hidden="true" />
+    <section className="hero-mesh relative overflow-hidden" aria-labelledby="hero-heading">
+      <div className="container-page grid items-center gap-14 py-16 md:py-24 lg:grid-cols-12 lg:py-28">
+        <div className="fade-in-up lg:col-span-7">
+          <div className="eyebrow-pill">
+            <Sparkles className="h-3.5 w-3.5 text-accent-violet" aria-hidden="true" />
             {t.badge}
           </div>
           <h1
             id="hero-heading"
-            className="mt-6 text-4xl md:text-5xl lg:text-6xl font-bold text-brand leading-[1.05] hyphens-none text-balance [overflow-wrap:anywhere]"
+            className="display mt-6 text-[2.6rem] text-brand text-balance sm:text-5xl lg:text-[4.1rem] [overflow-wrap:anywhere]"
           >
-            {t.heading}
+            {t.headingLead} <span className="text-gradient-ai">{t.headingAccent}</span>{" "}
+            {t.headingTail}
           </h1>
-          <p className="mt-6 text-lg text-muted-foreground max-w-2xl leading-relaxed hyphens-auto [overflow-wrap:anywhere]">
+          <p className="mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground md:text-xl">
             {t.description}
           </p>
-          <div className="mt-8 flex flex-col sm:flex-row gap-3">
+          <div className="mt-9 flex flex-col gap-3 sm:flex-row">
             <Button
               asChild
               variant="brand"
               size="lg"
-              className="w-full sm:w-auto h-14 px-8 text-base bg-accent-blue hover:bg-accent-blue/90 shadow-lg shadow-accent-blue/30"
+              className="h-14 w-full px-8 text-base sm:w-auto"
             >
               <a href="#kontakt">
                 {t.ctaPrimary} <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </a>
             </Button>
-            <Button asChild variant="ghost" size="default" className="w-full sm:w-auto">
-              <a href="#leistungen">{t.ctaSecondary}</a>
+            <Button
+              asChild
+              variant="outline"
+              size="lg"
+              className="h-14 w-full border-brand/15 bg-white/70 px-7 text-base text-brand backdrop-blur sm:w-auto"
+            >
+              <Link to="/projekte">{t.ctaSecondary}</Link>
             </Button>
           </div>
-          <ul className="mt-10 grid sm:grid-cols-3 gap-4 max-w-2xl">
+          <ul className="mt-10 flex flex-wrap gap-x-6 gap-y-3">
             {t.highlights.map((h) => (
-              <li key={h} className="flex items-start gap-2 text-sm text-foreground/80">
+              <li key={h} className="flex items-center gap-2 text-sm text-foreground/80">
                 <CheckCircle2
-                  className="h-5 w-5 text-accent-teal shrink-0 mt-0.5"
+                  className="h-4.5 w-4.5 shrink-0 text-accent-teal"
                   aria-hidden="true"
                 />
                 {h}
@@ -153,8 +89,26 @@ export function Hero({ locale }: { locale: Locale }) {
             ))}
           </ul>
         </div>
-        <div className="lg:col-span-5 fade-in-up">
-          <HeroCard card={t.card} />
+
+        <div className="relative hidden justify-center sm:flex lg:col-span-5" aria-hidden="true">
+          <div className="absolute inset-x-6 top-10 bottom-6 rounded-[3rem] bg-ai-gradient opacity-20 blur-3xl" />
+          <div className="relative py-6">
+            <CallScreen />
+            <FloatingCard
+              tone="blue"
+              icon={<Inbox className="h-4 w-4" />}
+              title={t.floating.request}
+              sub={t.floating.requestSub}
+              className="float-slow -left-28 top-16 hidden md:flex"
+            />
+            <FloatingCard
+              tone="violet"
+              icon={<FileText className="h-4 w-4" />}
+              title={t.floating.invoice}
+              sub={t.floating.invoiceSub}
+              className="float-slower -right-24 bottom-20 hidden md:flex"
+            />
+          </div>
         </div>
       </div>
     </section>

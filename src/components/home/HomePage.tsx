@@ -16,11 +16,12 @@ import { Contact } from "./Contact";
 import { FAQ } from "./FAQ";
 import { ForWhom } from "./ForWhom";
 import { Hero } from "./Hero";
+import { KiShowcase } from "@/components/sections/KiShowcase";
+
 import { Pricing } from "./Pricing";
-import { Problem } from "./Problem";
 import { Process } from "./Process";
-import { ServiceLinks } from "./ServiceLinks";
 import { Services } from "./Services";
+import { Stats } from "./Stats";
 
 const SITE_URL = "https://korolov-it-service.de";
 
@@ -48,19 +49,17 @@ export function HomePage({ locale }: { locale: Locale }) {
       <JsonLd data={organizationSchema(locale)} />
       <JsonLd data={webSiteSchema(locale)} />
       <JsonLd data={faqPageSchema(faqItems)} />
-      <JsonLd
-        data={breadcrumbSchema([{ name: BREADCRUMB_NAME[locale], item: breadcrumbUrl }])}
-      />
+      <JsonLd data={breadcrumbSchema([{ name: BREADCRUMB_NAME[locale], item: breadcrumbUrl }])} />
       <SiteHeader locale={locale} basePath={basePath || undefined} />
       <main id="main" tabIndex={-1} className="flex-1 focus:outline-none">
         <Hero locale={locale} />
-        <Problem locale={locale} />
+        <Stats locale={locale} />
         <Services locale={locale} />
-        <ServiceLinks locale={locale} />
+        <KiShowcase locale={locale} />
+        <ReferencesSection locale={locale} />
         <ForWhom locale={locale} />
         <Pricing locale={locale} />
         <Process locale={locale} />
-        <ReferencesSection locale={locale} />
         <About locale={locale} />
         <FAQ locale={locale} />
         <Contact locale={locale} />

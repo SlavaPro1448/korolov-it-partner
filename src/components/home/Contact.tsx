@@ -23,6 +23,8 @@ const PHONE_CHARS_RE = /^[\d\s+\-()]*$/;
 
 const TOPIC_ORDER: ContactTopic[] = [
   "website",
+  "ki",
+  "app",
   "wartung",
   "email-domain",
   "it-support",
@@ -448,7 +450,11 @@ export function Contact({ locale }: { locale: Locale }) {
                   </SelectContent>
                 </Select>
                 {errors.topic && (
-                  <p id="contact-topic-error" role="alert" className="text-destructive text-xs mt-1">
+                  <p
+                    id="contact-topic-error"
+                    role="alert"
+                    className="text-destructive text-xs mt-1"
+                  >
                     {errors.topic}
                   </p>
                 )}

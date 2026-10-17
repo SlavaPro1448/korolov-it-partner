@@ -31,8 +31,8 @@ const copy: Record<
 > = {
   de: {
     eyebrow: "Referenzen",
-    title: "Ausgewählte Projekte",
-    subtitle: "Beispiele aus der bisherigen Zusammenarbeit.",
+    title: "Websites & IT für Kunden",
+    subtitle: "Projekte aus der Zusammenarbeit mit Unternehmen in Leverkusen und Umgebung.",
     openProject: "Projekt ansehen",
     moreOnRequest: "Weitere Projekte auf Anfrage",
     testimonialsTitle: "Kundenstimmen",
@@ -41,8 +41,8 @@ const copy: Record<
   },
   ru: {
     eyebrow: "Референсы",
-    title: "Избранные проекты",
-    subtitle: "Примеры из предыдущих сотрудничеств.",
+    title: "Сайты и IT для клиентов",
+    subtitle: "Проекты для компаний из Леверкузена и окрестностей.",
     openProject: "Открыть проект",
     moreOnRequest: "Другие проекты — по запросу",
     testimonialsTitle: "Отзывы клиентов",
@@ -51,8 +51,8 @@ const copy: Record<
   },
   uk: {
     eyebrow: "Референси",
-    title: "Вибрані проєкти",
-    subtitle: "Приклади з попередньої співпраці.",
+    title: "Сайти та IT для клієнтів",
+    subtitle: "Проєкти для компаній із Леверкузена та околиць.",
     openProject: "Переглянути проєкт",
     moreOnRequest: "Інші проєкти — за запитом",
     testimonialsTitle: "Відгуки клієнтів",
@@ -73,7 +73,7 @@ function CaseCard({ item, locale, openLabel }: CaseCardProps) {
   const isLogo = item.thumbnailStyle === "logo";
 
   return (
-    <article className="card-soft p-7 flex flex-col">
+    <article className="card-bento is-interactive p-7 flex flex-col">
       <div
         className={cn(
           "relative w-full overflow-hidden rounded-xl border border-border/60 bg-section",
@@ -182,7 +182,7 @@ function TestimonialsCarousel({ locale }: { locale: Locale }) {
         <CarouselContent>
           {testimonials.map((item) => (
             <CarouselItem key={`testimonial-${item.id}`}>
-              <figure className="card-soft p-6 md:p-7">
+              <figure className="card-bento p-6 md:p-7">
                 <div className="flex items-center gap-2">
                   <Quote className="h-5 w-5 text-accent-blue" aria-hidden="true" />
                   <div
@@ -242,7 +242,7 @@ export function ReferencesSection({ locale }: { locale: Locale }) {
   return (
     <section
       id="referenzen"
-      className="py-20 md:py-28 bg-section scroll-mt-20"
+      className="py-20 md:py-28 scroll-mt-20"
       aria-labelledby="references-heading"
     >
       <div className="container-page">

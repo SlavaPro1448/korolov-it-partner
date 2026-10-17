@@ -19,7 +19,7 @@ export function ForWhom({ locale }: { locale: Locale }) {
   return (
     <section
       id="fuer-wen"
-      className="py-20 md:py-28 scroll-mt-20"
+      className="py-20 md:py-28 bg-section scroll-mt-20"
       aria-labelledby="forwhom-heading"
     >
       <div className="container-page">
@@ -33,7 +33,7 @@ export function ForWhom({ locale }: { locale: Locale }) {
           {t.items.map((a, i) => {
             const Icon = ICONS[i];
             return (
-              <div key={a.title} className="card-soft p-6">
+              <div key={a.title} className="card-bento p-6">
                 <div
                   className="h-10 w-10 rounded-lg bg-section text-accent-teal flex items-center justify-center"
                   aria-hidden="true"
