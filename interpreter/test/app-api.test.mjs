@@ -611,3 +611,28 @@ test("history: recorded translation time decides OpenAI cost, plain stream calls
   assert.equal(partly.translated, true);
   assert.equal(partly.openaiPrice, 0.068, "one translated minute");
 });
+
+test("notice for the callee is never cut by a translation; mode switches mid-call without a new notice", async (t) => {
+  const app = await start(config, { assist: fakeAssist });
+  t.after(() => app.close());
+  const { owner, peer } = await connectedCall(app);
+  t.after(() => { owner.close(); peer.close(); });
+  await wait(20);
+  // Notice startet bei der Annahme; der Inhaber sagt sofort etwas -> Übersetzung kommt dazu
+  const clearsBefore = peer.received.filter((m) => m.event === "clear").length;
+  const fromOwner = app.translators.find((tr) => tr.label.endsWith(":owner"));
+  const translation = Buffer.alloc(160, 0x01).toString("base64");
+  fromOwner.onAudio(translation);
+  await wait(20);
+  assert.equal(peer.received.filter((m) => m.event === "clear").length, clearsBefore, "notice keeps playing");
+  const order = peer.received.filter((m) => m.event === "media").map((m) => m.media.payload);
+  assert.ok(order.indexOf(translation) > order.indexOf(CLIPS.peerNotice), "translation queued after the notice");
+
+  const before = app.translators.length;
+  const sw = await api(app, "/api/translate", { on: true, mode: "seq" });
+  assert.equal((await sw.json()).changed, true);
+  assert.equal(app.translators.length, before + 2);
+  assert.equal(app.translators.at(-1).mode, "seq");
+  const notices = peer.received.filter((m) => m.media?.payload === CLIPS.peerNotice).length;
+  assert.equal(notices, 1, "no second notice when only the mode changes");
+});

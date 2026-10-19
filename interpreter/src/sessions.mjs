@@ -16,7 +16,9 @@ const ECHO_TAIL_MS = 600;
 // Das Original der Gegenseite läuft leise mit (Klingeln, Ansagen, Stimme), solange gerade keine
 // Übersetzung und kein Hinweis abgespielt wird. Twilio spielt gesendetes Audio nacheinander ab,
 // deshalb wird die Warteschlange vor einer Übersetzung geleert ("clear").
-const PASSTHROUGH_GAIN = 0.5;
+// Leiser bei "По фразам": dort kommt die Übersetzung erst nach der Äußerung, ein lautes Original
+// darunter verwirrt. Im Synchronmodus etwas lauter (Klingeln, Sprachmenüs bleiben hörbar).
+const PASSTHROUGH_GAIN = { live: 0.35, seq: 0.15, direct: 0.35 };
 const RINGBACK = ringbackTone();
 const CONNECTED = connectedTone();
 const RINGBACK_INTERVAL_MS = 5000;
@@ -46,7 +48,9 @@ const TRANSLATION_HOLD_MS = 400;
 // Dazwischenreden: spricht der Hörer deutlich, während ihm eine Übersetzung vorgespielt wird,
 // bricht die Wiedergabe ab und seine Rede geht normal weiter. Hohe Schwelle gegen Echo.
 const BARGE_IN_RMS = 1500;
-const BARGE_IN_FRAMES = 5; // ~100 ms bei 20-ms-Paketen
+// Erst eine echte Äußerung bricht ab, kein kurzes "ja"/"ага": laute Pakete zählen +1, leise −0,5;
+// bei 30 (≈ 0,6 s Sprache netto) wird die Wiedergabe gestoppt
+const BARGE_IN_FRAMES = 30;
 
 export class SessionStore {
   constructor({
@@ -180,7 +184,8 @@ export class SessionStore {
     if (!session.translators) return;
     let hearing = now < session.translationUntil[role] + ECHO_TAIL_MS;
     if (hearing && now < session.translationUntil[role]) {
-      session.bargeFrames[role] = rms(payload) > BARGE_IN_RMS ? session.bargeFrames[role] + 1 : 0;
+      session.bargeFrames[role] =
+        rms(payload) > BARGE_IN_RMS ? session.bargeFrames[role] + 1 : Math.max(0, session.bargeFrames[role] - 0.5);
       if (session.bargeFrames[role] >= BARGE_IN_FRAMES) {
         this.stopPlayback(session, role);
         hearing = false;
@@ -203,7 +208,7 @@ export class SessionStore {
       session.legs[listener]?.send(payload);
       stats.passed += 1;
     } else if (!hearing && now >= session.playingUntil[listener]) {
-      session.legs[listener]?.send(attenuateMulaw(payload, PASSTHROUGH_GAIN));
+      session.legs[listener]?.send(attenuateMulaw(payload, PASSTHROUGH_GAIN[session.mode] ?? 0.35));
       stats.passed += 1;
     }
   }
@@ -213,7 +218,9 @@ export class SessionStore {
     const now = Date.now();
     const cuePlaying =
       now < session.playingUntil[listener] && now >= session.translationUntil[listener];
-    if (now >= session.playingUntil[listener] || (isTranslation && cuePlaying)) {
+    // Die KI-Ansage an die Gegenseite wird nie von einer Übersetzung abgeschnitten – die kommt danach
+    const noticePlaying = listener === "peer" && now < (session.noticeUntil ?? 0);
+    if (now >= session.playingUntil[listener] || (isTranslation && cuePlaying && !noticePlaying)) {
       session.legs[listener]?.clear?.();
       session.playingUntil[listener] = now;
     }
@@ -292,8 +299,20 @@ export class SessionStore {
   setTranslation(session, on, mode = "live") {
     if (!session.paired || session.waiting) return false;
     if (on) {
-      if (session.mode !== "off") return false;
-      session.mode = mode === "seq" ? "seq" : "live";
+      const wanted = mode === "seq" ? "seq" : "live";
+      if (session.mode !== "off") {
+        // Schon übersetzt: nur zwischen Синхронно und По фразам wechseln, ohne erneute Ansage
+        if (session.mode === wanted) return false;
+        this.#stopTranslators(session);
+        session.mode = wanted;
+        this.stopPlayback(session, "owner");
+        this.#startTranslators(session);
+        this.onCue(session, "translator", { on: true, mode: session.mode });
+        this.#play(session, "owner", wanted === "seq" ? "modeSeq" : "modeLive");
+        this.log.info(`[session:${session.id}] Modus: ${session.mode}`);
+        return true;
+      }
+      session.mode = wanted;
       this.stopPlayback(session, "owner");
       this.stopPlayback(session, "peer");
       this.#startTranslators(session);
@@ -326,6 +345,7 @@ export class SessionStore {
     }
     this.stopPlayback(session, "owner");
     const clip = { live: "modeLive", seq: "modeSeq", direct: "modeDirect" }[session.mode];
+    this.onCue(session, "translator", { on: true, mode: session.mode });
     this.#play(session, "owner", clip);
     this.log.info(`[session:${session.id}] Modus: ${session.mode}`);
   }
@@ -370,8 +390,10 @@ export class SessionStore {
     const payload = this.clips?.get("peerNotice");
     clearTimeout(session.noticeTimer);
     if (!payload) return this.#ready(session); // Ansage lief schon per <Say> vor dem Stream
+    this.stopPlayback(session, "peer");
     this.#playback(session, "peer", payload);
     const ms = mulawMs(payload);
+    session.noticeUntil = Date.now() + ms;
     this.onCue(session, "notice", { ms });
     session.noticeTimer = setTimeout(() => this.#ready(session), ms + 200);
     session.noticeTimer.unref?.();
@@ -449,7 +471,7 @@ export class SessionStore {
       this.stopPlayback(session, "peer");
     }
     // Beide Seiten verbunden – für die App (Zeit läuft, Live-Text dieses Gesprächs beginnt)
-    this.onCue(session, "paired", { direction: session.direction });
+    this.onCue(session, "paired", { direction: session.direction, mode: session.mode });
     if (session.mode === "off") this.onCue(session, "translator", { on: false });
     else this.#startTranslators(session);
     if (session.direction === "outgoing") this.#playback(session, "owner", CONNECTED);

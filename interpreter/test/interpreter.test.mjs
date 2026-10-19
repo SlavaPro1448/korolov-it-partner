@@ -270,8 +270,13 @@ test("in-call keys: # skips playback, * switches mode, barge-in stops the transl
   // leise Rede während der Wiedergabe wird noch gedämpft
   store.media(session.tokens.owner, silence, now + 100);
   assert.deepEqual(made[0].sent.at(-1), silence);
-  // 5 laute Pakete hintereinander -> Dazwischenreden: Wiedergabe gestoppt, Rede geht durch
-  for (let i = 0; i < 5; i += 1) store.media(session.tokens.owner, loud, now + 200 + i * 20);
+  // kurzes "ага" (10 laute Pakete) bricht die Übersetzung NICHT ab
+  const clearsBeforeShort = ownerLeg.clears;
+  for (let i = 0; i < 10; i += 1) store.media(session.tokens.owner, loud, now + 150 + i * 2);
+  for (let i = 0; i < 10; i += 1) store.media(session.tokens.owner, silence, now + 175 + i * 2);
+  assert.equal(ownerLeg.clears, clearsBeforeShort, "short backchannel keeps the translation");
+  // eine echte Äußerung (30 laute Pakete) -> Dazwischenreden: Wiedergabe gestoppt, Rede geht durch
+  for (let i = 0; i < 30; i += 1) store.media(session.tokens.owner, loud, now + 200 + i * 20);
   assert.equal(ownerLeg.clears >= 1, true);
   assert.deepEqual(made[0].sent.at(-1), loud);
 

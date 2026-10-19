@@ -51,8 +51,20 @@ export function createClips({
 }) {
   const cache = new Map();
 
+  // Die Sprachausgabe hängt gelegentlich: je Versuch höchstens 15 s, bis zu drei Versuche
   async function synthesize(text) {
+    for (let attempt = 1; ; attempt += 1) {
+      try {
+        return await synthesizeOnce(text);
+      } catch (error) {
+        if (attempt >= 3) throw error;
+      }
+    }
+  }
+
+  async function synthesizeOnce(text) {
     const res = await fetchImpl("https://api.openai.com/v1/audio/speech", {
+      signal: AbortSignal.timeout(15000),
       method: "POST",
       headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
       body: JSON.stringify({ model, voice, input: text, response_format: "pcm" }),
@@ -67,6 +79,7 @@ export function createClips({
     // Alle Hinweise beim Start erzeugen; schlägt es fehl, bleibt der Fallback über <Say>
     async warmup() {
       for (const [key, text] of Object.entries(CLIP_TEXT)) {
+        if (cache.has(key)) continue; // bei Wiederholung nur fehlende erzeugen
         try {
           const clip = await synthesize(text);
           cache.set(key, clip);

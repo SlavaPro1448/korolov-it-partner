@@ -12,6 +12,7 @@ struct InCallView: View {
     var body: some View {
         VStack(spacing: 14) {
             header
+            if calls.phase == .connected { CallModeSwitch(fallback: calls.isIncoming ? .plain : calls.mode) }
             SpeakCue()
             if translationOn || !feed.turns.isEmpty {
                 LiveTranscript(placeholder: placeholder)
@@ -23,7 +24,7 @@ struct InCallView: View {
                 dtmfPad
             } else {
                 controls
-                if calls.phase == .connected { AssistButtons(translationOn: translationOn) }
+                if calls.phase == .connected { AssistButtons() }
             }
             endButton
         }
@@ -57,7 +58,7 @@ struct InCallView: View {
             TimelineView(.periodic(from: .now, by: 1)) { _ in
                 Text(statusText).font(.headline.monospacedDigit()).foregroundStyle(statusColor)
             }
-            Label((calls.isIncoming ? "Входящий · " : "") + (translationOn ? (calls.mode == .seq ? "По фразам" : "С переводом") : "Без перевода") + " · через интернет",
+            Label((calls.isIncoming ? "Входящий" : "Исходящий") + " · через интернет",
                   systemImage: calls.isIncoming ? "phone.arrow.down.left" : "wifi")
                 .font(.caption)
                 .foregroundStyle(.secondary)
@@ -67,6 +68,7 @@ struct InCallView: View {
 
     /// Перевод включён: по событиям сервера, а до них — по режиму, выбранному при звонке
     private var translationOn: Bool { feed.translatorOn ?? (calls.mode != .plain && !calls.isIncoming) }
+    // (режим переключается на CallModeSwitch; здесь — только показать ли ленту текста)
 
     private var placeholder: String {
         talkStartedAt == nil

@@ -9,6 +9,7 @@ import { createApiRoutes, createTwilioApi } from "./api.mjs";
 import { createVoiceToken } from "./voicetoken.mjs";
 import { LIVE_PAGE, createLiveFeed } from "./live.mjs";
 import { createSequentialTranslator } from "./sequential.mjs";
+import { createStreamingSequential } from "./streamseq.mjs";
 import { realtimeToTwilio, twilioToRealtime } from "./audio.mjs";
 import { SessionStore } from "./sessions.mjs";
 import { createClips } from "./clips.mjs";
@@ -102,12 +103,15 @@ export function buildServer(config, deps = {}) {
   const clips = deps.clips ?? createClips({ apiKey: config.openaiApiKey, log });
   const assist = deps.assist ?? createAssist({ apiKey: config.openaiApiKey });
   let clipsReady = false;
-  const warmup = clips.warmup().then((ok) => {
-    clipsReady = ok;
-    log.info(
-      `[clips] ${ok ? "Sprachhinweise bereit" : "Sprachhinweise unvollständig, Fallback über <Say>"}`,
-    );
-  });
+  // Fehlen Hinweise (Sprachausgabe gestört), alle 2 Minuten die fehlenden nachholen
+  const warmClips = () =>
+    clips.warmup().then((ok) => {
+      clipsReady = ok;
+      log.info(`[clips] ${ok ? "Sprachhinweise bereit" : "Sprachhinweise unvollständig, neuer Versuch in 2 min"}`);
+      if (!ok) setTimeout(warmClips, 120000).unref?.();
+      return ok;
+    });
+  const warmup = warmClips();
   const sessions = new SessionStore({
     onCue: (session, name, extra) => live.event(name, extra),
     // Warteschleife: erkannte Ansagen laufen als Text mit, damit man sieht, dass gewartet wird
@@ -159,7 +163,9 @@ export function buildServer(config, deps = {}) {
         const onTranscript = (dir, text) => live.publish(role, dir, text);
         if (options.mode === "seq") {
           // Der Satz-für-Satz-Übersetzer arbeitet mit PCM 24 kHz; Telefon liefert μ-law 8 kHz
-          const seq = createSequentialTranslator({
+          // Standard: Streaming-Erkennung (schneller); SEQ_ENGINE=batch = alter Weg (ganze Äußerung)
+          const seqFactory = process.env.SEQ_ENGINE === "batch" ? createSequentialTranslator : createStreamingSequential;
+          const seq = seqFactory({
             apiKey: config.openaiApiKey,
             sourceLanguage: options.sourceLanguage,
             targetLanguage: options.targetLanguage,
@@ -343,7 +349,8 @@ export function buildServer(config, deps = {}) {
       if (role === "peer") {
         // Ohne Übersetzung: keine KI-Ansage (die kommt erst beim Einschalten)
         if (session.mode === "off") return twiml.peerStreamFirst(config.wsUrl, session.tokens.peer);
-        return clipsReady
+        // KI-Hinweis genau einmal: als eigener Clip, wenn vorhanden, sonst per <Say> vor dem Stream
+        return clips.get("peerNotice")
           ? twiml.peerStreamFirst(config.wsUrl, session.tokens.peer)
           : twiml.peerStream(config.wsUrl, session.tokens.peer, TEXT.peerOutgoing);
       }

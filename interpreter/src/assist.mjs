@@ -17,6 +17,7 @@ export function createAssist({
 
   async function chat(system, user) {
     const res = await fetchImpl(`${OPENAI}/chat/completions`, {
+      signal: AbortSignal.timeout(10000),
       method: "POST",
       headers: { ...headers, "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -50,14 +51,22 @@ export function createAssist({
       ),
 
     async speak(text) {
-      const res = await fetchImpl(`${OPENAI}/audio/speech`, {
-        method: "POST",
-        headers: { ...headers, "Content-Type": "application/json" },
-        body: JSON.stringify({ model: ttsModel, voice, input: text, response_format: "pcm" }),
-      });
-      if (!res.ok) throw new Error(`TTS ${res.status}`);
-      const pcm = compressPauses(Buffer.from(await res.arrayBuffer()));
-      return realtimeToTwilio(pcm.toString("base64"));
+      // Hängt die Sprachausgabe, nach 8 s ein zweiter Versuch
+      for (let attempt = 1; ; attempt += 1) {
+        try {
+          const res = await fetchImpl(`${OPENAI}/audio/speech`, {
+            signal: AbortSignal.timeout(8000),
+            method: "POST",
+            headers: { ...headers, "Content-Type": "application/json" },
+            body: JSON.stringify({ model: ttsModel, voice, input: text, response_format: "pcm" }),
+          });
+          if (!res.ok) throw new Error(`TTS ${res.status}`);
+          const pcm = compressPauses(Buffer.from(await res.arrayBuffer()));
+          return realtimeToTwilio(pcm.toString("base64"));
+        } catch (error) {
+          if (attempt >= 2) throw error;
+        }
+      }
     },
 
     async transcribe(pcm24k) {
@@ -65,7 +74,12 @@ export function createAssist({
       form.append("file", new Blob([wav(pcm24k)], { type: "audio/wav" }), "hold.wav");
       form.append("model", sttModel);
       form.append("language", "de");
-      const res = await fetchImpl(`${OPENAI}/audio/transcriptions`, { method: "POST", headers, body: form });
+      const res = await fetchImpl(`${OPENAI}/audio/transcriptions`, {
+        method: "POST",
+        headers,
+        body: form,
+        signal: AbortSignal.timeout(10000),
+      });
       if (!res.ok) throw new Error(`STT ${res.status}`);
       return ((await res.json()).text ?? "").trim();
     },

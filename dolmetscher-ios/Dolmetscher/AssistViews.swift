@@ -7,16 +7,10 @@ struct AssistButtons: View {
     @EnvironmentObject private var feed: LiveFeed
     @State private var showSay = false
     @State private var busy = false
-    @State private var switching = false
     @State private var error: String?
-    /// Перевод сейчас включён (по событиям сервера; до них — как выбрано при звонке)
-    var translationOn: Bool
 
     var body: some View {
-        HStack(spacing: 22) {
-            AssistButton(icon: "translate", title: translationOn ? "Перевод вкл" : "Переводчик",
-                         on: translationOn, busy: switching) { toggleTranslation() }
-                .disabled(feed.waitingSince != nil)
+        HStack(spacing: 28) {
             AssistButton(icon: "text.bubble.fill", title: "Сказать", on: false) { showSay = true }
             AssistButton(icon: "hourglass", title: feed.waitingSince == nil ? "Ждать за меня" : "Хватит ждать",
                          on: feed.waitingSince != nil, busy: busy) { toggleWait() }
@@ -25,15 +19,6 @@ struct AssistButtons: View {
         .alert("Не получилось", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) {
             Button("OK", role: .cancel) {}
         } message: { Text(error ?? "") }
-    }
-
-    private func toggleTranslation() {
-        let on = !translationOn
-        switching = true
-        Task {
-            defer { switching = false }
-            do { _ = try await model.api.translate(on, phrases: model.mode == .seq) } catch { self.error = error.localizedDescription }
-        }
     }
 
     private func toggleWait() {
@@ -71,6 +56,46 @@ private struct AssistButton: View {
             }
         }
         .disabled(busy)
+    }
+}
+
+/// Режим перевода в разговоре — всегда виден и переключается сразу: синхронно, по фразам или выкл.
+/// Показывает то, что реально работает на сервере (события живого текста), а не выбор на клавиатуре.
+struct CallModeSwitch: View {
+    @EnvironmentObject private var model: AppModel
+    @EnvironmentObject private var feed: LiveFeed
+    /// Пока сервер не сообщил режим — что выбрали при звонке
+    var fallback: CallMode
+    @State private var busy = false
+    @State private var error: String?
+
+    private var current: CallMode {
+        guard let on = feed.translatorOn else { return fallback }
+        if !on { return .plain }
+        return feed.translatorMode == "seq" ? .seq : .translate
+    }
+
+    var body: some View {
+        VStack(spacing: 4) {
+            Picker("Режим перевода", selection: Binding(get: { current }, set: { change(to: $0) })) {
+                ForEach(CallMode.allCases) { Text($0.title).tag($0) }
+            }
+            .pickerStyle(.segmented)
+            .disabled(busy || feed.waitingSince != nil)
+            if let error { Text(error).font(.caption).foregroundStyle(.orange) }
+        }
+    }
+
+    private func change(to mode: CallMode) {
+        guard mode != current else { return }
+        busy = true
+        error = nil
+        Task {
+            defer { busy = false }
+            do { _ = try await model.api.translate(mode != .plain, phrases: mode == .seq) }
+            catch { self.error = error.localizedDescription }
+        }
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
     }
 }
 

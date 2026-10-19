@@ -29,6 +29,8 @@ final class LiveFeed: ObservableObject {
     @Published var pairedAt: Date?
     /// Переводчик включён в этом разговоре; nil — сервер ещё не сообщил
     @Published var translatorOn: Bool?
+    /// Какой перевод идёт: "live" (синхронно), "seq" (по фразам), "direct"
+    @Published var translatorMode: String?
 
     private var task: URLSessionWebSocketTask?
     private var wanted = false
@@ -112,7 +114,8 @@ final class LiveFeed: ObservableObject {
             // Новый разговор: всё с начала
             turns = []; state = .talking; noticeUntil = nil; readyAt = nil; waitingSince = nil; humanAt = nil
             pairedAt = message.at.map { Date(timeIntervalSince1970: $0 / 1000) } ?? Date()
-            translatorOn = nil
+            translatorOn = message.mode.map { $0 != "off" }
+            translatorMode = message.mode
             return
         case "start":
             state = .talking
@@ -121,6 +124,7 @@ final class LiveFeed: ObservableObject {
             return
         case "translator":
             translatorOn = message.on ?? false
+            if let mode = message.mode { translatorMode = mode }
             if message.on != true { noticeUntil = nil }
             return
         case "said":
@@ -249,7 +253,10 @@ struct LiveView: View {
                 SpeakCue().padding(.horizontal)
                 LiveTranscript(placeholder: placeholder)
                 // Звонок перезвоном на мобильный: помощь в разговоре — здесь
-                if feed.state == .talking { AssistButtons(translationOn: feed.translatorOn ?? true).padding(.bottom, 8) }
+                if feed.state == .talking {
+                    CallModeSwitch(fallback: .translate).padding(.horizontal)
+                    AssistButtons().padding(.bottom, 8)
+                }
             }
             .navigationTitle("Текст разговора")
             .navigationBarTitleDisplayMode(.inline)
